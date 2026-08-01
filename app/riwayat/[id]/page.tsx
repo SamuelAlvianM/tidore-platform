@@ -50,7 +50,7 @@ export default async function RiwayatDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative py-12 overflow-hidden" style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}>
+      <div className="relative py-12 overflow-hidden" style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}>
         <div className="container mx-auto px-4 relative z-10">
           <Link href="/riwayat" className="inline-flex items-center gap-2 text-primary-foreground/80 hover:text-white text-sm mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Kembali ke Riwayat
@@ -132,6 +132,8 @@ export default async function RiwayatDetailPage({ params }: { params: Promise<{ 
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <a
             href={`/api/permohonan/${item.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
             className={
               item.status === 'SELESAI'
                 ? 'inline-flex items-center gap-2 text-sm font-medium text-white px-5 py-2.5 rounded-xl shadow-md bg-success hover:bg-success/90'
@@ -144,7 +146,7 @@ export default async function RiwayatDetailPage({ params }: { params: Promise<{ 
           <Link
             href="/permohonan-online"
             className="inline-flex items-center gap-2 text-sm font-medium text-white px-5 py-2.5 rounded-xl shadow-md"
-            style={{ background: 'linear-gradient(90deg, #d97706, #fbbf24)' }}
+            style={{ background: 'linear-gradient(90deg, #d9b400, #F4CE14)' }}
           >
             <FileText className="w-4 h-4" />
             Ajukan Permohonan Baru

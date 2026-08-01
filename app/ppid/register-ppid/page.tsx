@@ -1,9 +1,9 @@
 import { PpidLayananHalaman } from '@/components/ppid/ppid-layanan-halaman';
 
 export const metadata = {
-  title: 'Register PPID — Disdukcapil Tana Tidung',
+  title: 'Register PPID — Disdukcapil Tidore Kepulauan',
   description:
-    'Register permintaan informasi publik dan register keberatan PPID Disdukcapil Kabupaten Tana Tidung.',
+    'Register permintaan informasi publik dan register keberatan PPID Disdukcapil Kota Tidore Kepulauan.',
 };
 
 // Menampilkan berkas PDF unggahan dashboard → dinamis.
@@ -13,7 +13,7 @@ export default function RegisterPpidPage() {
   return (
     <PpidLayananHalaman
       judul="Register PPID"
-      deskripsi="Buku register pencatatan permohonan informasi publik dan register keberatan yang masuk ke PPID Disdukcapil Kabupaten Tana Tidung."
+      deskripsi="Buku register pencatatan permohonan informasi publik dan register keberatan yang masuk ke PPID Disdukcapil Kota Tidore Kepulauan."
       duaKolom
       seksi={[
         {

@@ -12,7 +12,7 @@ import { siteConfig } from "@/lib/site-config";
  */
 
 const BASE = (siteConfig.url ?? "").replace(/\/$/, "");
-const NAMA = "SIDAKO"; // nama portal untuk pesan
+const NAMA = "DAGA"; // nama portal untuk pesan
 
 async function kirim(hp: string | null | undefined, pesan: string): Promise<boolean> {
   const target = normalisasiHp(hp ?? "");

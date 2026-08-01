@@ -740,7 +740,7 @@ export function DemografiEditor({
                    latar biru (senada hero beranda) + pengaturan ikon ── */}
             <div
               className="relative flex flex-wrap items-center gap-x-6 gap-y-4 overflow-hidden rounded-2xl px-5 py-4 text-white shadow-md"
-              style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}
+              style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}
             >
               <div
                 className="pointer-events-none absolute inset-0 opacity-10"

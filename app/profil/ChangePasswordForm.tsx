@@ -51,7 +51,7 @@ export function ChangePasswordForm() {
       <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-200/60">
         <div
           className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)' }}
+          style={{ background: 'linear-gradient(135deg, #495E57, #3a4b45)' }}
         >
           <KeyRound className="h-5 w-5" />
         </div>
@@ -100,7 +100,7 @@ export function ChangePasswordForm() {
             type="submit"
             disabled={saving}
             className="text-white"
-            style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)' }}
+            style={{ background: 'linear-gradient(135deg, #495E57, #3a4b45)' }}
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
             <span className="ml-1.5">Ubah Password</span>

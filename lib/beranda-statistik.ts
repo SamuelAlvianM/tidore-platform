@@ -39,6 +39,8 @@ export const WARNA_PRESET: Record<string, { accentBg: string; accent: string; la
   emerald: { accentBg: "bg-gradient-to-br from-emerald-400 to-emerald-600", accent: "text-emerald-600", label: "Hijau" },
   violet: { accentBg: "bg-gradient-to-br from-violet-400 to-violet-600", accent: "text-violet-600", label: "Ungu" },
   slate: { accentBg: "bg-gradient-to-br from-slate-500 to-slate-700", accent: "text-slate-600", label: "Abu" },
+  tealtua: { accentBg: "bg-gradient-to-br from-[#5c766d] to-[#3a4b45]", accent: "text-[#3a4b45]", label: "Teal" },
+  arang: { accentBg: "bg-gradient-to-br from-[#63666b] to-[#45474B]", accent: "text-[#45474B]", label: "Arang" },
 };
 
 export const WARNA_DEFAULT = "biru";
@@ -60,9 +62,9 @@ export const labelKolom = (k: string) => KOLOM_LABEL[k] ?? k;
 /** Susunan kartu bawaan — sama dengan tampilan lama sebelum bisa diatur. */
 export const DEFAULT_KARTU: KartuStatistik[] = [
   { title: "Jumlah Penduduk", icon: "Users", kategori: "jenis-kelamin", kolom: "JML", warna: "biru" },
-  { title: "Kepala Keluarga", icon: "Home", kategori: "kk", kolom: "KK_JML", warna: "amber" },
+  { title: "Kepala Keluarga", icon: "Home", kategori: "kk", kolom: "KK_JML", warna: "tealtua" },
   { title: "Laki-laki", icon: "User", kategori: "jenis-kelamin", kolom: "L", warna: "sky", badgeKolom: "JML" },
-  { title: "Perempuan", icon: "UserCircle", kategori: "jenis-kelamin", kolom: "P", warna: "rose", badgeKolom: "JML" },
+  { title: "Perempuan", icon: "UserCircle", kategori: "jenis-kelamin", kolom: "P", warna: "arang", badgeKolom: "JML" },
   { title: "Wajib KTP", icon: "IdCard", kategori: "wajib-ktp", kolom: "JML", warna: "teal" },
   { title: "Sudah Rekam KTP-el", icon: "ScanLine", kategori: "wajib-ktp", kolom: "JML_WKTP", warna: "emerald", badgeKolom: "JML" },
 ];

@@ -4,13 +4,12 @@ export interface Relasi {
   href: string;
 }
 
+// Relasi Terkait — mengikuti portal Tidore lama (5 relasi resmi, dari
+// resources/views/society/start.blade.php). Domain Tidore = KOTA → tidorekota.go.id.
 export const relasiTerkait: Relasi[] = [
-  { nama: 'Dinas Kependudukan dan Pencatatan Sipil', logo: '/LOGO-dinas_sidako.png', href: 'https://tanatidungkab.go.id' },
-  { nama: 'Kementerian Dalam Negeri', logo: '/relasi/kemendagri.png', href: 'https://kemendagri.go.id' },
-  { nama: 'LPSE Tana Tidung', logo: '/relasi/lpse.png', href: 'https://lpse.tanatidungkab.go.id' },
-  { nama: 'LAPOR!', logo: '/relasi/lapor.png', href: 'https://www.lapor.go.id' },
+  { nama: 'Dinas Kependudukan dan Pencatatan Sipil', logo: '/LOGO-dinas_tidore.png', href: 'https://tidorekota.go.id' },
+  { nama: 'Kementerian Dalam Negeri', logo: '/relasi/kemendagri.png', href: 'https://dukcapil.kemendagri.go.id' },
+  { nama: 'LPSE Kota Tidore Kepulauan', logo: '/relasi/lpse.png', href: 'https://lpse.tidorekota.go.id' },
   { nama: 'Ombudsman RI', logo: '/relasi/ombudsman.jpg', href: 'https://ombudsman.go.id' },
-  { nama: 'KemenPAN-RB', logo: '/relasi/panrb.png', href: 'https://menpan.go.id' },
-  { nama: 'Kota Tanpa Kumuh', logo: '/relasi/kotaku.png', href: 'https://kotaku.pu.go.id' },
-  { nama: 'SIAPP', logo: '/relasi/siapp.svg', href: '#' },
+  { nama: 'KemenPAN-RB', logo: '/relasi/panrb.png', href: 'https://sippn.menpan.go.id' },
 ];

@@ -315,7 +315,7 @@ export default async function DashboardPage() {
             ) : (
               <ProgressPermohonanChart
                 data={[
-                  { label: 'Menunggu', value: statusCount('MENUNGGU'), color: '#fbbf24' },
+                  { label: 'Menunggu', value: statusCount('MENUNGGU'), color: '#F4CE14' },
                   { label: 'Diproses', value: statusCount('DIPROSES'), color: '#0ea5e9' },
                   { label: 'Selesai', value: statusCount('SELESAI'), color: '#10b981' },
                   { label: 'Ditolak', value: statusCount('DITOLAK'), color: '#f43f5e' },

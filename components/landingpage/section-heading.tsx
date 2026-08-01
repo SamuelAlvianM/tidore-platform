@@ -2,11 +2,11 @@
 export function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-center gap-3 mb-8">
-      <span className="h-[3px] w-8 rounded-full" style={{ background: '#1b4b72' }} />
+      <span className="h-[3px] w-8 rounded-full" style={{ background: '#495E57' }} />
       <h2 className="text-lg md:text-xl font-bold uppercase tracking-wider text-slate-800 text-center">
         {children}
       </h2>
-      <span className="h-[3px] w-8 rounded-full" style={{ background: '#1b4b72' }} />
+      <span className="h-[3px] w-8 rounded-full" style={{ background: '#495E57' }} />
     </div>
   );
 }

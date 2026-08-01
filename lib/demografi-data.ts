@@ -13,7 +13,7 @@ export interface DemografiDataset {
 export const demografiData: Record<string, DemografiDataset> = {
   agama: {
     title: 'Statistik Penduduk Berdasarkan Agama',
-    description: 'Distribusi jumlah penduduk Kabupaten Tana Tidung menurut agama yang dianut.',
+    description: 'Distribusi jumlah penduduk Kota Tidore Kepulauan menurut agama yang dianut.',
     unit: 'jiwa',
     items: [
       { label: 'Islam', value: 24650 },
@@ -47,7 +47,7 @@ export const demografiData: Record<string, DemografiDataset> = {
   },
   'kepala-keluarga': {
     title: 'Statistik Kepala Keluarga',
-    description: 'Jumlah kepala keluarga per kecamatan di Kabupaten Tana Tidung.',
+    description: 'Jumlah kepala keluarga per kecamatan di Kota Tidore Kepulauan.',
     unit: 'KK',
     items: [
       { label: 'Sesayap', value: 2850 },

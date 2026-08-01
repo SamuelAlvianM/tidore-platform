@@ -8,7 +8,7 @@ import { statsKunjungan, tanggalHariIni } from "@/lib/kunjungan";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const VID_COOKIE = "sidako_vid";
+const VID_COOKIE = "tidore_vid";
 
 /**
  * Jendela satu "kunjungan" (sesi). Selama pengunjung masih aktif dalam rentang

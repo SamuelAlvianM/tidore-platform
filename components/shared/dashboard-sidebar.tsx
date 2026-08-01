@@ -127,7 +127,7 @@ function mobileMainForLevel(level: number): MenuItem[] {
   return MOBILE_MAIN.filter((m) => !ADMIN_ONLY_HREFS.has(m.href));
 }
 
-const COLLAPSE_KEY = 'sidako-dash-collapsed';
+const COLLAPSE_KEY = 'tidore-dash-collapsed';
 
 /**
  * Label sidebar yang memudar & meluncur saat diciutkan.
@@ -276,10 +276,10 @@ function DesktopSidebar() {
           )}
         >
           <div className="relative h-8 w-8 flex-shrink-0">
-            <Image src="/LOGO-dinas_sidako.png" alt="Logo SIDAKO" fill className="object-contain" />
+            <Image src="/LOGO-dinas_tidore.png" alt="Logo DAGA" fill className="object-contain" />
           </div>
           <LabelSidebar collapsed={collapsed}>
-            <p className="truncate text-sm font-bold leading-tight text-slate-900">SIDAKO</p>
+            <p className="truncate text-sm font-bold leading-tight text-slate-900">DAGA</p>
             <p className="truncate text-[0.68rem] leading-tight text-slate-500">
               Dashboard Petugas
             </p>
@@ -327,7 +327,7 @@ function DesktopSidebar() {
                     active ? 'text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100',
                     collapsed && 'justify-center gap-0 px-0',
                   )}
-                  style={active ? { background: '#d97706' } : undefined}
+                  style={active ? { background: '#d9b400' } : undefined}
                 >
                   <m.icon className="h-4 w-4 flex-shrink-0" />
                   <LabelSidebar collapsed={collapsed}>{m.label}</LabelSidebar>
@@ -392,14 +392,14 @@ function MobileTopBar() {
   return (
     <header
       className="sticky top-0 z-40 flex items-center justify-between gap-3 px-4 py-2.5 shadow-md shadow-amber-900/10 lg:hidden"
-      style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}
     >
       <Link href="/" title="Kembali ke Beranda" className="flex min-w-0 items-center gap-2.5">
         <div className="relative h-8 w-8 flex-shrink-0">
-          <Image src="/LOGO-dinas_sidako.png" alt="Logo SIDAKO" fill className="object-contain" />
+          <Image src="/LOGO-dinas_tidore.png" alt="Logo DAGA" fill className="object-contain" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold leading-tight text-white">SIDAKO</p>
+          <p className="truncate text-sm font-bold leading-tight text-white">DAGA</p>
           <p className="truncate text-[0.68rem] leading-tight text-white/70">{displayName}</p>
         </div>
       </Link>

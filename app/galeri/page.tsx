@@ -32,7 +32,7 @@ export default function GaleriPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative py-16 overflow-hidden" style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}>
+      <div className="relative py-16 overflow-hidden" style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center gap-4">
@@ -41,7 +41,7 @@ export default function GaleriPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Galeri</h1>
-              <p className="text-primary-foreground/80 mt-1">Dokumentasi kegiatan Disdukcapil Kabupaten Tana Tidung</p>
+              <p className="text-primary-foreground/80 mt-1">Dokumentasi kegiatan Disdukcapil Kota Tidore Kepulauan</p>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function GaleriPage() {
                     ? 'text-white shadow-md'
                     : 'bg-white/60 text-slate-600 border border-slate-200 hover:border-primary/40'
                 }`}
-                style={filter === cat ? { background: 'linear-gradient(90deg, #2e6da4, #1b4b72)' } : {}}
+                style={filter === cat ? { background: 'linear-gradient(90deg, #5c766d, #3a4b45)' } : {}}
               >
                 {cat}
               </button>

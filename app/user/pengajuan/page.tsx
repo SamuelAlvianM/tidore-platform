@@ -19,7 +19,7 @@ export default async function UserPengajuanPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative py-12 overflow-hidden" style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}>
+      <div className="relative py-12 overflow-hidden" style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="container mx-auto px-4 md:px-8 lg:px-16 relative z-10 max-w-4xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
@@ -42,7 +42,7 @@ export default async function UserPengajuanPage() {
             <div className="flex gap-2 shrink-0">
               <Link
                 href="/user/pengajuan/baru"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#1b4b72] shadow-lg hover:bg-slate-100 transition-colors"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#3a4b45] shadow-lg hover:bg-slate-100 transition-colors"
               >
                 <FilePlus2 className="w-4 h-4" />
                 Ajukan Permohonan

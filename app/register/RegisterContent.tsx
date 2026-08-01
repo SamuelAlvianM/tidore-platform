@@ -40,7 +40,7 @@ interface Kecamatan {
   nama: string;
 }
 
-/** Nama daerah ber-huruf-kapital tiap kata (mis. "tana tidung" → "Tana Tidung"). */
+/** Nama daerah ber-huruf-kapital tiap kata (mis. "tidore kepulauan" → "Tidore Kepulauan"). */
 const namaWilayah = siteConfig.namaFull.replace(/\b\w/g, (c) => c.toUpperCase());
 
 /** Kotak satu bagian formulir (Informasi Personal / Akun / Foto). */
@@ -462,8 +462,8 @@ export default function RegisterPage() {
               <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl opacity-40" />
               <div className="relative p-1">
                 <Image
-                  src="/LOGO-dinas_sidako.png"
-                  alt="Logo Dinas SIDAKO"
+                  src="/LOGO-dinas_tidore.png"
+                  alt="Logo Dinas DAGA"
                   width={60}
                   height={60}
                   className="object-contain drop-shadow-lg"

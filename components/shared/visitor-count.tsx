@@ -34,7 +34,7 @@ export function VisitorCount() {
 
   return (
     <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-      <Users className="h-3.5 w-3.5 text-yellow-400" />
+      <Users className="h-3.5 w-3.5 text-[#F4CE14]" />
       <span>
         Total pengunjung:{' '}
         <span className="font-semibold text-slate-300">{fmt(stats.total)}</span>

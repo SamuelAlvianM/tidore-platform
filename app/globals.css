@@ -56,59 +56,60 @@
 :root {
   --radius: 0.75rem;
 
-  /* Brand colours — SIDAKO: kuning keemasan dominan, navy tua sebagai kontras */
-  --brand-blue:        #1b4b72;
-  --brand-blue-dark:   #12395e;
-  --brand-blue-light:  #2e6da4;
-  --brand-yellow:      #f59e0b;
-  --brand-yellow-dark: #b45309;
+  /* Brand palette — DAGA (baru): abu terang #F5F7F8 + charcoal #45474B
+     + kuning aksen #F4CE14 + teal secondary #495E57. Kuning hanya highlight. */
+  --brand-blue:        #495E57;   /* di-repurpose → teal secondary */
+  --brand-blue-dark:   #3a4b45;
+  --brand-blue-light:  #5c766d;
+  --brand-yellow:      #F4CE14;
+  --brand-yellow-dark: #d9b400;
 
   /* Glass effect helpers */
-  --glass-bg:          rgba(255, 253, 245, 0.6);
-  --glass-border:      rgba(255, 255, 255, 0.4);
-  --glass-shadow:      0 8px 32px rgba(217, 119, 6, 0.14);
+  --glass-bg:          rgba(255, 255, 255, 0.85);
+  --glass-border:      rgba(255, 255, 255, 0.5);
+  --glass-shadow:      0 8px 32px rgba(69, 71, 75, 0.10);
 
-  --background: oklch(0.98 0.012 90);
-  --foreground: oklch(0.16 0.02 255);
-  --card: oklch(1 0 0 / 0.8);
-  --card-foreground: oklch(0.16 0.02 255);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.02 255);
-  /* primary = brand golden amber */
-  --primary: oklch(0.63 0.15 55);
-  --primary-foreground: oklch(0.99 0.01 90);
-  /* secondary = soft amber-tinted cream */
-  --secondary: oklch(0.95 0.03 90);
-  --secondary-foreground: oklch(0.32 0.06 250);
-  --muted: oklch(0.95 0.02 90);
-  --muted-foreground: oklch(0.5 0.03 250);
-  /* accent = navy tua (biru ketuaan) */
-  --accent: oklch(0.93 0.025 250);
-  --accent-foreground: oklch(0.32 0.07 250);
+  --background: #F5F7F8;
+  --foreground: #45474B;
+  --card: #ffffff;
+  --card-foreground: #45474B;
+  --popover: #ffffff;
+  --popover-foreground: #45474B;
+  /* primary = teal #495E57 (terbaca sbg teks & tombol; teks putih di atasnya) */
+  --primary: #495E57;
+  --primary-foreground: #ffffff;
+  /* secondary = abu lembut */
+  --secondary: #e9edef;
+  --secondary-foreground: #45474B;
+  --muted: #eceff1;
+  --muted-foreground: #6f7378;
+  /* accent = kuning #F4CE14 (highlight; teks charcoal di atasnya) */
+  --accent: #F4CE14;
+  --accent-foreground: #45474B;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.025 90);
-  --input: oklch(0.93 0.02 90);
-  --ring: oklch(0.7 0.15 70);
+  --border: #e2e6e9;
+  --input: #e2e6e9;
+  --ring: #495E57;
   /* status colours — kept in the same blue-forward palette so pages don't clash */
   --success: oklch(0.55 0.13 155);
   --success-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.72 0.15 70);
-  --warning-foreground: oklch(0.2 0.03 70);
+  --warning: #F4CE14;
+  --warning-foreground: #45474B;
   --info: var(--primary);
   --info-foreground: var(--primary-foreground);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --chart-1: #495E57;
+  --chart-2: #F4CE14;
+  --chart-3: #45474B;
+  --chart-4: #7c9a8f;
+  --chart-5: #d9b400;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #45474B;
+  --sidebar-primary: #495E57;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eceff1;
+  --sidebar-accent-foreground: #45474B;
+  --sidebar-border: #e2e6e9;
+  --sidebar-ring: #495E57;
 
   /* Carousel fonts – actual values are injected by layout.tsx via className;
      these are safe fallbacks in case that hasn't fired yet. */
@@ -163,8 +164,8 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(ellipse at 10% 0%, rgba(245,158,11,0.10) 0%, transparent 55%),
-      radial-gradient(ellipse at 90% 100%, rgba(27,75,114,0.08) 0%, transparent 55%);
+      radial-gradient(ellipse at 10% 0%, rgba(234,179,8,0.09) 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 100%, rgba(255,204,0,0.06) 0%, transparent 55%);
     min-height: 100vh;
   }
 }
@@ -181,18 +182,24 @@
 }
 
 .glass-card-blue {
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(73, 94, 87, 0.06);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(252, 211, 77, 0.35);
-  box-shadow: 0 8px 32px rgba(217, 119, 6, 0.10);
+  border: 1px solid rgba(73, 94, 87, 0.22);
+  box-shadow: 0 8px 32px rgba(69, 71, 75, 0.08);
 }
 
 .glass-nav {
-  background: linear-gradient(180deg, rgba(250, 176, 20, 0.82) 0%, rgba(217, 119, 6, 0.78) 100%);
-  backdrop-filter: blur(22px) saturate(200%);
-  -webkit-backdrop-filter: blur(22px) saturate(200%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  /* Putih/#F5F7F8 dominan, frosted 3D-glass. Aksen: garis kuning tipis di bawah,
+     kilau dalam, bayang lembut charcoal → bar seolah melayang. */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(245, 247, 248, 0.70) 100%);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(73, 94, 87, 0.16);
+  box-shadow:
+    0 10px 30px -6px rgba(69, 71, 75, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -2px 0 rgba(244, 206, 20, 0.55);
 }
 
 /* ==========================================================================
@@ -368,11 +375,11 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #f59e0b, #b45309);
+  background: linear-gradient(135deg, #495E57, #3a4b45);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.45);
+  box-shadow: 0 4px 14px rgba(73, 94, 87, 0.45);
   z-index: 2;
 }
 .office-marker__pulse {
@@ -383,7 +390,7 @@
   height: 34px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  background: rgba(245, 158, 11, 0.5);
+  background: rgba(234, 179, 8, 0.5);
   animation: office-pulse 2s ease-out infinite;
 }
 @keyframes office-pulse {
@@ -422,7 +429,7 @@ html.a11y-underline a {
   text-underline-offset: 3px;
   text-decoration-thickness: 2px !important;
   background-color: rgba(250, 204, 21, 0.3);
-  outline: 1px solid rgba(180, 83, 9, 0.45);
+  outline: 1px solid rgba(161, 98, 7, 0.45);
   outline-offset: 1px;
 }
 
@@ -463,9 +470,9 @@ html.a11y-cursor * {
 
 /* Sorotan blok teks yang sedang dibacakan (mode "Baca Saat Diarahkan") */
 .a11y-tts-hover {
-  outline: 2px solid #d97706 !important;
+  outline: 2px solid #d9b400 !important;
   outline-offset: 2px;
-  background-color: rgba(245, 158, 11, 0.12) !important;
+  background-color: rgba(244, 206, 20, 0.15) !important;
   border-radius: 4px;
 }
 
@@ -476,8 +483,8 @@ html.a11y-cursor * {
   right: 0;
   top: 50%;
   height: 4px;
-  background: #f59e0b;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+  background: #F4CE14;
+  box-shadow: 0 0 0 2px rgba(244, 206, 20, 0.25);
   z-index: 68;
   pointer-events: none;
 }
@@ -506,7 +513,7 @@ html.a11y-no-motion *::after {
 
 /* Fokus keyboard yang selalu jelas (navigasi tanpa mouse) */
 :focus-visible {
-  outline: 3px solid #d97706 !important;
+  outline: 3px solid #495E57 !important;
   outline-offset: 2px;
 }
 
@@ -516,7 +523,7 @@ html.a11y-no-motion *::after {
   top: -100px;
   left: 16px;
   z-index: 100;
-  background: #1b4b72;
+  background: #3a4b45;
   color: #fff;
   padding: 10px 16px;
   border-radius: 8px;

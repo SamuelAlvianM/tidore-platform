@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   if (fonnteAktif()) {
     const terkirim = await kirimWa(
       hp,
-      `*${kode}* adalah kode verifikasi pendaftaran akun SIDAKO Disdukcapil Tana Tidung Anda. Kode berlaku 5 menit. JANGAN berikan kode ini kepada siapa pun.`,
+      `*${kode}* adalah kode verifikasi pendaftaran akun DAGA Disdukcapil Tidore Kepulauan Anda. Kode berlaku 5 menit. JANGAN berikan kode ini kepada siapa pun.`,
     );
     if (!terkirim) {
       return fail(["Gagal mengirim OTP WhatsApp. Periksa nomor atau coba lagi."], 502);

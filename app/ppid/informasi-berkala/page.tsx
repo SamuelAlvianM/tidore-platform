@@ -3,7 +3,7 @@ import { PPID_BERKALA, INFORMASI_PUBLIK_TABS } from '@/lib/ppid-informasi';
 import { PpidSubnav } from '@/components/ppid/ppid-subnav';
 
 export const metadata = {
-  title: 'Informasi Wajib Diumumkan Secara Berkala — PPID Disdukcapil Tana Tidung',
+  title: 'Informasi Wajib Diumumkan Secara Berkala — PPID Disdukcapil Tidore Kepulauan',
   description: PPID_BERKALA.deskripsi,
 };
 

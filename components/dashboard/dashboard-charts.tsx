@@ -150,7 +150,7 @@ export function TrenBulananChart({ data }: { data: TitikLabel[] }) {
         // Bulan terakhir (berjalan) pakai warna lebih pekat.
         data: data.map((d, i) => ({
           y: d.count,
-          color: i === data.length - 1 ? '#b45309' : '#f59e0b',
+          color: i === data.length - 1 ? '#3a4b45' : '#495E57',
         })),
       },
     ],
@@ -191,7 +191,7 @@ export function LayananPopulerChart({ data }: { data: Layanan[] }) {
     plotOptions: {
       bar: {
         borderRadius: 4,
-        color: '#d97706',
+        color: '#d9b400',
         dataLabels: {
           enabled: true,
           style: { fontSize: '11px', fontWeight: '700', color: '#334155', textOutline: 'none' },
@@ -229,7 +229,7 @@ export function PermohonanHarianChart({
         step: 5,
         style: { color: '#94a3b8', fontSize: '10px' },
       },
-      crosshair: { color: '#f59e0b', dashStyle: 'Dash', width: 1 },
+      crosshair: { color: '#495E57', dashStyle: 'Dash', width: 1 },
     },
     yAxis: {
       title: { text: undefined },
@@ -239,14 +239,14 @@ export function PermohonanHarianChart({
       plotLines: [
         {
           value: rataRata,
-          color: '#f59e0b',
+          color: '#495E57',
           dashStyle: 'Dash',
           width: 1,
           zIndex: 3,
           label: {
             text: `rata² ${rataRata.toFixed(1)}`,
             align: 'right',
-            style: { color: '#d97706', fontSize: '10px', fontWeight: '600' },
+            style: { color: '#d9b400', fontSize: '10px', fontWeight: '600' },
           },
         },
       ],
@@ -258,13 +258,13 @@ export function PermohonanHarianChart({
     },
     plotOptions: {
       areaspline: {
-        color: '#d97706',
+        color: '#d9b400',
         lineWidth: 2.25,
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
-            [0, 'rgba(217,119,6,0.28)'],
-            [1, 'rgba(217,119,6,0)'],
+            [0, 'rgba(202,138,4,0.28)'],
+            [1, 'rgba(202,138,4,0)'],
           ],
         },
         marker: { enabled: false, symbol: 'circle', radius: 3 },

@@ -48,7 +48,7 @@ export function ProdukDisdukcapilView() {
               </h1>
               <p className="text-sm text-slate-500 mt-1 max-w-2xl">
                 Produk layanan Pencatatan Sipil (Capil) dan Pendaftaran Penduduk
-                (Dafduk) Disdukcapil Kabupaten Tana Tidung.
+                (Dafduk) Disdukcapil Kota Tidore Kepulauan.
               </p>
             </div>
           </motion.div>

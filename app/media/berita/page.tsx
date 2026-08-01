@@ -58,7 +58,7 @@ export default function BeritaListPage() {
       {/* Hero header brand */}
       <div
         className="relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #92400e 0%, #b45309 55%, #f59e0b 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #2f3d38 0%, #3a4b45 55%, #495E57 100%)' }}
       >
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -77,7 +77,7 @@ export default function BeritaListPage() {
                 Berita &amp; Informasi
               </h1>
               <p className="text-sm text-white/75 mt-1 max-w-xl">
-                Kabar dan informasi terkini seputar layanan Disdukcapil Kabupaten Tana Tidung.
+                Kabar dan informasi terkini seputar layanan Disdukcapil Kota Tidore Kepulauan.
               </p>
             </div>
           </div>

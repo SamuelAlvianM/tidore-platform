@@ -48,7 +48,7 @@ async function main() {
       password: adminPass,
       userlevelId: 1,
       userFullname: "Administrator",
-      userEmail: "admin@sidako.local",
+      userEmail: "admin@daga.local",
       status: 1,
       activationTime: new Date(),
     },
@@ -80,7 +80,7 @@ async function main() {
     });
   }
 
-  // Wilayah — seluruh kecamatan Kabupaten Tana Tidung (Kalimantan Utara).
+  // Wilayah — seluruh kecamatan Kota Tidore Kepulauan (Maluku Utara).
   // Kode mengikuti Kemendagri (65.04.xx). Upsert → idempoten & aman diulang.
   const KECAMATAN_KTT: { kode: string; nama: string }[] = [
     { kode: "6504010", nama: "Sesayap" },
@@ -120,7 +120,7 @@ async function main() {
       slug: "pelayanan-adminduk-online",
       kategori: "Pengumuman",
       ringkasan: "Warga dapat mengajukan permohonan dokumen kependudukan secara daring.",
-      konten: "<p>Disdukcapil Tana Tidung meluncurkan layanan SIDAKO...</p>",
+      konten: "<p>Disdukcapil Tidore Kepulauan meluncurkan layanan DAGA...</p>",
       penulis: "Admin",
       publish: true,
     },

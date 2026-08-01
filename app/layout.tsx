@@ -32,22 +32,22 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3300",
   ),
-  title: "SIDAKO - Disdukcapil Tana Tidung",
+  title: "DAGA - Disdukcapil Tidore Kepulauan",
   description:
-    "SIDAKO — Portal layanan administrasi kependudukan & pencatatan sipil Disdukcapil Kabupaten Tana Tidung.",
+    "DAGA — Portal layanan administrasi kependudukan & pencatatan sipil Disdukcapil Kota Tidore Kepulauan.",
   openGraph: {
-    title: "SIDAKO - Disdukcapil Tana Tidung",
+    title: "DAGA - Disdukcapil Tidore Kepulauan",
     description:
-      "SIDAKO — Portal layanan administrasi kependudukan & pencatatan sipil Disdukcapil Kabupaten Tana Tidung.",
-    siteName: "Portal SIDAKO",
+      "DAGA — Portal layanan administrasi kependudukan & pencatatan sipil Disdukcapil Kota Tidore Kepulauan.",
+    siteName: "Portal DAGA",
     locale: "id_ID",
     type: "website",
-    images: [{ url: "/og-sidako.png", width: 1200, height: 630, alt: "Logo Disdukcapil Kabupaten Tana Tidung" }],
+    images: [{ url: "/og-tidore.png", width: 1200, height: 630, alt: "Logo Disdukcapil Kota Tidore Kepulauan" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SIDAKO - Disdukcapil Tana Tidung",
-    images: ["/og-sidako.png"],
+    title: "DAGA - Disdukcapil Tidore Kepulauan",
+    images: ["/og-tidore.png"],
   },
 };
 

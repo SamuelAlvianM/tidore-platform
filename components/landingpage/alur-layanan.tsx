@@ -62,10 +62,10 @@ export default function AlurLayanan() {
               className="relative bg-white rounded-2xl border border-slate-200/70 p-6 text-center shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >
               <div className="relative inline-flex">
-                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#b45309] to-[#f59e0b] text-white shadow-lg shadow-amber-900/20">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#3a4b45] to-[#495E57] text-white shadow-lg shadow-[#45474B]/20">
                   <step.icon className="h-7 w-7" />
                 </div>
-                <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-[#1b4b72] text-amber-300 text-xs font-bold shadow">
+                <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-[#F4CE14] text-[#45474B] text-xs font-bold shadow">
                   {i + 1}
                 </span>
               </div>
@@ -84,7 +84,7 @@ export default function AlurLayanan() {
         >
           <Link
             href="/permohonan-online"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#b45309] to-[#f59e0b] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 hover:opacity-90 hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F4CE14] px-6 py-3 text-sm font-semibold text-[#45474B] shadow-lg shadow-[#45474B]/15 hover:brightness-95 hover:-translate-y-0.5 transition-all"
           >
             Mulai Ajukan Permohonan
             <ArrowRight className="h-4 w-4" />

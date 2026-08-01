@@ -26,6 +26,28 @@ import { cn } from '@/lib/utils';
 import { ICON_MAP, ICON_NAMES } from '@/lib/icon-map';
 import type { StaticField } from '@/lib/static-content-registry';
 
+/**
+ * Petunjuk pengisian di bawah sebuah field (`catatan` di registry).
+ * Dipakai SEMUA tipe field — dulu hanya `image` yang merendernya, sehingga
+ * catatan pada field teks (mis. tautan formulir survei) tidak pernah terlihat.
+ * Baris kosong pada catatan dipertahankan sebagai paragraf terpisah supaya
+ * petunjuk berlangkah tetap terbaca.
+ */
+function CatatanField({ teks }: { teks?: string }) {
+  if (!teks) return null;
+  const paragraf = teks.split('\n').filter((b) => b.trim());
+  return (
+    <div className="flex items-start gap-1.5 rounded-lg bg-slate-50 px-2.5 py-2 text-xs leading-relaxed text-slate-500">
+      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
+      <div className="space-y-1">
+        {paragraf.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Satu field form sesuai tipe di registry konten statis.
  *  Dipakai bersama oleh editor dashboard dan editor inline (mode edit). */
 export function FieldEditor({
@@ -46,6 +68,7 @@ export function FieldEditor({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
         />
+        <CatatanField teks={field.catatan} />
       </div>
     );
   }
@@ -60,6 +83,7 @@ export function FieldEditor({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
         />
+        <CatatanField teks={field.catatan} />
       </div>
     );
   }
@@ -123,9 +147,7 @@ export function FieldEditor({
           className={cn('w-full', field.aspect ? '' : 'aspect-video')}
           style={field.aspect ? { aspectRatio: String(field.aspect) } : undefined}
         />
-        {field.catatan && (
-          <p className="text-xs text-slate-500">{field.catatan}</p>
-        )}
+        <CatatanField teks={field.catatan} />
       </div>
     );
   }

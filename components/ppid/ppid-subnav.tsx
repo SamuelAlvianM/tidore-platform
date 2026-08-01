@@ -47,7 +47,7 @@ export function PpidSubnav({
               {isActive && (
                 <motion.span
                   layoutId={`${layoutId}-bg`}
-                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#b45309] shadow-md shadow-primary/40 ring-1 ring-white/20"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#495E57] to-[#3a4b45] shadow-md shadow-primary/40 ring-1 ring-white/20"
                   transition={{ type: 'spring', stiffness: 320, damping: 30 }}
                 />
               )}

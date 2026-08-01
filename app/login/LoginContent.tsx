@@ -144,27 +144,27 @@ export default function LoginPage() {
     >
       {/* Subtle background accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(217,119,6,0.12)' }} />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(217,119,6,0.08)' }} />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(202,138,4,0.12)' }} />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(202,138,4,0.08)' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl" style={{ background: 'rgba(255,237,74,0.05)' }} />
       </div>
 
       <Card
-        className={`w-full max-w-[420px] relative z-10 transition-all duration-700 border-0 shadow-[0_8px_40px_rgba(217,119,6,0.18)] overflow-hidden ${
+        className={`w-full max-w-[420px] relative z-10 transition-all duration-700 border-0 shadow-[0_8px_40px_rgba(202,138,4,0.18)] overflow-hidden ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
         style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)' }}
       >
         {/* Top accent — biru dengan glow ke bawah */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{ background: '#d97706', boxShadow: '0 2px 12px 0 rgba(217,119,6,0.45)' }} />
+        <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{ background: '#d9b400', boxShadow: '0 2px 12px 0 rgba(202,138,4,0.45)' }} />
         
         <CardHeader className="pt-8 pb-5 px-8 text-center space-y-3">
           {/* Logo */}
           <div className="flex justify-center">
             <div className="relative w-16 h-16 drop-shadow-md">
               <Image
-                src="/LOGO-dinas_sidako.png"
-                alt="Logo Disdukcapil Tana Tidung"
+                src="/LOGO-dinas_tidore.png"
+                alt="Logo Disdukcapil Tidore Kepulauan"
                 fill
                 className="object-contain"
                 priority
@@ -176,7 +176,7 @@ export default function LoginPage() {
               Selamat Datang
             </CardTitle>
             <CardDescription className="text-sm text-slate-500 mt-1">
-              Portal SIDAKO — Disdukcapil Kab. Tana Tidung
+              Portal DAGA — Disdukcapil Kota Tidore Kepulauan
             </CardDescription>
           </div>
         </CardHeader>
@@ -289,7 +289,7 @@ export default function LoginPage() {
                 <div className={`absolute inset-0 rounded-md pointer-events-none transition-opacity duration-300 ${
                   focusedField === 'user_id' ? 'opacity-100' : 'opacity-0'
                 }`}>
-                  <div className="absolute inset-0 rounded-md bg-yellow-400/10" />
+                  <div className="absolute inset-0 rounded-md bg-[#495E57]/10" />
                 </div>
               </div>
             </div>
@@ -337,7 +337,7 @@ export default function LoginPage() {
                 <div className={`absolute inset-0 rounded-md pointer-events-none transition-opacity duration-300 ${
                   focusedField === 'password' ? 'opacity-100' : 'opacity-0'
                 }`}>
-                  <div className="absolute inset-0 rounded-md bg-yellow-400/10" />
+                  <div className="absolute inset-0 rounded-md bg-[#495E57]/10" />
                 </div>
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               className="w-full text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              style={{ background: 'linear-gradient(90deg, #2e6da4, #1b4b72)' }}
+              style={{ background: 'linear-gradient(90deg, #5c766d, #3a4b45)' }}
               disabled={isLoading || !recaptchaReady}
             >
               {isLoading ? (
@@ -417,7 +417,7 @@ export default function LoginPage() {
             </div>
 
             {/* Notes Section */}
-            <div className="rounded-xl p-4 space-y-2.5 border" style={{ background: 'rgba(217,119,6,0.04)', borderColor: 'rgba(217,119,6,0.15)' }}>
+            <div className="rounded-xl p-4 space-y-2.5 border" style={{ background: 'rgba(202,138,4,0.04)', borderColor: 'rgba(202,138,4,0.15)' }}>
               <h3 className="font-semibold text-primary text-xs uppercase tracking-wide">
                 Catatan
               </h3>
@@ -458,7 +458,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-slate-400">
-        <p>SIDAKO &mdash; Disdukcapil Kabupaten Tana Tidung &copy; 2024</p>
+        <p>DAGA &mdash; Disdukcapil Kota Tidore Kepulauan &copy; 2026</p>
       </div>
     </div>
   );

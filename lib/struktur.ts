@@ -31,7 +31,7 @@ export interface StrukturData {
 }
 
 /** Gradien kotak pimpinan — sama dengan aksen brand (navbar/hero). */
-export const GRADIEN_PIMPINAN = 'linear-gradient(135deg, #f59e0b, #b45309)';
+export const GRADIEN_PIMPINAN = 'linear-gradient(135deg, #495E57, #3a4b45)';
 
 /** Pilihan tingkat untuk selektor di editor. */
 export const TINGKAT_OPSI: { value: Tingkat; label: string }[] = [

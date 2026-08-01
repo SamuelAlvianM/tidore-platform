@@ -1,12 +1,12 @@
 import { appUrl } from "./mail";
 
 /**
- * Template email HTML bergaya brand SIDAKO (biru #1b4b72 → #d97706).
+ * Template email HTML bergaya brand DAGA (biru #3a4b45 → #495E57).
  * Semua template mengembalikan { subject, html } siap kirim via sendMail.
  */
 
-const ORG = "Disdukcapil Kabupaten Tana Tidung";
-const PORTAL = "Portal SIDAKO";
+const ORG = "Disdukcapil Kota Tidore Kepulauan";
+const PORTAL = "Portal DAGA";
 
 function esc(s: string): string {
   return s
@@ -24,21 +24,21 @@ function layout(judul: string, isi: string, cta?: { label: string; url: string }
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(27,75,114,.12);">
         <tr>
-          <td style="background:linear-gradient(135deg,#b45309 0%,#f59e0b 100%);padding:28px 32px;">
-            <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:.5px;">SIDAKO</p>
+          <td style="background:linear-gradient(135deg,#3a4b45 0%,#495E57 100%);padding:28px 32px;">
+            <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:.5px;">DAGA</p>
             <p style="margin:4px 0 0;color:rgba(255,255,255,.85);font-size:12px;">${ORG}</p>
           </td>
         </tr>
         <tr>
           <td style="padding:32px;">
-            <h1 style="margin:0 0 16px;color:#1b4b72;font-size:18px;">${judul}</h1>
+            <h1 style="margin:0 0 16px;color:#3a4b45;font-size:18px;">${judul}</h1>
             <div style="color:#334155;font-size:14px;line-height:1.7;">${isi}</div>
             ${
               cta
-                ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 8px;"><tr><td style="border-radius:10px;background:#d97706;">
+                ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 8px;"><tr><td style="border-radius:10px;background:#495E57;">
                      <a href="${cta.url}" style="display:inline-block;padding:12px 28px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:10px;">${cta.label}</a>
                    </td></tr></table>
-                   <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;text-align:center;">Jika tombol tidak berfungsi, salin tautan ini:<br/><a href="${cta.url}" style="color:#d97706;word-break:break-all;">${cta.url}</a></p>`
+                   <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;text-align:center;">Jika tombol tidak berfungsi, salin tautan ini:<br/><a href="${cta.url}" style="color:#495E57;word-break:break-all;">${cta.url}</a></p>`
                 : ""
             }
           </td>
@@ -66,7 +66,7 @@ export interface MailContent {
 /** Konfirmasi pendaftaran diterima — menunggu verifikasi petugas. */
 export function tplRegistrasiDiterima(nama: string): MailContent {
   return {
-    subject: "Pendaftaran Akun SIDAKO Diterima — Menunggu Verifikasi",
+    subject: "Pendaftaran Akun DAGA Diterima — Menunggu Verifikasi",
     html: layout(
       "Pendaftaran Anda sudah kami terima",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -81,7 +81,7 @@ export function tplRegistrasiDiterima(nama: string): MailContent {
 /** Akun disetujui/diaktifkan — bisa langsung login. */
 export function tplAkunDisetujui(nama: string): MailContent {
   return {
-    subject: "Akun SIDAKO Anda Telah Disetujui ✅",
+    subject: "Akun DAGA Anda Telah Disetujui ✅",
     html: layout(
       "Selamat! Akun Anda sudah aktif",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -95,7 +95,7 @@ export function tplAkunDisetujui(nama: string): MailContent {
 /** Akun ditolak — beri alasan + ajak mendaftar ulang dengan data diperbaiki. */
 export function tplAkunDitolak(nama: string, alasan?: string): MailContent {
   return {
-    subject: "Pendaftaran Akun SIDAKO Ditolak",
+    subject: "Pendaftaran Akun DAGA Ditolak",
     html: layout(
       "Pendaftaran akun Anda belum dapat disetujui",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -116,7 +116,7 @@ export function tplAkunDitolak(nama: string, alasan?: string): MailContent {
 /** Tautan reset password. */
 export function tplResetPassword(nama: string, resetUrl: string): MailContent {
   return {
-    subject: "Reset Password Akun SIDAKO",
+    subject: "Reset Password Akun DAGA",
     html: layout(
       "Permintaan reset password",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>

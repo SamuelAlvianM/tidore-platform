@@ -8,7 +8,7 @@ export default function RiwayatPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative py-14 overflow-hidden" style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}>
+      <div className="relative py-14 overflow-hidden" style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center gap-4">

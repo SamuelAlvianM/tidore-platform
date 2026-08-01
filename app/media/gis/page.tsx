@@ -5,7 +5,7 @@ import PetaDemografiLoader from '@/components/landingpage/peta-demografi-loader'
 
 export const metadata = {
   title: 'GIS Dukcapil — Peta Sebaran Penduduk',
-  description: 'Peta sebaran penduduk per kecamatan Kabupaten Tana Tidung.',
+  description: 'Peta sebaran penduduk per kecamatan Kota Tidore Kepulauan.',
 };
 
 export default function GisPage() {
@@ -22,7 +22,7 @@ export default function GisPage() {
               GIS Dukcapil — Peta Sebaran Penduduk
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-slate-500">
-              Persebaran jumlah penduduk per kecamatan di Kabupaten Tana Tidung. Klik lingkaran
+              Persebaran jumlah penduduk per kecamatan di Kota Tidore Kepulauan. Klik lingkaran
               untuk melihat rincian.
             </p>
           </div>

@@ -131,7 +131,7 @@ function MaklumatPanel({
           return (
             <div
               key={i}
-              className="group flex flex-col items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.09] to-primary/[0.03] p-5 text-center shadow-[0_4px_20px_rgba(217,119,6,0.06)] transition-all duration-300 hover:-translate-y-1 hover:from-primary/[0.13] hover:shadow-lg hover:shadow-primary/10"
+              className="group flex flex-col items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.09] to-primary/[0.03] p-5 text-center shadow-[0_4px_20px_rgba(202,138,4,0.06)] transition-all duration-300 hover:-translate-y-1 hover:from-primary/[0.13] hover:shadow-lg hover:shadow-primary/10"
             >
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/10 bg-white text-primary shadow-sm transition-all duration-300 group-hover:scale-110">
                 <Icon className="h-5 w-5" />
@@ -145,7 +145,7 @@ function MaklumatPanel({
       {data?.standar && (
         <div
           className="relative overflow-hidden rounded-2xl p-7 text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)' }}
+          style={{ background: 'linear-gradient(135deg, #495E57 0%, #3a4b45 100%)' }}
         >
           <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
           <Quote className="mb-3 h-7 w-7 text-white/40" />

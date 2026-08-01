@@ -22,7 +22,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-[#12395e] to-[#0b2238] text-slate-400">
+    <footer className="bg-gradient-to-b from-[#3a4b45] to-[#0b2238] text-slate-400">
       <div className="container mx-auto px-4 md:px-8 lg:px-16 py-14 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8">
           {/* Brand */}
@@ -30,24 +30,24 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-11 w-11 flex-shrink-0">
                 <Image
-                  src="/LOGO-dinas_sidako.png"
-                  alt="Logo SIDAKO"
+                  src="/LOGO-dinas_tidore.png"
+                  alt="Logo DAGA"
                   fill
                   className="object-contain"
                 />
               </div>
               <div>
                 <span className="text-white font-bold text-lg tracking-wide">
-                  SIDAKO
+                  DAGA
                 </span>
                 <p className="text-xs text-slate-400">
-                  Disdukcapil Kabupaten Tana Tidung
+                  Disdukcapil Kota Tidore Kepulauan
                 </p>
               </div>
             </div>
             <p className="text-sm leading-relaxed max-w-md">
               Portal layanan administrasi kependudukan dan pencatatan sipil
-              Kabupaten Tana Tidung. Melayani masyarakat secara profesional,
+              Kota Tidore Kepulauan. Melayani masyarakat secara profesional,
               akuntabel, dan prima.
             </p>
           </div>
@@ -98,23 +98,23 @@ export function Footer() {
               </h4>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 mt-0.5 text-[#F4CE14] flex-shrink-0" />
                   <span>
-                    Komplek Perkantoran Pemda Kabupaten Tana Tidung,
+                    Jl. Ahmad Yani No.A, Indonesiana,
                     <br />
-                    Tideng Pale, Kec. Sesayap, Kalimantan Utara
+                    Kota Tidore Kepulauan, Maluku Utara
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-                  <span>disdukcapil@tanatidungkab.go.id</span>
+                  <Mail className="w-4 h-4 text-[#F4CE14] flex-shrink-0" />
+                  <span>disdukcapil@tidorekab.go.id</span>
                 </li>
                 {/* <li className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-[#F4CE14] flex-shrink-0" />
                   <span>(0553) 2022000</span>
                 </li> */}
                 <li className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                  <Clock className="w-4 h-4 text-[#F4CE14] flex-shrink-0" />
                   <span>Senin – Jumat: 08.00 – 16.00 WITA</span>
                 </li>
               </ul>
@@ -132,8 +132,8 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-slate-500">
             <p>
               © {year}{" "}
-              <span className="text-slate-300 font-medium">SIDAKO</span> —
-              Disdukcapil Kabupaten Tana Tidung
+              <span className="text-slate-300 font-medium">DAGA</span> —
+              Disdukcapil Kota Tidore Kepulauan
             </p>
             <div className="flex items-center gap-4">
               <Link

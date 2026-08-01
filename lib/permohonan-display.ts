@@ -3,6 +3,7 @@
  * data-info form portal lama (app.pesbar.002) agar warga dan petugas
  * membaca istilah yang sama dengan formulir aslinya.
  */
+import { CODE_VALUES_MASTER } from "@/lib/permohonan-lookup";
 
 /** Label field data (non-berkas). */
 export const FIELD_LABELS: Record<string, string> = {
@@ -153,6 +154,7 @@ export const BERKAS_LABELS: Record<string, string> = {
 
 /** Nilai kode → label untuk select tertentu (mengikuti OptionModel lama). */
 const CODE_VALUES: Record<string, Record<string, string>> = {
+  ...CODE_VALUES_MASTER, // agama, pekerjaan, pendidikan, golongandarah, statusperkawinan
   jeniskelamin: { "1": "Laki-laki", "2": "Perempuan" },
   tempatdilahirkan: {
     "1": "Rumah Sakit", "2": "Puskesmas", "3": "Rumah Bersalin",
@@ -169,6 +171,11 @@ const CODE_VALUES: Record<string, Record<string, string>> = {
 const HIDDEN_FIELDS = new Set([
   "permohonanType", "permohonanKet", "permohonanInitial",
   "prgsts", "rjkalasan", "alasandetail", "key", "act",
+  // Kolom sistem hasil migrasi — bukan data warga, jangan ditampilkan.
+  "id", "status", "skm_key", "created_at", "created_by", "updated_at", "updated_by",
+  "alasan_detail", "catatan_admin", "catatan_detail", "reject_alasan",
+  "progress_status", "evidenceDelete_by", "evidenceDelete_date",
+  "evidenceDelete_status", "evidencedelete_status",
 ]);
 
 export function isFileField(key: string) {
@@ -176,12 +183,20 @@ export function isFileField(key: string) {
 }
 
 /** Label field data; fallback: pisahkan underscore + kapitalisasi. */
+// Prefix per-jenis pada key payload (kk_agama, biodata_jeniskelamin, dll) dilepas
+// agar cocok dengan FIELD_LABELS / CODE_VALUES yang disimpan tanpa prefix.
+const PREFIX_RE =
+  /^(kk|biodata|dataKelahiran|dataKematian|dataPerceraian|aktaPerkawinan|ktpel|pencetakanKTP|pindah|kedatangan|konsolidasi)_/;
+export const normKey = (key: string) => key.replace(/x$/, "").replace(PREFIX_RE, "");
+
 export function labelField(key: string): string {
   const base = key.replace(/x$/, "");
+  const bare = normKey(key);
   return (
     FIELD_LABELS[key] ??
     FIELD_LABELS[base] ??
-    key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    FIELD_LABELS[bare] ??
+    bare.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
   );
 }
 
@@ -194,7 +209,7 @@ export function labelBerkas(key: string): string {
 /** Format nilai payload (terjemahkan kode select yang dikenal). */
 export function formatPayloadValue(key: string, value: unknown): string {
   const s = String(value ?? "");
-  const map = CODE_VALUES[key.replace(/x$/, "")];
+  const map = CODE_VALUES[key.replace(/x$/, "")] ?? CODE_VALUES[normKey(key)];
   return map?.[s] ?? s;
 }
 
@@ -213,6 +228,7 @@ export function payloadDataEntries(
     .filter(
       ([k, v]) =>
         !HIDDEN_FIELDS.has(k) &&
+        !k.startsWith("_") &&
         !isFileField(k) &&
         v !== null &&
         v !== undefined &&

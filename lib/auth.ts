@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
-const SESSION_COOKIE = "sidako_session";
+const SESSION_COOKIE = "tidore_session";
 const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET ?? "dev-secret-ganti-di-produksi-minimal-32-karakter"
 );

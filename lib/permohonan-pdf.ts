@@ -6,6 +6,7 @@ import {
   payloadDataEntries,
   payloadBerkasEntries,
   labelField,
+  formatPayloadValue,
 } from "@/lib/permohonan-display";
 
 /**
@@ -27,7 +28,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_WARNA: Record<string, string> = {
-  MENUNGGU: "#b45309",
+  MENUNGGU: "#3a4b45",
   DIPROSES: "#1d4ed8",
   SELESAI: "#15803d",
   DITOLAK: "#b91c1c",
@@ -40,7 +41,7 @@ const HAL_TINGGI = 841.89;
 const KONTEN_LEBAR = HAL_LEBAR - MARGIN * 2;
 const BATAS_BAWAH = HAL_TINGGI - MARGIN - 28; // sisakan ruang footer
 
-const AKSEN = "#b45309";
+const AKSEN = "#3a4b45";
 
 // Berkas permohonan disimpan di storage/ (di luar public/); berkas lama masih
 // tertinggal di public/uploads/ — pola resolusi sama dengan app/uploads/[...path].
@@ -123,8 +124,10 @@ interface BerkasSiap {
   label: string;
   /** Sudah dinormalkan ke JPEG; null = bukan gambar / tidak ditemukan. */
   gambar: Buffer | null;
-  /** Berkasnya ada di disk tapi bukan gambar (mis. PDF). */
+  /** Berkasnya ada di disk tapi bukan gambar (mis. PDF/ZIP). */
   adaTapiBukanGambar: boolean;
+  /** Ekstensi huruf kecil tanpa titik (mis. "pdf", "zip") — untuk teks pengganti. */
+  ekstensi: string;
 }
 
 export interface PermohonanPdfInput {
@@ -134,13 +137,27 @@ export interface PermohonanPdfInput {
   status: string;
   catatan: string | null;
   pemohon: string;
+  /** Identitas kontak pemohon — ditampilkan di kotak ringkasan bila terisi. */
+  pemohonNik?: string | null;
+  pemohonHp?: string | null;
+  pemohonEmail?: string | null;
   /** Kapan status terakhir diubah & oleh siapa; null bila belum diproses. */
   prosesTanggal?: string | null;
   prosesOleh?: string | null;
   payload: Record<string, unknown>;
+  /**
+   * Lampiran dari tabel `t_berkas` (unggahan portal DAN hasil migrasi ETL).
+   * WAJIB diisi pemanggil: permohonan hasil migrasi mencatat lampirannya HANYA
+   * di sini, tidak di payload — bila diabaikan, PDF-nya tampil tanpa lampiran
+   * padahal layar detail menampilkannya. Digabung dengan berkas yang hanya
+   * tercatat di payload, persis seperti `berkasView` di layar detail.
+   */
+  berkas?: { label: string; path: string }[];
 }
 
-interface DataPdf extends Omit<PermohonanPdfInput, "payload"> {
+// `berkas` ikut di-Omit: pada input ia berupa daftar path mentah, sedangkan di
+// sini sudah berubah jadi BerkasSiap (gambar terbaca & dinormalkan).
+interface DataPdf extends Omit<PermohonanPdfInput, "payload" | "berkas"> {
   data: { label: string; nilai: string }[];
   berkas: BerkasSiap[];
   logo: Buffer | null;
@@ -166,13 +183,13 @@ function gambarDokumen(doc: PDFKit.PDFDocument, d: DataPdf) {
     });
   doc
     .font("Times-Bold").fontSize(13)
-    .text("KABUPATEN TANA TIDUNG", MARGIN, doc.y + 1, {
+    .text("KOTA TIDORE KEPULAUAN", MARGIN, doc.y + 1, {
       align: "center",
       width: KONTEN_LEBAR,
     });
   doc
     .font("Helvetica").fontSize(8.5).fillColor("#555")
-    .text("Portal SIDAKO — Bukti Pengajuan Permohonan Online", MARGIN, doc.y + 4, {
+    .text("Portal DAGA — Bukti Pengajuan Permohonan Online", MARGIN, doc.y + 4, {
       align: "center",
       width: KONTEN_LEBAR,
     });
@@ -191,6 +208,15 @@ function gambarDokumen(doc: PDFKit.PDFDocument, d: DataPdf) {
     ["No. Registrasi", d.noregister],
     ["Jenis Permohonan", d.jenis],
     ["Nama Pemohon", d.pemohon],
+    // Identitas kontak pemohon: hanya baris yang benar-benar terisi, supaya
+    // kotak tidak dipenuhi tanda "-" pada data migrasi yang tak lengkap.
+    ...((
+      [
+        ["NIK Pemohon", d.pemohonNik],
+        ["Telepon", d.pemohonHp],
+        ["Email", d.pemohonEmail],
+      ] as [string, string | null | undefined][]
+    ).filter(([, v]) => !!v?.trim()) as [string, string][]),
     ["Dibuat Pada", d.tanggal],
     // Baris kedua tanggal: kapan status terakhir berubah — supaya pembaca tahu
     // kapan permohonan diproses/diselesaikan, bukan hanya kapan diajukan.
@@ -286,7 +312,7 @@ function gambarDokumen(doc: PDFKit.PDFDocument, d: DataPdf) {
     ruang(t);
     const y = doc.y;
     doc.roundedRect(MARGIN, y, KONTEN_LEBAR, t, 3)
-      .fillAndStroke("#fffbeb", "#fcd34d");
+      .fillAndStroke("#fffbeb", "#F4CE14");
     doc.fillColor("#111")
       .text(d.catatan, MARGIN + 12, y + 7, { width: KONTEN_LEBAR - 24 });
     doc.fillColor("#000");
@@ -334,9 +360,13 @@ function gambarDokumen(doc: PDFKit.PDFDocument, d: DataPdf) {
         } else {
           doc.font("Helvetica-Oblique").fontSize(8).fillColor("#999")
             .text(
-              it.adaTapiBukanGambar
-                ? "(berkas PDF — lihat di portal)"
-                : "(berkas tidak ditemukan)",
+              !it.adaTapiBukanGambar
+                ? "(berkas tidak ditemukan)"
+                : it.ekstensi === "pdf"
+                  ? "(berkas PDF — lihat di portal)"
+                  : it.ekstensi === "zip"
+                    ? "(arsip ZIP — lihat di portal)"
+                    : "(pratinjau tidak tersedia — lihat di portal)",
               x + 8,
               barisY + 60,
               { width: KARTU_L - 16, align: "center" },
@@ -361,7 +391,7 @@ function gambarDokumen(doc: PDFKit.PDFDocument, d: DataPdf) {
     doc.lineWidth(0.6).strokeColor("#dbe3ea")
       .moveTo(MARGIN, y).lineTo(MARGIN + KONTEN_LEBAR, y).stroke();
     doc.font("Helvetica").fontSize(7.5).fillColor("#8a97a4")
-      .text(`Dokumen ini dicetak dari sistem SIDAKO  •  ${dicetak}`, MARGIN, y + 5, {
+      .text(`Dokumen ini dicetak dari sistem DAGA  •  ${dicetak}`, MARGIN, y + 5, {
         width: KONTEN_LEBAR - 60,
       })
       .text(`Hal. ${i + 1}/${total}`, MARGIN, y + 5, {
@@ -378,23 +408,34 @@ export async function buatPermohonanPdf(
 ): Promise<Buffer> {
   const data = payloadDataEntries(input.payload).map(([k, v]) => ({
     label: labelField(k),
-    nilai: rapikanNilai(k, v),
+    nilai: rapikanNilai(k, formatPayloadValue(k, v)),
   }));
 
+  // Gabungan sumber lampiran, urutan & aturan sama dengan layar detail:
+  // t_berkas dulu, lalu berkas yang HANYA tercatat di payload (anti-duplikat
+  // berdasarkan path).
+  const dariDb = input.berkas ?? [];
+  const pathDb = new Set(dariDb.map((b) => b.path));
+  const semuaBerkas = [
+    ...dariDb,
+    ...payloadBerkasEntries(input.payload).filter((b) => !pathDb.has(b.path)),
+  ];
+
   const berkas: BerkasSiap[] = await Promise.all(
-    payloadBerkasEntries(input.payload).map(async (b) => {
+    semuaBerkas.map(async (b) => {
       const mentah = await bacaBerkas(b.path);
       const gambar = mentah ? await siapkanGambar(mentah) : null;
       return {
         label: b.label,
         gambar,
         adaTapiBukanGambar: Boolean(mentah) && !gambar,
+        ekstensi: (b.path.split(".").pop() ?? "").toLowerCase(),
       };
     }),
   );
 
   const logo = await readFile(
-    join(process.cwd(), "public", "LOGO-dinas_sidako.png"),
+    join(process.cwd(), "public", "LOGO-dinas_tidore.png"),
   ).catch(() => null);
 
   return new Promise<Buffer>((resolve, reject) => {

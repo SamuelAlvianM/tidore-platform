@@ -3,7 +3,7 @@ import { PPID_SETIAP_SAAT, INFORMASI_PUBLIK_TABS } from '@/lib/ppid-informasi';
 import { PpidSubnav } from '@/components/ppid/ppid-subnav';
 
 export const metadata = {
-  title: 'Informasi Wajib Tersedia Setiap Saat — PPID Disdukcapil Tana Tidung',
+  title: 'Informasi Wajib Tersedia Setiap Saat — PPID Disdukcapil Tidore Kepulauan',
   description: PPID_SETIAP_SAAT.deskripsi,
 };
 

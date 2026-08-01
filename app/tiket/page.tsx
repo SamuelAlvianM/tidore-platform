@@ -15,7 +15,7 @@ export default async function TiketPage() {
     <div className="min-h-screen bg-background">
       <div
         className="relative py-14 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #b45309 0%, #f59e0b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #3a4b45 0%, #495E57 100%)" }}
       >
         <div
           className="absolute inset-0 opacity-10"

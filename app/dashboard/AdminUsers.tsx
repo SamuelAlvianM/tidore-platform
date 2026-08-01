@@ -540,7 +540,11 @@ export function AdminUsers() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-4">
-      <div className={ringkas ? 'lg:col-span-2' : 'lg:col-span-4'}>
+      {/* `min-w-0`: anak grid bawaannya TIDAK boleh menyusut di bawah lebar
+          konten terpanjangnya (min-width:auto), sehingga isi sepanjang tombol
+          "Tambah Akun" membuat seluruh kartu melebihi layar ponsel dan halaman
+          bisa digeser menyamping. */}
+      <div className={`min-w-0 ${ringkas ? 'lg:col-span-2' : 'lg:col-span-4'}`}>
         <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm md:p-6">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -569,12 +573,20 @@ export function AdminUsers() {
                 {g.label}
               </button>
             ))}
-            {!ringkas && <span className="ml-1 text-xs text-slate-400">{grupAktif.desc}</span>}
+            {/* Keterangan grup disembunyikan di ponsel — memakan satu baris penuh
+                padahal tiap tab sudah punya `title` yang sama isinya. */}
+            {!ringkas && (
+              <span className="ml-1 hidden text-xs text-slate-400 sm:inline">
+                {grupAktif.desc}
+              </span>
+            )}
           </div>
 
           {/* Filter & search */}
           <div className="mb-4 flex flex-col gap-3 sm:flex-row">
-            <div className="flex gap-1">
+            {/* `flex-wrap`: lima tombol status tak muat sebaris di layar ponsel —
+                tanpa ini ujungnya terpotong keluar kartu. */}
+            <div className="flex flex-wrap gap-1.5">
               {(
                 [
                   ['', 'Semua'],
@@ -630,7 +642,85 @@ export function AdminUsers() {
               Tidak ada user yang cocok.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            {/* ── Ponsel: daftar kartu ──────────────────────────────────────
+                Tabel 6 kolom mustahil dibaca di layar sempit — dulu hanya
+                dibungkus `overflow-x-auto` sehingga isinya harus digeser
+                menyamping. Di sini tiap akun jadi satu kartu yang bisa diketuk. */}
+            <ul className="space-y-2 md:hidden">
+              {items.map((u) => (
+                <li
+                  key={u.id}
+                  className={`flex items-start gap-2 rounded-xl border p-3 transition-colors ${
+                    detailId === u.id
+                      ? 'border-primary/40 bg-primary/5'
+                      : 'border-slate-200 bg-white'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setDetailId(u.id)}
+                    className="flex min-w-0 flex-1 items-start gap-3 text-left"
+                  >
+                    {u.userFoto ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={u.userFoto}
+                        alt=""
+                        className="h-9 w-9 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                        <UserRound className="h-4 w-4" />
+                      </span>
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-slate-800">
+                        {u.userFullname ?? '-'}
+                      </span>
+                      <span className="block truncate font-mono text-[0.7rem] text-slate-500">
+                        {u.userId}
+                      </span>
+                      {(u.userEmail || u.userHp) && (
+                        <span className="mt-0.5 block truncate text-[0.7rem] text-slate-500">
+                          {[u.userEmail, u.userHp].filter(Boolean).join(' · ')}
+                        </span>
+                      )}
+                      <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[0.65rem] font-medium text-slate-600">
+                          {u.level?.nama ?? `Level ${u.userlevelId}`}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ring-1 ${infoStatus(u.status).badge}`}
+                        >
+                          {infoStatus(u.status).label}
+                        </span>
+                      </span>
+                    </span>
+                    <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-300" />
+                  </button>
+
+                  {/* Hapus permanen — hanya Super Admin. Di luar tombol utama
+                      supaya tidak jadi tombol di dalam tombol. */}
+                  {myLevel === 1 && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title="Hapus akun permanen"
+                      aria-label={`Hapus akun ${u.userFullname ?? u.userId}`}
+                      disabled={busyId === u.id}
+                      onClick={() => setKonfirmasi({ tipe: 'hapus', user: u })}
+                      className="shrink-0 text-slate-400 hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* ── Layar sedang ke atas: tabel ── */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -717,13 +807,14 @@ export function AdminUsers() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Panel detail — layar lebar saja; di mobile memakai modal di bawah. */}
       {ringkas && (
-        <aside className="lg:col-span-2">
+        <aside className="min-w-0 lg:col-span-2">
           <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="font-semibold text-slate-900">Detail Akun</h2>
@@ -1110,7 +1201,7 @@ export function AdminUsers() {
                     value={form.nama}
                     onChange={(e) => setForm((f) => ({ ...f, nama: e.target.value }))}
                     placeholder={
-                      form.level === 4 ? 'mis. Dinas Kesehatan Tana Tidung' : 'Nama sesuai KTP'
+                      form.level === 4 ? 'mis. Dinas Kesehatan Tidore Kepulauan' : 'Nama sesuai KTP'
                     }
                   />
                 </div>
@@ -1123,7 +1214,7 @@ export function AdminUsers() {
                     value={form.userId}
                     onChange={(e) => setForm((f) => ({ ...f, userId: e.target.value }))}
                     maxLength={30}
-                    placeholder={form.level === 4 ? 'mis. rs.tanatidung' : 'mis. staff_dinas'}
+                    placeholder={form.level === 4 ? 'mis. rs.tidore' : 'mis. staff_dinas'}
                   />
                   {form.level === 4 && (
                     <p className="text-xs text-muted-foreground">

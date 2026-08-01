@@ -106,7 +106,7 @@ export function PpidModeSelector({ kunci }: { kunci: string }) {
             }
             className={`ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               sembunyikan
-                ? 'bg-amber-500 text-white shadow-sm'
+                ? 'bg-[#495E57] text-white shadow-sm'
                 : 'bg-white text-slate-600 hover:bg-slate-100'
             }`}
           >

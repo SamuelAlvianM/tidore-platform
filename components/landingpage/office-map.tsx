@@ -5,10 +5,10 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Koordinat kantor Disdukcapil Tana Tidung (Kompleks Perkantoran Pemda,
-// Tideng Pale, Kec. Sesayap). Bisa dioverride lewat env NEXT_PUBLIC_OFFICE_LAT/LNG.
-const OFFICE_LAT = Number(process.env.NEXT_PUBLIC_OFFICE_LAT ?? "3.55100");
-const OFFICE_LNG = Number(process.env.NEXT_PUBLIC_OFFICE_LNG ?? "117.14800");
+// Koordinat kantor Disdukcapil Kota Tidore Kepulauan (Jl. Ahmad Yani No.A,
+// Indonesiana, Soasio). Perkiraan — bisa dioverride lewat env NEXT_PUBLIC_OFFICE_LAT/LNG.
+const OFFICE_LAT = Number(process.env.NEXT_PUBLIC_OFFICE_LAT ?? "0.68360");
+const OFFICE_LNG = Number(process.env.NEXT_PUBLIC_OFFICE_LNG ?? "127.40090");
 
 /** Marker berdenyut (divIcon + CSS) — ringan, tanpa gambar aset. */
 const pulseIcon = L.divIcon({

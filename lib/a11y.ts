@@ -9,7 +9,7 @@
  * untuk skrip init anti-flicker maupun client component (widget).
  */
 
-export const A11Y_STORAGE_KEY = "sidako-a11y";
+export const A11Y_STORAGE_KEY = "tidore-a11y";
 
 /** Skala font global dalam persen; indeks 1 = 100% (default). */
 export const FONT_STEPS = [90, 100, 110, 125, 150, 175, 200];

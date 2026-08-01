@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       return fail(["Info: Kecamatan domisili wajib dipilih untuk akun warga"]);
     }
   }
-  // OPD login memakai USERNAME instansi (mis. rs.tanatidung); NIK perwakilan
+  // OPD login memakai USERNAME instansi (mis. rs.tidore); NIK perwakilan
   // disimpan terpisah untuk fitur lupa password.
   if (level === 4) {
     if (!/^[a-z0-9][a-z0-9._-]{3,29}$/i.test(userId.trim())) {

@@ -51,7 +51,7 @@ function addSheet(wb: ExcelJS.Workbook, label: string, rows: DbRow[]) {
  */
 export async function buildDemografiWorkbook(kategori?: string) {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "SIDAKO Disdukcapil Tana Tidung";
+  wb.creator = "DAGA Disdukcapil Tidore Kepulauan";
   wb.created = new Date();
 
   const targets = kategori

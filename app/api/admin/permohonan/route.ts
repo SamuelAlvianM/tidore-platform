@@ -1,9 +1,17 @@
 import { NextRequest } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 
-/** Daftar SEMUA permohonan untuk panel admin (filter status & pencarian). */
+/**
+ * Daftar SEMUA permohonan untuk panel admin (filter status & pencarian).
+ *
+ * Paginasi BERNOMOR (page/limit), bukan cursor: petugas perlu tahu total data
+ * dan bisa melompat ke halaman tertentu. Pencarian & filter dijalankan di
+ * DATABASE, jadi hasilnya mencakup seluruh data — bukan hanya baris yang
+ * kebetulan sedang tampil di halaman aktif.
+ */
 export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session || session.level > 2) return fail(["Akses ditolak"], 403);
@@ -11,10 +19,13 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status"); // MENUNGGU | DIPROSES | SELESAI | DITOLAK
   const q = searchParams.get("q")?.trim();
-  const cursor = searchParams.get("cursor");
-  const limit = Math.min(50, Math.max(10, parseInt(searchParams.get("limit") ?? "20", 10) || 20));
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+  const limit = Math.min(
+    100,
+    Math.max(10, parseInt(searchParams.get("limit") ?? "20", 10) || 20),
+  );
 
-  const where = {
+  const where: Prisma.PermohonanWhereInput = {
     ...(status ? { status } : {}),
     ...(q
       ? {
@@ -27,23 +38,25 @@ export async function GET(req: NextRequest) {
       : {}),
   };
 
-  // Paginasi cursor (id desc ≈ createdAt desc) untuk load-on-scroll.
-  const rawItems = await prisma.permohonan.findMany({
-    where,
-    include: {
-      jenis: { select: { nama: true, kategori: true } },
-      user: { select: { userId: true, userFullname: true, userHp: true } },
-      _count: { select: { berkas: true } },
-    },
-    orderBy: { id: "desc" },
-    take: limit + 1,
-    ...(cursor ? { cursor: { id: Number(cursor) }, skip: 1 } : {}),
-  });
-  const hasMore = rawItems.length > limit;
-  const pageRows = hasMore ? rawItems.slice(0, limit) : rawItems;
-  const nextCursor = hasMore ? pageRows[pageRows.length - 1].id : null;
+  // Hitungan total & baris halaman diambil sekaligus (id desc ≈ createdAt desc).
+  const [total, rows] = await Promise.all([
+    prisma.permohonan.count({ where }),
+    prisma.permohonan.findMany({
+      where,
+      include: {
+        jenis: { select: { nama: true, kategori: true } },
+        user: { select: { userId: true, userFullname: true, userHp: true } },
+        _count: { select: { berkas: true } },
+      },
+      orderBy: { id: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+  ]);
 
-  const items = pageRows.map((i) => ({
+  const totalHalaman = Math.max(1, Math.ceil(total / limit));
+
+  const items = rows.map((i) => ({
     id: i.id,
     noregister: i.noregister,
     status: i.status,
@@ -58,22 +71,32 @@ export async function GET(req: NextRequest) {
     jumlahBerkas: i._count.berkas,
   }));
 
-  // Jumlah per status (global, untuk chip filter) — hanya di halaman pertama
-  // (tanpa cursor) agar tidak dihitung ulang tiap scroll.
+  // Jumlah per status (untuk chip filter) — hanya di halaman pertama, isinya
+  // sama untuk tiap halaman sehingga tak perlu dihitung ulang.
   let counts: Record<string, number> | undefined;
-  if (!cursor) {
+  if (page === 1) {
+    // Mengikuti filter LAIN (pencarian), tapi bukan filter status itu sendiri —
+    // supaya angka tiap chip menunjukkan "berapa yang muncul kalau chip diklik".
     const grouped = await prisma.permohonan.groupBy({
       by: ["status"],
       _count: { _all: true },
+      where: { ...where, status: undefined },
     });
     counts = {};
-    let total = 0;
+    let semua = 0;
     for (const g of grouped) {
       counts[g.status] = g._count._all;
-      total += g._count._all;
+      semua += g._count._all;
     }
-    counts[""] = total; // "Semua"
+    counts[""] = semua; // "Semua"
   }
 
-  return ok({ items, nextCursor, ...(counts ? { counts } : {}) });
+  return ok({
+    items,
+    page,
+    limit,
+    total,
+    totalHalaman,
+    ...(counts ? { counts } : {}),
+  });
 }

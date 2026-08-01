@@ -1,4 +1,4 @@
-// Prisma schema — sidako-platform
+// Prisma schema — daga-platform
 // DB: MySQL (cocok untuk cPanel/shared hosting)
 // Tabel `users` direkonstruksi PERSIS dari kolom yang dipakai controller Laravel
 // (RegisterController/LoginController data-2). Tabel lain didesain ulang rapi
@@ -164,7 +164,7 @@ model News {
   kategori  String?
   ringkasan String?  @db.Text
   konten    String   @db.LongText
-  gambar    String?
+  gambar    String?  @db.Text
   penulis   String?
   publish   Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
@@ -179,7 +179,7 @@ model Gallery {
   id        Int      @id @default(autoincrement())
   judul     String
   kategori  String   @default("PELAYANAN") // BUPATI | PELAYANAN
-  gambar    String
+  gambar    String   @db.Text
   deskripsi String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -195,7 +195,7 @@ model Produk {
   /// muat di varchar(191) bawaan Prisma.
   judul     String   @db.VarChar(255)
   konten    String?  @db.LongText
-  file      String?
+  file      String?  @db.Text
   // Admin pengunggah (bisa >1 admin) — jejak siapa memasukkan dokumen.
   uploadedBy     Int?     @map("uploaded_by")
   uploadedByName String?  @map("uploaded_by_name")

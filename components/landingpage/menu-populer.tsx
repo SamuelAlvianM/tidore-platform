@@ -40,9 +40,9 @@ const menuItems: MenuItem[] = [
     title: "Pengaduan Online",
     description: "Laporkan masalah secara digital",
     href: "/pengaduan",
-    color: "text-amber-600",
-    bgColor: "bg-amber-500/10",
-    borderColor: "border-amber-200"
+    color: "text-[#8a7400]",
+    bgColor: "bg-[#F4CE14]/12",
+    borderColor: "border-[#F4CE14]/40"
   },
   {
     icon: <FileCheck className="w-10 h-10" />,

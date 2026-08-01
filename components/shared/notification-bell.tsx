@@ -31,7 +31,7 @@ interface Notifikasi {
   createdAt: string;
 }
 
-const SOUND_KEY = "sidako-notif-sound"; // "1" = nyala (default), "0" = bisu
+const SOUND_KEY = "tidore-notif-sound"; // "1" = nyala (default), "0" = bisu
 const POLL_MS = 25000;
 
 const TIPE_ICON: Record<string, { icon: LucideIcon; color: string }> = {

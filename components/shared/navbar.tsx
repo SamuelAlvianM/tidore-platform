@@ -99,13 +99,13 @@ function DropdownMenu({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
+          "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
           "transition-all duration-300 ease-out",
-          "hover:text-[#12395e] hover:bg-white/10",
-          "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
+          "hover:text-[#495E57] hover:bg-[#495E57]/10",
+          "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
           "before:transition-all before:duration-300 before:ease-out",
           "hover:before:w-[calc(100%-1.25rem)]",
-          isOpen && "text-[#12395e] bg-white/10",
+          isOpen && "text-[#495E57] bg-[#495E57]/10",
         )}
       >
         {Icon && (
@@ -153,8 +153,8 @@ function DropdownMenu({
               style={{
                 background: "rgba(255,255,255,0.97)",
                 backdropFilter: "blur(12px)",
-                border: "1px solid rgba(217,119,6,0.12)",
-                boxShadow: "0 8px 32px rgba(217,119,6,0.12)",
+                border: "1px solid rgba(202,138,4,0.12)",
+                boxShadow: "0 8px 32px rgba(202,138,4,0.12)",
                 overflow: isOpen ? "visible" : "hidden",
               }}
             >
@@ -291,8 +291,8 @@ function DropdownItem({
             style={{
               background: "rgba(255,255,255,0.97)",
               backdropFilter: "blur(12px)",
-              border: "1px solid rgba(217,119,6,0.12)",
-              boxShadow: "0 8px 32px rgba(217,119,6,0.12)",
+              border: "1px solid rgba(202,138,4,0.12)",
+              boxShadow: "0 8px 32px rgba(202,138,4,0.12)",
             }}
           >
             {item.subItems.map((subItem, subIndex) => (
@@ -464,7 +464,7 @@ function MobileMenuItem({
   if (!items) {
     const resolvedHref = href ?? `/${title.toLowerCase().replace(/\s+/g, "-")}`;
     const className =
-      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]";
+      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]";
     if (isExternalHref(resolvedHref)) {
       return (
         <a
@@ -496,7 +496,7 @@ function MobileMenuItem({
           "flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-[0.925rem] font-medium transition-colors",
           isExpanded
             ? "bg-primary/5 text-primary"
-            : "text-slate-700 hover:bg-[#12395e]/5 hover:text-[#12395e]",
+            : "text-slate-700 hover:bg-[#495E57]/8 hover:text-[#495E57]",
         )}
       >
         <span className="flex items-center gap-3">
@@ -533,7 +533,7 @@ function MobileMenuItem({
                       "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors",
                       expandedSubMenu === item.title
                         ? "text-primary"
-                        : "text-slate-600 hover:bg-[#12395e]/5 hover:text-[#12395e]",
+                        : "text-slate-600 hover:bg-[#495E57]/8 hover:text-[#495E57]",
                     )}
                   >
                     <span>{item.title}</span>
@@ -558,7 +558,7 @@ function MobileMenuItem({
                         <Link
                           key={subItem.title}
                           href={subItem.href}
-                          className="block rounded-lg px-3 py-1.5 text-[0.83rem] text-slate-500 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
+                          className="block rounded-lg px-3 py-1.5 text-[0.83rem] text-slate-500 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]"
                           onClick={onClose}
                         >
                           {subItem.title}
@@ -574,7 +574,7 @@ function MobileMenuItem({
               <Link
                 key={item.title}
                 href={item.href}
-                className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
+                className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]"
                 onClick={onClose}
               >
                 {item.title}
@@ -720,17 +720,17 @@ function AuthArea({
       <button
         onClick={() => setOpen((p) => !p)}
         className={cn(
-          "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15",
-          open && "bg-white/15",
+          "inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#495E57]/10",
+          open && "bg-[#495E57]/10",
         )}
       >
-        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/20 text-white ring-1 ring-white/40">
+        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#495E57]/12 text-[#45474B] ring-1 ring-[#495E57]/25">
           <UserIcon className="h-4 w-4" />
         </span>
-        <span className="max-w-[10rem] truncate text-white">{displayName}</span>
+        <span className="max-w-[10rem] truncate text-slate-700">{displayName}</span>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-white transition-transform",
+            "h-4 w-4 text-slate-500 transition-transform",
             open && "rotate-180",
           )}
         />
@@ -748,8 +748,8 @@ function AuthArea({
         style={{
           background: "rgba(255,255,255,0.97)",
           backdropFilter: "blur(12px)",
-          border: "1px solid rgba(217,119,6,0.12)",
-          boxShadow: "0 8px 32px rgba(217,119,6,0.15)",
+          border: "1px solid rgba(202,138,4,0.12)",
+          boxShadow: "0 8px 32px rgba(202,138,4,0.15)",
         }}
       >
           <Link
@@ -846,7 +846,7 @@ export function Navbar() {
               )}
             >
               <Image
-                src="/LOGO-dinas_sidako.png"
+                src="/LOGO-dinas_tidore.png"
                 alt="DISDUKCAPIL Logo"
                 fill
                 className="object-contain"
@@ -856,32 +856,43 @@ export function Navbar() {
             <div className="flex flex-col">
               <span
                 className={cn(
-                  "font-bold text-base leading-tight transition-all duration-300 ease-out text-white",
-                  logoHovered && "text-[#12395e] translate-x-1",
+                  "font-bold text-base leading-tight transition-all duration-300 ease-out text-[#45474B]",
+                  logoHovered && "text-[#495E57] translate-x-1",
                 )}
               >
-                SIDAKO
+                DAGA
               </span>
               <span
                 className={cn(
-                  "hidden sm:block text-xs leading-tight transition-all duration-300 ease-out text-primary-foreground/80",
+                  "hidden sm:block text-xs leading-tight transition-all duration-300 ease-out text-slate-500",
                   logoHovered && "translate-x-1",
                 )}
               >
-                Disdukcapil Kab. Tana Tidung
+                Disdukcapil Kota Tidore Kepulauan
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center flex-nowrap gap-0.5 flex-1 justify-center px-2">
+          {/* Desktop Navigation.
+              Ambang 1360px, bukan `lg` (1024px): deretan menu memakai
+              flex-nowrap + whitespace-nowrap sehingga TIDAK bisa menyusut — di
+              layar yang lebih sempit ia mendorong blok kanan (flex-shrink-0)
+              keluar layar, membuat SELURUH halaman bisa digeser menyamping.
+              Angka 1360 = logo 241 + menu 726 + blok kanan 270 + padding & gap.
+              Di bawah ambang ini navigasi memakai panel hamburger yang selalu muat.
+
+              `min-w-0` + `overflow-x-auto`: jaring pengaman. Admin bisa menambah
+              menu sendiri (blok konten `navigasi.tambahan`), jadi lebar deretan
+              ini tidak terbatas — kalau sampai melebihi ruang, yang bergeser
+              cukup deretan menunya, bukan seluruh halaman. */}
+          <div className="hidden min-[1360px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
             <Link
               href="/"
               className={cn(
-                "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md group whitespace-nowrap text-white/90",
+                "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md group whitespace-nowrap text-slate-700",
                 "transition-all duration-300 ease-out",
-                "hover:text-[#12395e] hover:bg-white/10",
-                "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
+                "hover:text-[#495E57] hover:bg-[#495E57]/10",
+                "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
                 "before:transition-all before:duration-300 before:ease-out",
                 "hover:before:w-[calc(100%-1.25rem)]",
               )}
@@ -896,10 +907,10 @@ export function Navbar() {
                 const Icon = navigationIcons[item.title];
                 const external = isExternalHref(item.href);
                 const linkClassName = cn(
-                  "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
+                  "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
                   "transition-all duration-300 ease-out",
-                  "hover:text-[#12395e] hover:bg-white/10",
-                  "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
+                  "hover:text-[#495E57] hover:bg-[#495E57]/10",
+                  "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
                   "before:transition-all before:duration-300 before:ease-out",
                   "hover:before:w-[calc(100%-1.25rem)]",
                 );
@@ -936,19 +947,19 @@ export function Navbar() {
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden lg:flex items-center gap-1.5 flex-shrink-0">
-            <NotificationBell tone="onDark" />
+          <div className="hidden min-[1360px]:flex items-center gap-1.5 flex-shrink-0">
+            <NotificationBell tone="onLight" />
             <AuthArea />
           </div>
 
-          {/* Mobile: lonceng notifikasi + hamburger */}
-          <div className="flex items-center gap-1 lg:hidden">
-            <NotificationBell tone="onDark" />
+          {/* Mobile & tablet: lonceng notifikasi + hamburger */}
+          <div className="flex items-center gap-1 min-[1360px]:hidden">
+            <NotificationBell tone="onLight" />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <button
                   aria-label="Buka menu navigasi"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white backdrop-blur transition-colors hover:bg-white/20"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#45474B]/15 bg-white/50 text-[#45474B] backdrop-blur transition-colors hover:bg-[#495E57]/10"
                 >
                   <Menu className="h-5 w-5" strokeWidth={2} />
                 </button>
@@ -961,28 +972,33 @@ export function Navbar() {
               {/* Kepala panel: identitas + tombol tutup */}
               <div
                 className="flex items-center justify-between px-5 py-4"
-                style={{ background: "linear-gradient(135deg, #b45309 0%, #f59e0b 100%)" }}
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,251,235,0.8) 100%)",
+                  borderBottom: "1px solid rgba(202,138,4,0.22)",
+                  backdropFilter: "blur(16px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(16px) saturate(180%)",
+                }}
               >
                 <div className="flex items-center gap-2.5">
                   <div className="relative h-9 w-9">
                     <Image
-                      src="/LOGO-dinas_sidako.png"
-                      alt="Logo SIDAKO"
+                      src="/LOGO-dinas_tidore.png"
+                      alt="Logo DAGA"
                       fill
                       className="object-contain"
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-bold leading-tight text-white">SIDAKO</p>
-                    <p className="text-[0.7rem] leading-tight text-white/70">
-                      Disdukcapil Kab. Tana Tidung
+                    <p className="text-sm font-bold leading-tight text-[#45474B]">DAGA</p>
+                    <p className="text-[0.7rem] leading-tight text-slate-500">
+                      Disdukcapil Kota Tidore Kepulauan
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}
                   aria-label="Tutup menu"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#495E57]/10 text-slate-600 transition-colors hover:bg-[#495E57]/18"
                 >
                   <X className="h-4 w-4" strokeWidth={2} />
                 </button>
@@ -996,7 +1012,7 @@ export function Navbar() {
                 {!isOpd && (
                   <Link
                     href="/"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]"
                     onClick={() => setMobileOpen(false)}
                   >
                     <MobileItemIcon icon={Home} />

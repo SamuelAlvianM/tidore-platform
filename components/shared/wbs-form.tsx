@@ -15,7 +15,7 @@ import { CheckCircle2, AlertCircle, Loader2, Send, ShieldCheck, ImagePlus, X } f
  * BUKTI FOTO (opsional, maks 4 @5MB).
  *
  * Disimpan lewat /api/pengaduan (tabel Pengaduan) — TIDAK pakai tabel baru
- * supaya tanpa migrasi DB (SIDAKO live). Foto diunggah dulu ke
+ * supaya tanpa migrasi DB (DAGA live). Foto diunggah dulu ke
  * /api/pengaduan/upload (publik → storage privat, hanya petugas yang bisa
  * melihat), lalu URL-nya disisipkan ke `isi` dengan penanda "Bukti Foto:".
  * Pratinjau thumbnail di form memakai objectURL LOKAL karena berkas di server

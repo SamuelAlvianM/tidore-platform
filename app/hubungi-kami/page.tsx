@@ -13,9 +13,9 @@ import {
 import { SurveyKepuasanForm } from '@/components/shared/survey-kepuasan-form';
 
 export const metadata = {
-  title: 'Hubungi Kami — Disdukcapil Tana Tidung',
+  title: 'Hubungi Kami — Disdukcapil Tidore Kepulauan',
   description:
-    'Alamat kantor, jam pelayanan, kontak, dan peta lokasi Disdukcapil Kabupaten Tana Tidung.',
+    'Alamat kantor, jam pelayanan, kontak, dan peta lokasi Disdukcapil Kota Tidore Kepulauan.',
 };
 
 const INFO = [
@@ -24,8 +24,8 @@ const INFO = [
     judul: 'Alamat Kantor',
     gradasi: 'from-sky-400 to-sky-600',
     baris: [
-      'Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung',
-      'Jl. Perkantoran Pemda, Tideng Pale, Kecamatan Sesayap, Kabupaten Tana Tidung, Kalimantan Utara',
+      'Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan',
+      'Jl. Ahmad Yani No.A, Indonesiana, Kota Tidore Kepulauan, Maluku Utara',
     ],
   },
   {
@@ -37,8 +37,8 @@ const INFO = [
   {
     icon: Phone,
     judul: 'Kontak',
-    gradasi: 'from-amber-400 to-amber-600',
-    baris: ['Telepon: (0553) 2022XXX', 'Email: disdukcapil@tanatidungkab.go.id'],
+    gradasi: 'from-[#5c766d] to-[#495E57]',
+    baris: ['Telepon: (0553) 2022XXX', 'Email: disdukcapil@tidorekab.go.id'],
   },
 ];
 
@@ -58,7 +58,7 @@ export default function HubungiKamiPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600 md:text-base">
             Informasi alamat kantor, jam pelayanan, dan kanal kontak resmi Dinas
-            Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.
+            Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan.
           </p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function HubungiKamiPage() {
           {embedUrl ? (
             <iframe
               src={embedUrl}
-              title="Peta lokasi kantor Disdukcapil Tana Tidung"
+              title="Peta lokasi kantor Disdukcapil Tidore Kepulauan"
               className="h-[420px] w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -143,7 +143,7 @@ export default function HubungiKamiPage() {
         </div>
 
         {/* Ajakan pengaduan */}
-        <div className="flex flex-col items-start justify-between gap-5 rounded-2xl bg-gradient-to-br from-[#f59e0b] to-[#b45309] p-7 text-white shadow-lg md:flex-row md:items-center md:p-8">
+        <div className="flex flex-col items-start justify-between gap-5 rounded-2xl bg-gradient-to-br from-[#495E57] to-[#3a4b45] p-7 text-white shadow-lg md:flex-row md:items-center md:p-8">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/15">
               <MessageSquareWarning className="h-6 w-6" />
@@ -154,7 +154,7 @@ export default function HubungiKamiPage() {
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-relaxed text-white/80">
                 Sampaikan melalui fitur Pengaduan Masyarakat — setiap laporan
-                ditindaklanjuti oleh petugas Disdukcapil Tana Tidung.
+                ditindaklanjuti oleh petugas Disdukcapil Tidore Kepulauan.
               </p>
             </div>
           </div>

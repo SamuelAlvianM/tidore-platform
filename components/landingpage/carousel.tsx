@@ -18,7 +18,7 @@ export interface CarouselSlide {
   color: string;
 }
 
-// TODO: ganti `image` dengan foto asli SIDAKO/Disdukcapil Tana Tidung —
+// TODO: ganti `image` dengan foto asli DAGA/Disdukcapil Tidore Kepulauan —
 // masih placeholder karena akses jaringan ke situs live diblokir pada
 // sesi pengerjaan ini.
 const DEFAULT_SLIDES: CarouselSlide[] = [
@@ -32,8 +32,8 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
   },
   {
     id: 2,
-    title: "Disdukcapil Tana Tidung",
-    subtitle: "Melayani masyarakat Kabupaten Tana Tidung dengan profesional",
+    title: "Disdukcapil Tidore Kepulauan",
+    subtitle: "Melayani masyarakat Kota Tidore Kepulauan dengan profesional",
     image:
       "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1200&h=800&fit=crop",
     color: "#0f1923",
@@ -49,7 +49,7 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
   },
   {
     id: 4,
-    title: "SIDAKO",
+    title: "DAGA",
     subtitle: "Sistem Administrasi Informasi Berbasis Aplikasi Terintegrasi",
     image:
       "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop",

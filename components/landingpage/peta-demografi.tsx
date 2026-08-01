@@ -5,10 +5,10 @@ import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-lea
 import 'leaflet/dist/leaflet.css';
 import { Loader2 } from 'lucide-react';
 import {
-  TANA_TIDUNG_CENTER,
-  TANA_TIDUNG_ZOOM,
+  TIDORE_CENTER,
+  TIDORE_ZOOM,
   geoForWilayah,
-} from '@/lib/tana-tidung-geo';
+} from '@/lib/tidore-geo';
 
 interface Row {
   kode: string;
@@ -75,8 +75,8 @@ export default function PetaDemografi() {
     <div className="space-y-3">
       <div className="relative h-[520px] overflow-hidden rounded-2xl border border-slate-200 ring-1 ring-primary/10 z-0">
         <MapContainer
-          center={TANA_TIDUNG_CENTER}
-          zoom={TANA_TIDUNG_ZOOM}
+          center={TIDORE_CENTER}
+          zoom={TIDORE_ZOOM}
           scrollWheelZoom={false}
           className="h-full w-full"
         >
@@ -90,9 +90,9 @@ export default function PetaDemografi() {
               center={[m.lat, m.lng]}
               radius={radiusOf(m.penduduk)}
               pathOptions={{
-                color: '#1b4b72',
+                color: '#3a4b45',
                 weight: 1.5,
-                fillColor: '#d97706',
+                fillColor: '#495E57',
                 fillOpacity: 0.45,
               }}
             >
@@ -127,7 +127,7 @@ export default function PetaDemografi() {
 
       {markers.length === 0 && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          Belum ada data penduduk yang cocok dengan kecamatan Tana Tidung. Import data
+          Belum ada data penduduk yang cocok dengan kecamatan Tidore Kepulauan. Import data
           <b> Jenis Kelamin</b> di dashboard (atau dari beranda) agar peta terisi.
         </p>
       )}

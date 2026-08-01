@@ -1,5 +1,5 @@
 {
-  "name": "sidako-platform",
+  "name": "tidore-platform",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -73,6 +73,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "mysql2": "^3.23.2",
     "prisma": "^6.2.1",
     "puppeteer-core": "^25.3.0",
     "tailwindcss": "^4",

@@ -116,7 +116,7 @@ export function RiwayatList() {
                 ? 'text-white shadow-md'
                 : 'bg-white/60 text-slate-600 border border-slate-200 hover:border-primary/40'
             }`}
-            style={tab === t.key ? { background: 'linear-gradient(90deg, #d97706, #fbbf24)' } : {}}
+            style={tab === t.key ? { background: 'linear-gradient(90deg, #d9b400, #F4CE14)' } : {}}
           >
             {t.label}
             <span className="ml-1.5 text-xs opacity-70">
@@ -151,7 +151,7 @@ export function RiwayatList() {
             <Link
               href="/user/pengajuan/baru"
               className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white px-4 py-2 rounded-lg"
-              style={{ background: 'linear-gradient(90deg, #d97706, #fbbf24)' }}
+              style={{ background: 'linear-gradient(90deg, #d9b400, #F4CE14)' }}
             >
               Ajukan Permohonan <ChevronRight className="w-4 h-4" />
             </Link>
@@ -169,7 +169,7 @@ export function RiwayatList() {
                   href={`/riwayat/${item.id}`}
                   className="glass-card rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg hover:border-primary/30 transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(217,119,6,0.08)' }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(202,138,4,0.08)' }}>
                     <FileText className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">

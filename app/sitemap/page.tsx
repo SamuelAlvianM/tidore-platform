@@ -70,7 +70,7 @@ export default function SitemapPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight mb-2">
           Sitemap
         </h1>
-        <p className="text-sm text-slate-500 mb-8">Peta seluruh halaman portal SIDAKO.</p>
+        <p className="text-sm text-slate-500 mb-8">Peta seluruh halaman portal DAGA.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sections.map((section) => (

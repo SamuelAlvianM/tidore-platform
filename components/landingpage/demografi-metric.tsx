@@ -94,7 +94,7 @@ export function DemografiMetric({
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.08] to-primary/[0.02] px-5 py-4">
         <div>
           <p className="text-[0.66rem] font-bold uppercase tracking-widest text-primary">
-            {title} · Kabupaten Tana Tidung
+            {title} · Kota Tidore Kepulauan
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
             {loading ? '—' : fmt(total)}

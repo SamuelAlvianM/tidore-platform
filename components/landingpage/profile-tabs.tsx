@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useInView, LayoutGroup, easeInOut } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -57,32 +57,29 @@ const TABS: TabConfig[] = [
   { id: 'tugas',      label: 'Tugas & Fungsi',   shortLabel: 'Tugas',    icon: <CheckSquare className="w-4 h-4" />, description: 'Wewenang dan tanggung jawab' },
   { id: 'struktur',   label: 'Struktur',          shortLabel: 'Struktur', icon: <Network className="w-4 h-4" />,     description: 'Susunan organisasi' },
   { id: 'profil-pejabat', label: 'Profil Pejabat', shortLabel: 'Pejabat', icon: <Contact className="w-4 h-4" />,     description: 'Kepala Dinas Kependudukan & Pencatatan Sipil' },
-  { id: 'sejarah',        label: 'Sejarah',        shortLabel: 'Sejarah', icon: <History className="w-4 h-4" />,     description: 'Perjalanan Disdukcapil Tana Tidung' },
+  { id: 'sejarah',        label: 'Sejarah',        shortLabel: 'Sejarah', icon: <History className="w-4 h-4" />,     description: 'Perjalanan Disdukcapil Tidore Kepulauan' },
 ];
 
-// Tab bergambar (Profil Pejabat, Sejarah) — sumber materi resmi Disdukcapil,
-// ditampilkan apa adanya (bukan data terstruktur) sehingga TIDAK memakai
-// StaticContent seperti 5 tab lain (StaticField belum punya tipe gambar
-// tunggal di luar list "items"). Ganti berkasnya langsung di public/ppid/
-// bila ada foto/infografis resmi baru dari dinas.
 // Tab teks yang punya toggle "Tulis Manual | Gambar" di editornya: bila admin
 // memilih mode gambar (konten.mode === 'gambar') dan mengunggah gambar, tab
 // menampilkan gambar itu menggantikan teksnya.
 // (Struktur punya mekanisme mode gambarnya sendiri lewat StrukturChart.)
 const GAMBAR_OVERRIDE_TABS = new Set(['visi-misi', 'maklumat', 'tugas']);
 
-const TAB_GAMBAR: Record<string, { src: string; width: number; height: number; alt: string }> = {
+/**
+ * Tab yang isinya SATU gambar utuh (materi resmi dinas), bukan data terstruktur.
+ * Gambarnya diunggah admin lewat Mode Edit (blok `profil.<id>`, field `gambar`)
+ * — TIDAK lagi dipaku ke berkas di public/. Materi lama berasal dari dinas lain
+ * (Kab. Tana Tidung) dan sudah dilepas, jadi defaultnya kosong.
+ * Selama kosong, tab disembunyikan dari pengunjung dan hanya tampak bagi admin
+ * dalam Mode Edit supaya ada jalan untuk mengunggahnya.
+ */
+const TAB_GAMBAR: Record<string, { alt: string }> = {
   'profil-pejabat': {
-    src: '/ppid/profil-pejabat-kepala-dinas-v2.jpg',
-    width: 1095,
-    height: 438,
-    alt: 'Profil Singkat Kepala Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung',
+    alt: 'Profil Singkat Kepala Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan',
   },
   sejarah: {
-    src: '/ppid/sejarah-disdukcapil.jpg',
-    width: 897,
-    height: 566,
-    alt: 'Sejarah Disdukcapil Kabupaten Tana Tidung',
+    alt: 'Sejarah Disdukcapil Kota Tidore Kepulauan',
   },
 };
 
@@ -278,7 +275,7 @@ function MaklumatPanel({ data }: { data: typeof CONTENT['maklumat'] }) {
               key={i}
               {...fadeUp(0.15 + i * 0.08)}
               whileHover={{ y: -4 }}
-              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-gradient-to-br from-primary/[0.09] to-primary/[0.03] border border-primary/15 shadow-[0_4px_20px_rgba(217,119,6,0.06)] hover:from-primary/[0.13] hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
+              className="group flex flex-col items-center text-center p-5 rounded-2xl bg-gradient-to-br from-primary/[0.09] to-primary/[0.03] border border-primary/15 shadow-[0_4px_20px_rgba(202,138,4,0.06)] hover:from-primary/[0.13] hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
             >
               <div className="w-11 h-11 rounded-2xl bg-white shadow-sm border border-primary/10 flex items-center justify-center text-primary mb-3 group-hover:scale-110 group-hover:shadow-primary/20 transition-all duration-300">
                 <Icon className="w-5 h-5" />
@@ -294,7 +291,7 @@ function MaklumatPanel({ data }: { data: typeof CONTENT['maklumat'] }) {
       <motion.div
         {...fadeUp(0.55)}
         className="relative p-7 rounded-2xl text-white overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #495E57 0%, #3a4b45 100%)' }}
       >
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
         <Quote className="w-7 h-7 text-white/40 mb-3" />
@@ -342,20 +339,39 @@ function StrukturPanel({ data }: { data: typeof CONTENT['struktur'] }) {
   return <StrukturChart data={data} />;
 }
 
-/** Panel bergambar generik — dipakai Profil Pejabat & Sejarah. */
-function GambarPanel({ tabId }: { tabId: string }) {
+/**
+ * Panel bergambar generik — dipakai Profil Pejabat & Sejarah.
+ * `src` berasal dari unggahan admin (blok `profil.<tabId>`, field `gambar`).
+ * Dimensinya tak diketahui di muka, jadi memakai ProfilGambar (<img> polos),
+ * sama seperti tab lain yang memakai mode gambar.
+ */
+function GambarPanel({ tabId, src }: { tabId: string; src: string }) {
   const g = TAB_GAMBAR[tabId];
   if (!g) return null;
+
+  if (!src) {
+    // Hanya terlihat admin dalam Mode Edit (tab disembunyikan dari pengunjung
+    // selama kosong) — petunjuk agar materi resminya diunggah.
+    return (
+      <motion.div
+        {...fadeUp(0.15)}
+        className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center"
+      >
+        <p className="text-sm font-medium text-slate-500">
+          Belum ada gambar untuk tab ini.
+        </p>
+        <p className="mx-auto mt-1.5 max-w-md text-xs leading-relaxed text-slate-400">
+          Klik tombol <b>Edit</b> di pojok kanan atas untuk mengunggah materi
+          resmi Disdukcapil Tidore Kepulauan. Selama kosong, tab ini tidak tampil
+          bagi pengunjung.
+        </p>
+      </motion.div>
+    );
+  }
+
   return (
-    <motion.div {...fadeUp(0.15)} className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
-      <Image
-        src={g.src}
-        alt={g.alt}
-        width={g.width}
-        height={g.height}
-        className="h-auto w-full"
-        sizes="(min-width: 1024px) 900px, 100vw"
-      />
+    <motion.div {...fadeUp(0.15)}>
+      <ProfilGambar src={src} alt={g.alt} />
     </motion.div>
   );
 }
@@ -374,7 +390,16 @@ export default function ProfileTabs() {
     'profil.maklumat',
     'profil.tugas',
     'profil.struktur',
+    'profil.profil-pejabat',
+    'profil.sejarah',
   ]);
+  /** Gambar unggahan admin untuk tab bergambar; '' = belum diunggah. */
+  const gambarTab: Record<string, string> = {
+    'profil-pejabat': String(
+      (cms['profil.profil-pejabat'] as { gambar?: string })?.gambar ?? '',
+    ),
+    sejarah: String((cms['profil.sejarah'] as { gambar?: string })?.gambar ?? ''),
+  };
   const content: Record<string, any> = {
     'visi-misi': cms['profil.visi-misi'],
     motto: cms['profil.motto'],
@@ -384,12 +409,30 @@ export default function ProfileTabs() {
   };
 
   const activeContent = content[activeTab] ?? CONTENT[activeTab];
-  const activeTabConfig = TABS.find((t) => t.id === activeTab)!;
   const { editMode, openEditor } = useInlineEdit();
   const [strukturEditorOpen, setStrukturEditorOpen] = useState(false);
-  // Tab bergambar (lihat TAB_GAMBAR) belum punya editor CMS — sembunyikan
-  // tombol Edit di situ daripada menampilkan tombol yang tidak berbuat apa-apa.
-  const bisaEdit = !(activeTab in TAB_GAMBAR);
+  // Semua tab kini punya editor CMS — termasuk tab bergambar (blok profil.<id>).
+  const bisaEdit = true;
+
+  // Tab bergambar yang belum diisi dinas disembunyikan dari pengunjung (daripada
+  // memamerkan panel kosong), tapi TETAP tampak bagi admin dalam Mode Edit —
+  // kalau ikut disembunyikan, tak ada jalan untuk mengunggah gambarnya.
+  const tabTampil = useMemo(
+    () => TABS.filter((t) => !(t.id in TAB_GAMBAR) || editMode || !!gambarTab[t.id]),
+    // Bergantung pada NILAI gambarnya, bukan identitas objek `gambarTab` yang
+    // dibentuk ulang tiap render (kalau tidak, memo & efek ikut terpicu terus).
+    [editMode, gambarTab['profil-pejabat'], gambarTab.sejarah],
+  );
+
+  // Bila tab aktif baru saja tersembunyi (mis. admin menutup Mode Edit), pindah
+  // ke tab pertama agar tidak menampilkan panel yang tak ada tombolnya.
+  useEffect(() => {
+    if (!tabTampil.some((t) => t.id === activeTab)) {
+      setActiveTab(tabTampil[0]?.id ?? 'visi-misi');
+    }
+  }, [tabTampil, activeTab]);
+
+  const activeTabConfig = TABS.find((t) => t.id === activeTab)!;
 
   return (
     <section ref={containerRef} className="relative py-14 overflow-hidden bg-white border-t border-slate-100">
@@ -446,7 +489,7 @@ export default function ProfileTabs() {
             transition={{ delay: 0.2, duration: 0.55 }}
             className="flex flex-wrap justify-center gap-1.5 mb-6 p-1.5 bg-slate-100/70 backdrop-blur-md rounded-2xl max-w-fit mx-auto border border-slate-200/60"
           >
-            {TABS.map((tab) => {
+            {tabTampil.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
@@ -484,7 +527,7 @@ export default function ProfileTabs() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.99 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="rounded-3xl shadow-[0_8px_40px_rgba(217,119,6,0.08)] border border-primary/15 bg-gradient-to-br from-primary/[0.06] to-primary/[0.02] overflow-hidden"
+              className="rounded-3xl shadow-[0_8px_40px_rgba(202,138,4,0.08)] border border-primary/15 bg-gradient-to-br from-primary/[0.06] to-primary/[0.02] overflow-hidden"
             >
               {/* Top accent line */}
               <div className="h-0.5 bg-gradient-to-r from-primary via-primary/70 to-primary/40" />
@@ -514,8 +557,8 @@ export default function ProfileTabs() {
                       {activeTab === 'maklumat'    && <MaklumatPanel  data={activeContent} />}
                       {activeTab === 'tugas'       && <TugasPanel     data={activeContent} />}
                       {activeTab === 'struktur'    && <StrukturPanel  data={activeContent} />}
-                      {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} />}
-                      {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} />}
+                      {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} src={gambarTab[activeTab]} />}
+                      {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} src={gambarTab[activeTab]} />}
                     </>
                   )}
                 </div>

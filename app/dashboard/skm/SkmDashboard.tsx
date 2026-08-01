@@ -88,7 +88,7 @@ export function SkmDashboard() {
                 <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
-                    style={{ width: `${(a.rata / data.skalaMax) * 100}%`, background: 'linear-gradient(90deg, #d97706, #fcd34d)' }}
+                    style={{ width: `${(a.rata / data.skalaMax) * 100}%`, background: 'linear-gradient(90deg, #d9b400, #F4CE14)' }}
                   />
                 </div>
               </div>

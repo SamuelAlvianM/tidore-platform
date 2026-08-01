@@ -57,7 +57,7 @@ export function ProfilForm({ initial }: { initial: ProfilInitial }) {
       <div className="flex items-center gap-4 pb-6 mb-6 border-b border-slate-200/60">
         <div
           className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)' }}
+          style={{ background: 'linear-gradient(135deg, #495E57, #3a4b45)' }}
         >
           <User className="h-7 w-7" />
         </div>
@@ -119,7 +119,7 @@ export function ProfilForm({ initial }: { initial: ProfilInitial }) {
           type="submit"
           disabled={saving}
           className="text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)' }}
+          style={{ background: 'linear-gradient(135deg, #495E57, #3a4b45)' }}
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           <span className="ml-1.5">Simpan Perubahan</span>

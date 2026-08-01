@@ -56,14 +56,22 @@ const OfficeMap = dynamic(() => import('./office-map'), {
   ),
 });
 
+// Grafik Highcharts (tren 6 bulan & layanan terpopuler) — klien saja.
+const TrenChart = dynamic(() => import('./stats-charts').then((m) => m.TrenChart), {
+  ssr: false,
+  loading: () => <div className="h-[134px] w-full animate-pulse rounded-lg bg-slate-100/70" />,
+});
+const TopLayananChart = dynamic(() => import('./stats-charts').then((m) => m.TopLayananChart), {
+  ssr: false,
+  loading: () => <div className="h-[150px] w-full animate-pulse rounded-lg bg-slate-100/70" />,
+});
+
 // Kartu biru glassy — dipakai semua kartu statistik.
 // Tanpa backdrop-blur: di atas latar putih efeknya nol tapi memicu flicker
 // saat transisi hover. Gradasi tipis memberi kesan kaca seperti navbar.
 const GLASS =
-  'rounded-2xl bg-gradient-to-br from-primary/[0.09] to-primary/[0.03] ' +
-  'border border-primary/15 shadow-[0_4px_20px_rgba(217,119,6,0.06)]';
-const BAR = 'bg-gradient-to-t from-[#b45309] to-[#fcd34d]';
-const BAR_H = 'bg-gradient-to-r from-[#b45309] to-[#fcd34d]';
+  'rounded-2xl bg-gradient-to-br from-white to-[#f6f9fb] ' +
+  'border border-[#e7ebee] shadow-[0_6px_22px_rgba(69,71,75,0.07),inset_0_1px_0_rgba(255,255,255,0.9)]';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -170,41 +178,17 @@ function StatCard({ title, value, icon, accent, accentBg, badge, onClick, editHi
   );
 }
 
-// ─── Mini trend bar chart (6 bulan) ─────────────────────────────────────────────
-
-function TrendChart({ data }: { data: TrendPoint[] }) {
-  const max = Math.max(1, ...data.map((d) => d.count));
-  return (
-    <div className="flex items-end justify-between gap-1.5 h-16">
-      {data.map((d, i) => {
-        const h = Math.max(6, (d.count / max) * 100);
-        return (
-          <div key={i} className="flex flex-1 flex-col items-center gap-1">
-            <div className="relative w-full flex items-end justify-center h-12">
-              <div
-                className={cn('w-full max-w-[22px] rounded-md', BAR)}
-                style={{ height: `${h}%` }}
-                title={`${d.label}: ${d.count}`}
-              />
-            </div>
-            <span className="text-[0.6rem] font-medium text-slate-400">{d.label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+// Tren 6 bulan & Layanan Terpopuler kini pakai Highcharts (stats-charts.tsx).
 
 // ─── Service Stats Card (agregasi informatif) ───────────────────────────────────
 
 function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
   const { total, selesai, aktif, bulanIni, topJenis, trend6 } = pelayanan;
-  const maxJenis = Math.max(1, ...topJenis.map((t) => t.count));
 
   const metrics = [
     { label: 'Bulan Ini', value: bulanIni, icon: <CalendarDays className="w-4 h-4" />, tint: 'text-primary bg-primary/10' },
     { label: 'Selesai', value: selesai, icon: <CheckCircle2 className="w-4 h-4" />, tint: 'text-success bg-success/10' },
-    { label: 'Berjalan', value: aktif, icon: <Hourglass className="w-4 h-4" />, tint: 'text-amber-600 bg-amber-50' },
+    { label: 'Berjalan', value: aktif, icon: <Hourglass className="w-4 h-4" />, tint: 'text-[#8a7400] bg-[#faf3cf]' },
   ];
 
   return (
@@ -229,7 +213,7 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
       {/* 3 metrik agregat */}
       <div className="grid grid-cols-3 gap-2 px-5 pb-4">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded-xl bg-white/70 border border-primary/10 p-2.5 text-center">
+          <div key={m.label} className="rounded-xl bg-white border border-[#eaedf0] p-2.5 text-center">
             <div className={cn('w-7 h-7 mx-auto rounded-lg flex items-center justify-center mb-1.5', m.tint)}>
               {m.icon}
             </div>
@@ -246,7 +230,7 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
         <p className="text-[0.62rem] font-bold uppercase tracking-widest text-slate-400 mb-3">
           Tren Permohonan · 6 Bulan
         </p>
-        <TrendChart data={trend6} />
+        <TrenChart data={trend6} />
       </div>
 
       <Divider />
@@ -259,19 +243,7 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
         {topJenis.length === 0 ? (
           <p className="text-xs text-slate-400 py-2">Belum ada data permohonan.</p>
         ) : (
-          <div className="space-y-2.5">
-            {topJenis.map((t) => (
-              <div key={t.nama} className="space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-slate-600 truncate">{t.nama}</span>
-                  <span className="text-xs font-bold text-slate-900 shrink-0">{t.count.toLocaleString('id-ID')}</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-primary/10 overflow-hidden">
-                  <div className={cn('h-full rounded-full', BAR_H)} style={{ width: `${(t.count / maxJenis) * 100}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <TopLayananChart data={topJenis} />
         )}
       </div>
 
@@ -290,8 +262,8 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
 // ─── Map Card (full width, di bawah) ────────────────────────────────────────────
 
 const WILAYAH = [
-  { label: 'Kecamatan', value: '5', icon: <Building2 className="w-5 h-5" />, chip: 'bg-primary/10 text-primary' },
-  { label: 'Desa / Kelurahan', value: '32', icon: <Trees className="w-5 h-5" />, chip: 'bg-emerald-50 text-emerald-600' },
+  { label: 'Kecamatan', value: '8', icon: <Building2 className="w-5 h-5" />, chip: 'bg-primary/10 text-primary' },
+  { label: 'Desa / Kelurahan', value: '89', icon: <Trees className="w-5 h-5" />, chip: 'bg-emerald-50 text-emerald-600' },
 ];
 
 function MapCard() {
@@ -330,7 +302,7 @@ function MapCard() {
             {WILAYAH.map((item) => (
               <div
                 key={item.label}
-                className="flex items-center gap-3.5 rounded-xl bg-white/60 border border-primary/[0.08] px-4 py-3.5"
+                className="flex items-center gap-3.5 rounded-xl bg-white/90 border border-[#eaedf0] px-4 py-3.5"
               >
                 <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center shrink-0', item.chip)}>
                   {item.icon}
@@ -347,7 +319,7 @@ function MapCard() {
           <div className="flex items-start gap-2 rounded-xl bg-primary/[0.05] border border-primary/[0.08] px-3.5 py-3">
             <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
             <p className="text-[0.72rem] text-slate-500 leading-snug">
-              Kompleks Perkantoran Pemda, Tideng Pale, Kabupaten Tana Tidung, Kalimantan Utara
+              Jl. Ahmad Yani No.A, Indonesiana, Kota Tidore Kepulauan, Maluku Utara
             </p>
           </div>
         </div>
@@ -506,7 +478,7 @@ export default function StatsGrid() {
           <DialogHeader>
             <DialogTitle>{demoCard?.title ?? 'Data Demografi'}</DialogTitle>
             <DialogDescription>
-              Angka per kecamatan di Kabupaten Tana Tidung — klik “Desa/Kelurahan” untuk rincian tiap desa.
+              Angka per kecamatan di Kota Tidore Kepulauan — klik “Desa/Kelurahan” untuk rincian tiap desa.
             </DialogDescription>
           </DialogHeader>
           {demoCard && (

@@ -17,7 +17,7 @@ export default function PetaPage() {
               Peta Wilayah Administrasi
             </h1>
             <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-              Peta lokasi kantor Disdukcapil Kabupaten Tana Tidung.
+              Peta lokasi kantor Disdukcapil Kota Tidore Kepulauan.
             </p>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
+import { Pagination } from '@/components/shared/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -87,12 +87,15 @@ export function AdminPermohonan() {
   const [statusFilter, setStatusFilter] = useState('');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
-  // Load-on-scroll: cursor halaman berikutnya + indikator "memuat lagi".
-  const [cursor, setCursor] = useState<number | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
-  // Token anti-race saat filter/pencarian berubah; `appliedQ` = q yang sedang tampil.
+  // Paginasi bernomor. Pencarian & filter dijalankan di server, jadi hasilnya
+  // menjangkau SELURUH data — data di halaman 3 tetap ketemu walau kita sedang
+  // berada di halaman 1.
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
+  const [totalHalaman, setTotalHalaman] = useState(1);
+  // Token anti-race saat filter/pencarian berubah.
   const reqId = useRef(0);
-  const appliedQRef = useRef('');
   // Panel detail inline (menggantikan tabel — bukan pindah halaman).
   const [detail, setDetail] = useState<Detail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -105,48 +108,48 @@ export function AdminPermohonan() {
   // Konfirmasi ekstra sebelum status dijadikan final (Selesai/Ditolak).
   const [confirmFinal, setConfirmFinal] = useState(false);
 
-  const load = useCallback(async () => {
-    const my = ++reqId.current;
-    appliedQRef.current = q.trim();
-    setLoading(true);
-    const params = new URLSearchParams({ limit: '20' });
-    if (statusFilter) params.set('status', statusFilter);
-    if (q.trim()) params.set('q', q.trim());
-    const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
-    const json = await res.json();
-    if (my !== reqId.current) return; // filter/pencarian sudah berganti
-    setItems(json.data?.items ?? []);
-    setCursor(json.data?.nextCursor ?? null);
-    if (json.data?.counts) setCounts(json.data.counts);
-    setLoading(false);
-  }, [statusFilter, q]);
-
-  const loadMore = useCallback(async () => {
-    if (cursor == null || loadingMore) return;
-    const my = reqId.current;
-    setLoadingMore(true);
-    try {
-      const params = new URLSearchParams({ limit: '20', cursor: String(cursor) });
+  const load = useCallback(
+    async (halaman: number, baris = limit) => {
+      const my = ++reqId.current;
+      setLoading(true);
+      const params = new URLSearchParams({
+        limit: String(baris),
+        page: String(halaman),
+      });
       if (statusFilter) params.set('status', statusFilter);
-      if (appliedQRef.current) params.set('q', appliedQRef.current);
+      if (q.trim()) params.set('q', q.trim());
       const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
       const json = await res.json();
-      if (my !== reqId.current) return; // filter berganti saat memuat
-      setItems((prev) => [...prev, ...(json.data?.items ?? [])]);
-      setCursor(json.data?.nextCursor ?? null);
-    } finally {
-      if (my === reqId.current) setLoadingMore(false);
-    }
-  }, [cursor, loadingMore, statusFilter]);
+      if (my !== reqId.current) return; // filter/pencarian sudah berganti
+      setItems(json.data?.items ?? []);
+      setTotal(json.data?.total ?? 0);
+      setTotalHalaman(json.data?.totalHalaman ?? 1);
+      if (json.data?.counts) setCounts(json.data.counts);
+      setLoading(false);
+    },
+    [statusFilter, q, limit],
+  );
 
+  // Ganti filter → selalu balik ke halaman 1, kalau tidak bisa terdampar di
+  // halaman yang sudah tidak ada isinya.
   useEffect(() => {
-    load();
+    setPage(1);
+    load(1);
   }, [statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const sentinelRef = useInfiniteScroll(
-    loadMore,
-    cursor != null && !loading && !loadingMore && !detail && !detailLoading,
-  );
+  const gantiHalaman = (p: number) => {
+    setPage(p);
+    load(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Ganti jumlah baris → mulai lagi dari halaman 1 supaya posisi tidak melompat
+  // ke luar jangkauan (mis. halaman 9 dari 10 saat baris dinaikkan ke 100).
+  const gantiLimit = (l: number) => {
+    setLimit(l);
+    setPage(1);
+    load(1, l);
+  };
 
   const openDetail = async (it: Item) => {
     setDetailLoading(true);
@@ -336,7 +339,11 @@ export function AdminPermohonan() {
               {/* Aksi: proses (baca dulu detail di atas, baru proses di sini) */}
               <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
                 {detail.status === 'SELESAI' && (
-                  <a href={`/api/permohonan/${detail.id}/pdf`}>
+                  <a
+                    href={`/api/permohonan/${detail.id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Button variant="outline" className="border-success/40 text-success hover:bg-success/10 hover:text-success">
                       <Download className="h-4 w-4 mr-1.5" /> Unduh Dokumen (PDF)
                     </Button>
@@ -378,8 +385,7 @@ export function AdminPermohonan() {
             <h2 className="font-semibold text-slate-900">Daftar Permohonan</h2>
             {!loading && (
               <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
-                {items.length}
-                {cursor != null ? '+' : ''} data
+                {total} data
               </span>
             )}
           </div>
@@ -413,7 +419,8 @@ export function AdminPermohonan() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                load();
+                setPage(1);
+                load(1);
               }}
               className="flex gap-2 flex-1"
             >
@@ -432,7 +439,59 @@ export function AdminPermohonan() {
             <div className="text-center py-12 text-sm text-slate-500">Tidak ada permohonan.</div>
           ) : (
             <>
-            <div className="overflow-x-auto">
+            {/* ── Ponsel: daftar kartu ──────────────────────────────────────
+                Tabel 6 kolom harus digeser menyamping di layar sempit; sebagai
+                kartu, seluruh isi baris terbaca sekaligus. Mengetuk kartu =
+                menekan tombol Detail pada tabel. */}
+            <ul className="space-y-2 md:hidden">
+              {items.map((it) => (
+                <li key={it.id}>
+                  <button
+                    type="button"
+                    onClick={() => openDetail(it)}
+                    title="Lihat detail, berkas & proses"
+                    className="flex w-full items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left transition-colors hover:border-primary/40"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <StatusBadge status={it.status} />
+                        {FINAL_STATUS.includes(it.status) && (
+                          <span
+                            className="text-slate-300"
+                            title="Permohonan final — buka kunci lewat halaman Master"
+                          >
+                            <Lock className="h-3.5 w-3.5" />
+                          </span>
+                        )}
+                        <span className="text-[0.7rem] text-slate-400">
+                          {new Date(it.createdAt).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </span>
+                      <span className="mt-1.5 block truncate text-sm font-medium text-slate-800">
+                        {it.jenisNama}
+                      </span>
+                      <span className="block truncate font-mono text-[0.7rem] text-slate-500">
+                        {it.noregister}
+                      </span>
+                      <span className="mt-1 block truncate text-xs text-slate-500">
+                        {it.pemohon}
+                      </span>
+                      <span className="block truncate text-[0.7rem] text-slate-400">
+                        {it.kategori} &middot; {it.jumlahBerkas} berkas
+                      </span>
+                    </span>
+                    <Eye className="mt-0.5 h-4 w-4 shrink-0 text-slate-300" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* ── Layar sedang ke atas: tabel ── */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-slate-500 border-b border-slate-200">
@@ -478,17 +537,15 @@ export function AdminPermohonan() {
                 </tbody>
               </table>
             </div>
-            <div ref={sentinelRef} className="h-8" />
-            {loadingMore && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              </div>
-            )}
-            {cursor == null && items.length > 20 && (
-              <p className="py-3 text-center text-xs text-slate-400">
-                — Semua data ditampilkan —
-              </p>
-            )}
+            <Pagination
+              page={page}
+              totalHalaman={totalHalaman}
+              total={total}
+              limit={limit}
+              onChange={gantiHalaman}
+              onLimitChange={gantiLimit}
+              disabled={loading}
+            />
             </>
           )}
         </>

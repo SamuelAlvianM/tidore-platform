@@ -1,21 +1,21 @@
-// PM2 untuk ktt-platform (Next.js standalone). Secret dibaca dari
+// PM2 untuk tidore-platform / DAGA (Next.js standalone). Secret dibaca dari
 // process.env (di-source dari deploy/.env oleh deploy.sh). JANGAN hardcode secret.
 module.exports = {
   apps: [
     {
-      name: 'tanatidung',
+      name: 'daga',
       // server.js dihasilkan Next di root .next/standalone (dikirim ke REMOTE_DIR).
       script: 'server.js',
-      cwd: '/root/ktt-platform',
+      cwd: '/root/tidore-platform',
       instances: 1,
       exec_mode: 'fork',
       env_production: {
         NODE_ENV: 'production',
-        PORT: process.env.PORT || 3000,
-        HOSTNAME: '127.0.0.1', // hanya localhost; publik lewat Nginx
+        PORT: process.env.PORT || 3001, // internal; publik lewat Apache reverse proxy
+        HOSTNAME: '127.0.0.1',          // hanya localhost
         DATABASE_URL: process.env.DATABASE_URL,
         AUTH_SECRET: process.env.AUTH_SECRET,
-        // Demo via HTTP (tanpa SSL) → cookie sesi TIDAK boleh Secure.
+        // Selama SSL asli belum terbit → cookie sesi TIDAK boleh Secure (lihat deploy/.env).
         AUTH_COOKIE_SECURE: process.env.AUTH_COOKIE_SECURE || 'false',
         APP_URL: process.env.APP_URL,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -25,9 +25,7 @@ module.exports = {
         MAIL_USER: process.env.MAIL_USER,
         MAIL_PASS: process.env.MAIL_PASS,
         MAIL_FROM: process.env.MAIL_FROM,
-        // OTP WhatsApp (Fonnte): kosong = OTP dilewati saat register.
         FONNTE_TOKEN: process.env.FONNTE_TOKEN,
-        // Halaman /dashboard/master: kosong = fitur dinonaktifkan (503).
         MASTER_PASSWORD: process.env.MASTER_PASSWORD,
         TIKET_AUTO_CLOSE_DAYS: process.env.TIKET_AUTO_CLOSE_DAYS,
       },

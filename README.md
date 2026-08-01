@@ -1,6 +1,6 @@
-# SIDAKO Platform
+# DAGA Platform
 
-Portal layanan **SIDAKO — Disdukcapil Kabupaten Tana Tidung** (Kalimantan Utara) — hasil migrasi dari Laravel 9 (`data-2`) ke **Next.js full-stack**.
+Portal layanan **DAGA — Disdukcapil Kota Tidore Kepulauan** (Maluku Utara) — hasil migrasi dari Laravel 9 (`data-2`) ke **Next.js full-stack**.
 
 - **Frontend + Backend menyatu** (Next.js App Router + Route Handlers)
 - **TypeScript** (strict), **Tailwind v4 + shadcn/ui**, **Redux Toolkit**, **framer-motion**
@@ -16,7 +16,7 @@ Portal layanan **SIDAKO — Disdukcapil Kabupaten Tana Tidung** (Kalimantan Utar
 npm install
 cp .env.example .env.local      # isi DATABASE_URL & AUTH_SECRET
 
-# Siapkan DB MySQL (buat database "tanatidung" lebih dulu), lalu:
+# Siapkan DB MySQL (buat database "tidore" lebih dulu), lalu:
 npm run db:push                 # buat tabel dari schema Prisma
 npm run db:seed                 # isi data dummy + akun demo
 npm run dev                     # http://localhost:3300

@@ -353,7 +353,7 @@ export function StrukturEditor({
                     <Tree
                       key={root._id}
                       lineWidth="1px"
-                      lineColor="rgba(217,119,6,0.25)"
+                      lineColor="rgba(202,138,4,0.25)"
                       lineBorderRadius="8px"
                       label={
                         <div className="inline-flex">

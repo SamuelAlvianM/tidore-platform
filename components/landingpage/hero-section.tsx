@@ -83,7 +83,7 @@ export default function HeroSection() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(135deg, #92400e 0%, #b45309 45%, #f59e0b 100%)",
+            "radial-gradient(1100px 520px at 80% -12%, rgba(73,94,87,0.10), transparent 60%), radial-gradient(900px 520px at -5% 115%, rgba(73,94,87,0.08), transparent 55%), linear-gradient(180deg, #F5F7F8 0%, #F5F7F8 60%, #eef1f3 100%)",
         }}
       />
       {/* Pola titik halus */}
@@ -91,19 +91,19 @@ export default function HeroSection() {
         className="absolute inset-0 opacity-[0.07]"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            "radial-gradient(circle at 1px 1px, rgba(73,94,87,0.4) 1px, transparent 0)",
           backgroundSize: "28px 28px",
         }}
       />
       {/* Glow aksen */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl bg-sky-400/20 pointer-events-none" />
-      <div className="absolute -bottom-40 -left-20 w-96 h-96 rounded-full blur-3xl bg-amber-300/10 pointer-events-none" />
+      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full blur-3xl bg-[#495E57]/12 pointer-events-none" />
+      <div className="absolute -bottom-40 -left-20 w-96 h-96 rounded-full blur-3xl bg-[#495E57]/10 pointer-events-none" />
 
       <div className="relative container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-16">
         <div className="flex flex-col lg:flex-row items-center gap-10">
           {/* Kiri: headline + search + quick actions */}
           <EditableBlock kunci="beranda.hero" label="Teks Hero" className="w-full lg:flex-1">
-          <div className="w-full text-white">
+          <div className="w-full text-slate-900">
             {/* <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -111,7 +111,7 @@ export default function HeroSection() {
               className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-1.5 text-xs font-medium tracking-wide backdrop-blur-sm"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              Portal Resmi Disdukcapil Kabupaten Tana Tidung
+              Portal Resmi Disdukcapil Kota Tidore Kepulauan
             </motion.p> */}
 
             <motion.h1
@@ -127,7 +127,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.16, ease }}
-              className="mt-4 text-white/80 text-base md:text-lg max-w-xl leading-relaxed"
+              className="mt-4 text-slate-600 text-base md:text-lg max-w-xl leading-relaxed"
             >
               {hero?.subheading}
             </motion.p>
@@ -151,7 +151,7 @@ export default function HeroSection() {
               />
               <button
                 type="submit"
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#b45309] to-[#f59e0b] px-5 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity shrink-0"
+                className="flex items-center gap-1.5 rounded-xl bg-[#F4CE14] px-5 py-3 text-sm font-semibold text-[#45474B] shadow-lg shadow-[#45474B]/15 hover:brightness-95 transition-all shrink-0"
               >
                 Cari
                 <ArrowRight className="h-4 w-4" />
@@ -173,7 +173,7 @@ export default function HeroSection() {
                       ? "/user/pengajuan/baru"
                       : `/user/pengajuan/baru?q=${encodeURIComponent(a.label)}`
                   }
-                  className="group inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/90 backdrop-blur-sm hover:bg-white hover:text-[#1b4b72] transition-all"
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-[#45474B]/15 bg-white/70 px-3.5 py-1.5 text-xs font-medium text-[#45474B] backdrop-blur-sm shadow-sm shadow-[#45474B]/5 hover:bg-[#495E57]/10 hover:text-[#495E57] hover:border-[#495E57]/40 transition-all"
                   style={{ transitionDelay: `${i * 20}ms` }}
                 >
                   <a.icon className="h-3.5 w-3.5" />
@@ -187,14 +187,14 @@ export default function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.45, ease }}
-              className="mt-8 flex flex-wrap items-center gap-5 text-white/70 text-xs"
+              className="mt-8 flex flex-wrap items-center gap-5 text-slate-500 text-xs"
             >
               {TRUST_BADGES.map((b) => (
                 <span
                   key={b.label}
                   className="inline-flex items-center gap-1.5"
                 >
-                  <b.icon className="h-4 w-4 text-emerald-300" />
+                  <b.icon className="h-4 w-4 text-emerald-600" />
                   {b.label}
                 </span>
               ))}

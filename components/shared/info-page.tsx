@@ -237,7 +237,7 @@ export function InfoPage({
               Dokumen resmi belum tersedia secara digital di portal ini. Untuk informasi
               lengkap, silakan{' '}
               <Link href="/hubungi-kami/alamat" className="text-primary hover:underline">
-                hubungi Disdukcapil Tana Tidung
+                hubungi Disdukcapil Tidore Kepulauan
               </Link>{' '}
               secara langsung.
             </div>

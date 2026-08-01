@@ -84,7 +84,7 @@ export function StrukturChart({ data }: { data: StrukturData }) {
           <Tree
             key={root.jabatan}
             lineWidth="1px"
-            lineColor="rgba(217,119,6,0.25)"
+            lineColor="rgba(202,138,4,0.25)"
             lineBorderRadius="8px"
             label={<div className="inline-flex"><OrgBox node={root} org={org} /></div>}
           >

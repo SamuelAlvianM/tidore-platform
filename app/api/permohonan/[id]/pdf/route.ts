@@ -19,7 +19,21 @@ export async function GET(
     where: { id: Number(id) },
     include: {
       jenis: true,
-      user: { select: { userFullname: true, userId: true } },
+      user: {
+        select: {
+          userFullname: true,
+          userId: true,
+          userNik: true,
+          userHp: true,
+          userEmail: true,
+        },
+      },
+      // Lampiran permohonan hasil migrasi ETL HANYA tercatat di t_berkas
+      // (tidak di payload) — tanpa include ini PDF-nya keluar tanpa lampiran.
+      berkas: {
+        select: { namaFile: true, path: true },
+        orderBy: { id: "asc" },
+      },
     },
   });
   if (!item) return fail(["Permohonan tidak ditemukan"], 404);
@@ -44,6 +58,11 @@ export async function GET(
     status: item.status,
     catatan: item.catatan,
     pemohon: item.user?.userFullname ?? item.user?.userId ?? "-",
+    // userId = NIK saat warga mendaftar; dipakai bila kolom NIK belum terisi.
+    pemohonNik: item.user?.userNik ?? item.user?.userId ?? null,
+    pemohonHp: item.user?.userHp ?? null,
+    pemohonEmail: item.user?.userEmail ?? null,
+    berkas: item.berkas.map((b) => ({ label: b.namaFile, path: b.path })),
     prosesTanggal: item.prosesAt
       ? new Date(item.prosesAt).toLocaleString("id-ID", {
           dateStyle: "long",
@@ -57,7 +76,9 @@ export async function GET(
   return new Response(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="permohonan-${item.noregister}.pdf"`,
+      // `inline` agar PDF LANGSUNG TAMPIL di tab baru (tautan memakai
+      // target="_blank"); pengguna tetap bisa menyimpannya dari penampil PDF.
+      "Content-Disposition": `inline; filename="permohonan-${item.noregister}.pdf"`,
     },
   });
 }

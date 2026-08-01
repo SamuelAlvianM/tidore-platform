@@ -308,16 +308,16 @@ export function AccessibilityWidget() {
           'fixed right-3 top-[62%] z-[70] flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full',
           // Glassy: oranye cerah yang cukup tembus + blur kuat, supaya efek
           // kacanya benar-benar terlihat (latar di belakangnya ikut terbias).
-          'bg-gradient-to-br from-[#fdba74]/65 via-[#fb923c]/70 to-[#f97316]/75 text-white',
+          'bg-gradient-to-br from-white to-[#F5F7F8] text-[#495E57]',
           'backdrop-blur-xl backdrop-saturate-150',
           // Tepi terang → memisahkan tombol dari latar apa pun (termasuk hero
           // gelap di beranda saat tampilan ponsel, yang tadinya menyatu).
-          'border border-white/60 ring-1 ring-black/10',
+          'border-2 border-[#F4CE14] ring-1 ring-black/5',
           // Timbul (3D): bayangan luar berlapis + sorotan dalam di sisi atas
           // dan bayangan dalam di sisi bawah.
-          'shadow-[0_10px_24px_-6px_rgba(0,0,0,0.45),0_3px_8px_rgba(0,0,0,0.22),inset_0_1.5px_0_rgba(255,255,255,0.5),inset_0_-3px_8px_rgba(0,0,0,0.18)]',
+          'shadow-[0_10px_24px_-6px_rgba(69,71,75,0.30),0_3px_8px_rgba(69,71,75,0.15),inset_0_1.5px_0_rgba(255,255,255,0.9)]',
           'transition-all duration-200 hover:-translate-y-[calc(50%+2px)] hover:scale-105',
-          'hover:shadow-[0_16px_32px_-6px_rgba(0,0,0,0.5),0_4px_10px_rgba(0,0,0,0.25),inset_0_1.5px_0_rgba(255,255,255,0.6),inset_0_-3px_8px_rgba(0,0,0,0.18)]',
+          'hover:shadow-[0_16px_32px_-6px_rgba(69,71,75,0.35),0_4px_10px_rgba(69,71,75,0.18),inset_0_1.5px_0_rgba(255,255,255,0.9)]',
           'active:scale-95 focus-visible:ring-4 focus-visible:ring-primary/40',
         ].join(' ')}
       >

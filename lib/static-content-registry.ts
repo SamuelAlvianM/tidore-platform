@@ -79,7 +79,7 @@ export const STATIC_BLOCKS: StaticBlock[] = [
       },
     ],
     defaults: {
-      heading: "Layanan Kependudukan Kabupaten Tana Tidung",
+      heading: "Layanan Kependudukan Kota Tidore Kepulauan",
       subheading:
         "Urus akta kelahiran, KTP-el, Kartu Keluarga, dan layanan kependudukan lainnya secara online — cepat, mudah, dan gratis.",
       searchPlaceholder: "Mau mengurus apa hari ini?",
@@ -225,6 +225,42 @@ export const STATIC_BLOCKS: StaticBlock[] = [
       ],
     },
   },
+  // Tab profil yang isinya SATU gambar utuh (materi resmi dinas), bukan data
+  // terstruktur: Profil Pejabat & Sejarah. Default sengaja kosong — materi lama
+  // berasal dari dinas lain dan sudah dilepas; dinas mengunggah miliknya sendiri
+  // lewat Mode Edit. Selama kosong, tab disembunyikan dari pengunjung.
+  {
+    kunci: "profil.profil-pejabat",
+    judul: "Profil — Profil Pejabat",
+    deskripsi:
+      "Gambar/infografis profil singkat Kepala Dinas. Unggah materi resmi Disdukcapil Tidore Kepulauan.",
+    fields: [
+      {
+        name: "gambar",
+        label: "Gambar Profil Pejabat",
+        type: "image",
+        catatan:
+          "Unggah infografis profil Kepala Dinas dari materi resmi dinas. Selama kosong, tab ini tidak tampil bagi pengunjung.",
+      },
+    ],
+    defaults: { gambar: "" },
+  },
+  {
+    kunci: "profil.sejarah",
+    judul: "Profil — Sejarah",
+    deskripsi:
+      "Gambar/infografis sejarah dinas. Unggah materi resmi Disdukcapil Tidore Kepulauan.",
+    fields: [
+      {
+        name: "gambar",
+        label: "Gambar Sejarah",
+        type: "image",
+        catatan:
+          "Unggah infografis sejarah dinas dari materi resmi. Selama kosong, tab ini tidak tampil bagi pengunjung.",
+      },
+    ],
+    defaults: { gambar: "" },
+  },
   {
     kunci: "beranda.carousel",
     judul: "Beranda — Carousel Hero",
@@ -258,7 +294,7 @@ export const STATIC_BLOCKS: StaticBlock[] = [
     deskripsi: "Paragraf perkenalan dinas (teks bebas, mendukung format).",
     fields: [{ name: "html", label: "Isi", type: "richtext" }],
     defaults: {
-      html: "<p>Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung melayani administrasi kependudukan: KTP elektronik, Kartu Keluarga, akta kelahiran, akta kematian, perpindahan penduduk, dan layanan lainnya.</p>",
+      html: "<p>Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan melayani administrasi kependudukan: KTP elektronik, Kartu Keluarga, akta kelahiran, akta kematian, perpindahan penduduk, dan layanan lainnya.</p>",
     },
   },
 ];
@@ -275,6 +311,45 @@ STATIC_BLOCKS.push({
     "Judul, ikon, warna, dan sumber data (kategori + kolom) tiap kartu statistik di beranda.",
   fields: [{ name: "kartu", label: "Kartu Statistik", type: "items" }],
   defaults: { kartu: DEFAULT_KARTU },
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// Survei Kepuasan Masyarakat — halaman /survei-kepuasan.
+// Formulir survei DILAYANI PIHAK LUAR (mis. skm.go.id atau Google Form), jadi
+// yang disimpan cuma URL-nya; halaman menyematkannya sebagai iframe. URL
+// sengaja KOSONG secara bawaan: tautan resmi datang dari dinas, dan menebak
+// alamat instansi berarti mengirim warga mengisi survei milik instansi lain.
+// ───────────────────────────────────────────────────────────────────────────
+export const SURVEI_KEPUASAN_KUNCI = "layanan.survei-kepuasan";
+
+STATIC_BLOCKS.push({
+  kunci: SURVEI_KEPUASAN_KUNCI,
+  judul: "Halaman — Survei Kepuasan Masyarakat",
+  deskripsi:
+    "Judul, pengantar, dan TAUTAN formulir survei. Tempelkan tautan resmi dari dinas — formulirnya otomatis tampil langsung di halaman.",
+  fields: [
+    {
+      name: "url",
+      label: "Tautan Formulir Survei",
+      type: "text",
+      placeholder: "https://…",
+      catatan: [
+        "Tempel alamat formulir survei resmi (mis. Google Form atau skm.go.id). Formulir akan tampil langsung di halaman ini, dan tombol “Buka di website” mengarah ke alamat yang sama. Selama kosong, halaman memberi tahu bahwa survei belum tersedia.",
+        "PENTING — formulir harus bisa dibuka UMUM, kalau tidak bingkainya tampil kosong dan warga tidak bisa mengisi:",
+        "• Google Form → Settings → Responses: matikan “Restrict to users in …” dan “Limit to 1 response”; “Collect email addresses” jangan disetel “Verified”.",
+        "• Lalu Share/Bagikan → pilih “Anyone with the link”.",
+        "Cara memastikan: buka tautannya di jendela Incognito/Penyamaran. Kalau yang muncul halaman login Google, warga pun akan mentok di situ — bukan portal ini yang bermasalah.",
+      ].join("\n"),
+    },
+    { name: "judul", label: "Judul Halaman", type: "text" },
+    { name: "intro", label: "Paragraf Pengantar", type: "textarea" },
+  ],
+  defaults: {
+    url: "",
+    judul: "Survei Kepuasan Masyarakat",
+    intro:
+      "Penilaian Anda membantu kami meningkatkan mutu pelayanan administrasi kependudukan. Isi formulir survei resmi di bawah ini — cukup beberapa menit dan identitas Anda dijaga sesuai ketentuan.",
+  },
 });
 
 /** Kunci blok konten statis untuk label periode data DKB (badge beranda). */
@@ -315,7 +390,7 @@ STATIC_BLOCKS.push({
   ],
   defaults: {
     intro:
-      "Layanan Disdukcapil Tana Tidung terdiri atas Layanan Pencatatan Sipil (Capil) dan Layanan Pendaftaran Penduduk (Dafduk). Pencatatan Sipil adalah pencatatan peristiwa penting yang dialami oleh seseorang dalam register pencatatan sipil pada Instansi Pelaksana; dokumen yang dicatat meliputi akta-akta serta catatan pinggir. Pendaftaran Penduduk adalah pencatatan biodata penduduk, pencatatan atas pelaporan peristiwa kependudukan dan pendataan penduduk rentan administrasi kependudukan, serta penerbitan dokumen penduduk berupa kartu identitas atau surat keterangan kependudukan.",
+      "Layanan Disdukcapil Tidore Kepulauan terdiri atas Layanan Pencatatan Sipil (Capil) dan Layanan Pendaftaran Penduduk (Dafduk). Pencatatan Sipil adalah pencatatan peristiwa penting yang dialami oleh seseorang dalam register pencatatan sipil pada Instansi Pelaksana; dokumen yang dicatat meliputi akta-akta serta catatan pinggir. Pendaftaran Penduduk adalah pencatatan biodata penduduk, pencatatan atas pelaporan peristiwa kependudukan dan pendataan penduduk rentan administrasi kependudukan, serta penerbitan dokumen penduduk berupa kartu identitas atau surat keterangan kependudukan.",
     produk: [
       {
         image: "/produk-layanan/kelahiran.png",
@@ -396,9 +471,9 @@ STATIC_BLOCKS.push({
   ],
   defaults: {
     intro:
-      "Terima kasih sudah menggunakan aplikasi SIDAKO — Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
+      "Terima kasih sudah menggunakan aplikasi DAGA — Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan.",
     umum: [
-      "Aplikasi ini merupakan peralihan dari layanan offline (di kantor) Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
+      "Aplikasi ini merupakan peralihan dari layanan offline (di kantor) Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan.",
       "Pengunduhan dan/atau penggunaan aplikasi ini bebas biaya. Koneksi ke jaringan internet diperlukan untuk dapat menggunakan layanan ini; segala biaya yang timbul atas koneksi perangkat pemohon dengan jaringan internet sepenuhnya ditanggung oleh pemohon.",
       "Aplikasi ini dapat digunakan oleh pemohon dengan terlebih dahulu melakukan pendaftaran yang disertai pemberian informasi data pribadi pemohon sebagaimana diminta dalam aplikasi. Informasi data pribadi yang diberikan hanya akan digunakan untuk pemberian layanan dan tujuan lain yang dimuat dalam kebijakan privasi. Informasi tambahan wajib pemohon berikan untuk dapat menggunakan layanan tertentu dalam aplikasi.",
       "Aplikasi ini bertujuan memberikan informasi secara umum terkait produk dan layanan yang kami sediakan. Kami senantiasa berupaya menjaga kebenaran dan kekinian informasi tersebut, namun tidak membuat pernyataan dan jaminan apa pun, baik tersurat maupun tersirat, mengenai kelengkapan, akurasi, keandalan, kesesuaian, keamanan, kecepatan, maupun ketersediaan fitur, informasi, produk, layanan, gambar, atau grafis dalam aplikasi. Gambar, grafis, dan/atau foto dalam aplikasi mungkin tunduk pada hak kekayaan intelektual pihak ketiga.",
@@ -407,7 +482,7 @@ STATIC_BLOCKS.push({
       "Kami memiliki kebijakan sendiri dan menyeluruh untuk menerima, menunda, atau menolak permintaan Anda atas layanan.",
     ],
     penggunaan: [
-      "Anda menyatakan dan menjamin bahwa Anda adalah individu yang secara hukum berhak dan cakap berdasarkan hukum Negara Republik Indonesia untuk meminta layanan dari Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung serta menggunakan aplikasi ini. Apabila ketentuan tersebut tidak terpenuhi, kami berhak membatalkan setiap layanan yang Anda buat.",
+      "Anda menyatakan dan menjamin bahwa Anda adalah individu yang secara hukum berhak dan cakap berdasarkan hukum Negara Republik Indonesia untuk meminta layanan dari Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan serta menggunakan aplikasi ini. Apabila ketentuan tersebut tidak terpenuhi, kami berhak membatalkan setiap layanan yang Anda buat.",
       "Jika Anda mendaftar untuk dan atas nama suatu institusi, Anda menyatakan dan menjamin bahwa Anda berwenang bertindak untuk dan atas nama institusi tersebut dengan menunjukkan surat penunjukan.",
       "Kami mengumpulkan dan memproses data pribadi Anda seperti nama, alamat, nomor kartu identitas, nomor telepon, alamat surel, dan tanggal lahir saat Anda mendaftar dan menggunakan aplikasi. Anda wajib memberikan informasi yang akurat dan lengkap serta memperbaruinya dari waktu ke waktu, dan setuju memberikan bukti identitas yang secara wajar kami minta.",
       "Dalam hal terjadi penggunaan kata sandi akun Anda dengan cara apa pun yang bukan karena kesalahan kami dan mengakibatkan penggunaan tanpa kewenangan, permintaan yang dilakukan melalui aplikasi tetap dianggap permintaan yang sah, kecuali Anda memberitahu kami sebelum layanan diberikan.",
@@ -429,7 +504,7 @@ STATIC_BLOCKS.push({
   kunci: "info.syarat-ketentuan",
   judul: "Halaman — Syarat & Ketentuan",
   deskripsi:
-    "Syarat & ketentuan penggunaan portal SIDAKO (halaman /syarat). Tiap bagian berupa daftar poin yang bisa diedit.",
+    "Syarat & ketentuan penggunaan portal DAGA (halaman /syarat). Tiap bagian berupa daftar poin yang bisa diedit.",
   fields: [
     { name: "intro", label: "Kalimat Pembuka", type: "textarea" },
     { name: "pembaruan", label: "Label Terakhir Diperbarui", type: "text" },
@@ -451,12 +526,12 @@ STATIC_BLOCKS.push({
   ],
   defaults: {
     intro:
-      "Selamat datang di SIDAKO — portal layanan administrasi kependudukan dan pencatatan sipil Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung. Dengan mendaftar dan/atau menggunakan layanan pada portal ini, Anda dianggap telah membaca, memahami, dan menyetujui seluruh Syarat & Ketentuan berikut.",
+      "Selamat datang di DAGA — portal layanan administrasi kependudukan dan pencatatan sipil Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan. Dengan mendaftar dan/atau menggunakan layanan pada portal ini, Anda dianggap telah membaca, memahami, dan menyetujui seluruh Syarat & Ketentuan berikut.",
     pembaruan: "Terakhir diperbarui: Juli 2026",
     umum: [
-      "SIDAKO adalah portal layanan administrasi kependudukan berbasis daring milik Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung, sebagai peralihan dari layanan tatap muka di kantor.",
+      "DAGA adalah portal layanan administrasi kependudukan berbasis daring milik Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan, sebagai peralihan dari layanan tatap muka di kantor.",
       "Seluruh layanan pada portal ini tidak dipungut biaya (gratis). Biaya koneksi internet untuk mengakses layanan sepenuhnya menjadi tanggung jawab pemohon.",
-      "Portal ini merupakan alat bantu pencatatan proses permohonan; penerbitan dokumen tetap tunduk pada verifikasi dan ketentuan Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
+      "Portal ini merupakan alat bantu pencatatan proses permohonan; penerbitan dokumen tetap tunduk pada verifikasi dan ketentuan Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan.",
       "Beberapa layanan mensyaratkan akses kamera dan media penyimpanan perangkat untuk pengambilan foto serta pengunggahan berkas verifikasi.",
       "Dinas berupaya menjaga kebenaran dan kekinian informasi pada portal, namun tidak menjamin secara mutlak kelengkapan, akurasi, keandalan, keamanan, maupun ketersediaan seluruh fitur setiap saat.",
       "Dengan menggunakan portal ini, Anda juga menyetujui Kebijakan Privasi yang berlaku dan dapat diperbarui sewaktu-waktu.",
@@ -507,7 +582,7 @@ STATIC_BLOCKS.push({
       "Dinas dapat mengubah, memperbarui, atau menyesuaikan Syarat & Ketentuan ini sewaktu-waktu; perubahan berlaku sejak dipublikasikan pada portal.",
       "Syarat & Ketentuan ini merupakan satu kesatuan dengan Kebijakan Privasi yang berlaku.",
       "Segala hal yang timbul dari penggunaan portal tunduk pada hukum Negara Republik Indonesia.",
-      "Untuk pertanyaan atau bantuan, silakan hubungi Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung melalui kanal resmi yang tersedia pada portal.",
+      "Untuk pertanyaan atau bantuan, silakan hubungi Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan melalui kanal resmi yang tersedia pada portal.",
     ],
     image: "",
   },
@@ -552,12 +627,20 @@ for (const { seksi, label, content } of INFO_SECTIONS) {
       fields: [
         { name: "title", label: "Judul Halaman", type: "text" },
         { name: "description", label: "Deskripsi Singkat", type: "textarea" },
+        {
+          name: "image",
+          label: "Gambar/Infografis",
+          type: "image",
+          catatan:
+            "Opsional. Bila diisi, gambar tampil di atas paragraf isi (mis. infografis alur/tata cara). Kosongkan bila belum ada materi resmi dari dinas.",
+        },
         { name: "body", label: "Paragraf Isi", type: "list" },
         { name: "list", label: "Daftar Poin", type: "list" },
       ],
       defaults: {
         title: c.title,
         description: c.description,
+        image: c.image ?? "",
         body: c.body ?? [],
         list: c.list ?? [],
       },

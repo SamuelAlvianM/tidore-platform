@@ -54,7 +54,7 @@ export default function KritikSaranPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative py-16 overflow-hidden" style={{ background: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' }}>
+      <div className="relative py-16 overflow-hidden" style={{ background: 'linear-gradient(135deg, #3a4b45 0%, #495E57 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 70% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export default function KritikSaranPage() {
             <div>
               <h1 className="text-3xl font-bold text-white">Kritik &amp; Saran</h1>
               <p className="text-primary-foreground/80 mt-1">
-                Bantu kami meningkatkan kualitas pelayanan Disdukcapil Tana Tidung
+                Bantu kami meningkatkan kualitas pelayanan Disdukcapil Tidore Kepulauan
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function KritikSaranPage() {
             </p>
             <Button
               onClick={() => setSuccess(false)}
-              style={{ background: 'linear-gradient(90deg, #d97706, #fbbf24)' }}
+              style={{ background: 'linear-gradient(90deg, #d9b400, #F4CE14)' }}
               className="text-white"
             >
               Kirim Masukan Lain
@@ -144,7 +144,7 @@ export default function KritikSaranPage() {
                 type="submit"
                 disabled={isLoading}
                 className="w-full text-white font-semibold"
-                style={{ background: 'linear-gradient(90deg, #d97706, #fbbf24)' }}
+                style={{ background: 'linear-gradient(90deg, #d9b400, #F4CE14)' }}
               >
                 {isLoading ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mengirim...</>

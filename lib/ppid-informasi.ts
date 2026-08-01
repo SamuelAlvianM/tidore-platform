@@ -48,7 +48,7 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'LKJIP (Laporan Kinerja Instansi Pemerintah)',
       href: '/ppid/lkjip',
-      description: 'Laporan kinerja tahunan Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Laporan kinerja tahunan Disdukcapil Kota Tidore Kepulauan.',
       icon: 'ClipboardCheck',
       gradasi: 'from-amber-400 to-amber-600',
     },
@@ -62,7 +62,7 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'Buku Profil Kependudukan',
       href: '/ppid/buku-profil-kependudukan',
-      description: 'Buku profil data kependudukan Kabupaten Tana Tidung.',
+      description: 'Buku profil data kependudukan Kota Tidore Kepulauan.',
       icon: 'BookOpen',
       gradasi: 'from-violet-400 to-violet-600',
     },
@@ -83,9 +83,9 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'Rencana Kinerja Tahunan (RKT)',
       href: '/ppid/rkt',
-      description: 'Rencana kinerja tahunan Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Rencana kinerja tahunan Disdukcapil Kota Tidore Kepulauan.',
       icon: 'CalendarDays',
-      gradasi: 'from-[#2e6da4] to-[#1b4b72]',
+      gradasi: 'from-[#5c766d] to-[#3a4b45]',
     },
     {
       title: 'Rencana Kerja (Renka)',
@@ -132,7 +132,7 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'Capaian Indikator Kinerja (Cakin)',
       href: '/ppid/cakin',
-      description: 'Capaian indikator kinerja Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Capaian indikator kinerja Disdukcapil Kota Tidore Kepulauan.',
       icon: 'Target',
       gradasi: 'from-rose-400 to-rose-600',
     },
@@ -146,9 +146,9 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'Sistem Akuntabilitas Kinerja Instansi Pemerintah (SAKIP)',
       href: '/ppid/sakip',
-      description: 'Dokumen SAKIP Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Dokumen SAKIP Disdukcapil Kota Tidore Kepulauan.',
       icon: 'Award',
-      gradasi: 'from-[#2e6da4] to-[#1b4b72]',
+      gradasi: 'from-[#5c766d] to-[#3a4b45]',
     },
     {
       title: 'LPPD',
@@ -167,7 +167,7 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
     {
       title: 'Catatan Atas Laporan Keuangan (CALK)',
       href: '/ppid/calk',
-      description: 'Catatan atas laporan keuangan Disdukcapil Tana Tidung.',
+      description: 'Catatan atas laporan keuangan Disdukcapil Tidore Kepulauan.',
       icon: 'Book',
       gradasi: 'from-sky-400 to-sky-600',
     },
@@ -206,7 +206,7 @@ export const PPID_BERKALA: PpidInformasiGrup = {
     {
       title: 'Standar Pelayanan',
       href: '/ppid/standar-pelayanan',
-      description: 'Standar pelayanan publik Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Standar pelayanan publik Disdukcapil Kota Tidore Kepulauan.',
       icon: 'BadgeCheck',
       gradasi: 'from-emerald-400 to-emerald-600',
     },
@@ -220,7 +220,7 @@ export const PPID_BERKALA: PpidInformasiGrup = {
     {
       title: 'Perjanjian Kinerja',
       href: '/ppid/perjanjian-kinerja',
-      description: 'Perjanjian kinerja pejabat Disdukcapil Kabupaten Tana Tidung.',
+      description: 'Perjanjian kinerja pejabat Disdukcapil Kota Tidore Kepulauan.',
       icon: 'FileCheck',
       gradasi: 'from-violet-400 to-violet-600',
     },
@@ -243,7 +243,7 @@ export const PPID_BERKALA: PpidInformasiGrup = {
       href: '/ppid/zona-integritas',
       description: 'Pembangunan zona integritas menuju WBK/WBBM.',
       icon: 'ShieldCheck',
-      gradasi: 'from-[#2e6da4] to-[#1b4b72]',
+      gradasi: 'from-[#5c766d] to-[#3a4b45]',
     },
     {
       title: 'Pengendalian Gratifikasi',
@@ -325,7 +325,7 @@ export const PPID_GRADASI_PILIHAN = [
   { label: 'Ungu', value: 'from-violet-400 to-violet-600' },
   { label: 'Toska', value: 'from-teal-400 to-teal-600' },
   { label: 'Merah', value: 'from-rose-400 to-rose-600' },
-  { label: 'Biru Tua', value: 'from-[#2e6da4] to-[#1b4b72]' },
+  { label: 'Biru Tua', value: 'from-[#5c766d] to-[#3a4b45]' },
   { label: 'Abu', value: 'from-slate-500 to-slate-700' },
   { label: 'Sian', value: 'from-cyan-400 to-cyan-600' },
 ];
