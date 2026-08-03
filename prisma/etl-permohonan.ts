@@ -22,18 +22,35 @@ const USER_LEVELS: Record<number, string> = {
 };
 
 // tabel sumber berisi → jenis permohonan. (tabel kosong dilewati.)
+//
+// ⚠️ `kode` WAJIB memakai ejaan kanonik dari `prisma/seed.ts`, karena itulah yang
+// dicari `LAYANAN_KODE` di app/api/[layanan]/[action]/route.ts saat warga menekan
+// "Ajukan". Salah satu huruf saja → `findUnique({kode})` null → warga dapat
+// "Jenis permohonan tidak valid" dan permohonan TIDAK BISA dibuat sama sekali.
+// (Insiden 2026-08-03: 3 kode di sini mengarang ejaan sendiri —
+// AKTA_KELAHIRAN_NIK_TIDAK_ADA / KK_PERUBAHAN_BIODATA / KONSOLIDASI_DATA.)
 const TABEL_JENIS: { tabel: string; kode: string; nama: string; kategori: 'CAPIL' | 'DAFDUK' }[] = [
   { tabel: 't_kelahiran_1', kode: 'AKTA_KELAHIRAN_NIK_ADA', nama: 'Akta Kelahiran (NIK Sudah Ada)', kategori: 'CAPIL' },
-  { tabel: 't_kelahiran_2', kode: 'AKTA_KELAHIRAN_NIK_TIDAK_ADA', nama: 'Akta Kelahiran (NIK Belum Ada)', kategori: 'CAPIL' },
+  { tabel: 't_kelahiran_2', kode: 'AKTA_KELAHIRAN_NIK_BLM_ADA', nama: 'Akta Kelahiran (NIK Belum Ada)', kategori: 'CAPIL' },
   { tabel: 't_kematian', kode: 'AKTA_KEMATIAN', nama: 'Akta Kematian', kategori: 'CAPIL' },
   { tabel: 't_kk_tambahanak', kode: 'KK_TAMBAH_ANAK', nama: 'KK — Tambah Anak', kategori: 'DAFDUK' },
   { tabel: 't_kk_cetakulang', kode: 'KK_CETAK_ULANG', nama: 'KK — Cetak Ulang', kategori: 'DAFDUK' },
   { tabel: 't_kk_pisahkk', kode: 'KK_PISAH', nama: 'KK — Pisah KK', kategori: 'DAFDUK' },
-  { tabel: 't_kk_perubahanbiodata', kode: 'KK_PERUBAHAN_BIODATA', nama: 'KK — Perubahan Biodata', kategori: 'DAFDUK' },
+  { tabel: 't_kk_perubahanbiodata', kode: 'KK_UBAH_BIODATA', nama: 'KK — Perubahan Biodata', kategori: 'DAFDUK' },
   { tabel: 't_kk_numpang', kode: 'KK_NUMPANG', nama: 'KK — Numpang KK', kategori: 'DAFDUK' },
   { tabel: 't_kedatangan', kode: 'KEDATANGAN', nama: 'Surat Pindah Datang', kategori: 'DAFDUK' },
   { tabel: 't_kia', kode: 'KIA', nama: 'Kartu Identitas Anak (KIA)', kategori: 'DAFDUK' },
-  { tabel: 't_konsolidasiupdatedata', kode: 'KONSOLIDASI_DATA', nama: 'Konsolidasi / Update Data', kategori: 'DAFDUK' },
+  { tabel: 't_konsolidasiupdatedata', kode: 'KONSOLIDASI', nama: 'Konsolidasi / Update Data', kategori: 'DAFDUK' },
+];
+
+// Jenis layanan yang DITAWARKAN app tapi tabel lamanya kosong di Tidore
+// (t_perkawinan / t_perceraian / t_ktpel / t_pindah). Tanpa baris ini, layanannya
+// ada di menu tapi tak bisa diajukan. Tidak membawa data lama — hanya master.
+const JENIS_TANPA_DATA_LAMA: { kode: string; nama: string; kategori: 'CAPIL' | 'DAFDUK' }[] = [
+  { kode: 'AKTA_NIKAH', nama: 'Akta Perkawinan/Nikah', kategori: 'CAPIL' },
+  { kode: 'AKTA_PERCERAIAN', nama: 'Akta Perceraian', kategori: 'CAPIL' },
+  { kode: 'KTP_EL', nama: 'KTP Elektronik', kategori: 'DAFDUK' },
+  { kode: 'PINDAH', nama: 'Surat Keterangan Pindah', kategori: 'DAFDUK' },
 ];
 
 // progress_status (int) → status baru. Nilai mentah TETAP disimpan di payload.
@@ -127,7 +144,18 @@ async function main() {
     });
     jenisId.set(j.tabel, rec.id);
   }
-  console.log(`✅ JenisPermohonan: ${TABEL_JENIS.length}`);
+  // Master untuk layanan yang tak punya data lama — supaya semua menu layanan
+  // benar-benar bisa diajukan warga, bukan cuma yang kebetulan ada arsipnya.
+  for (let i = 0; i < JENIS_TANPA_DATA_LAMA.length; i++) {
+    const j = JENIS_TANPA_DATA_LAMA[i];
+    await prisma.jenisPermohonan.create({
+      data: { ...j, urutan: TABEL_JENIS.length + i + 1 },
+    });
+  }
+  console.log(
+    `✅ JenisPermohonan: ${TABEL_JENIS.length + JENIS_TANPA_DATA_LAMA.length} ` +
+      `(${TABEL_JENIS.length} berdata + ${JENIS_TANPA_DATA_LAMA.length} master tanpa data lama)`,
+  );
 
   // ── 4. Permohonan + Berkas ─────────────────────────────────────────────────
   let pTotal = 0, bTotal = 0, dupNoreg = 0;
