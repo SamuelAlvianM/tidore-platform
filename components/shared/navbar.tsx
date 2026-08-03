@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,14 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 
+/** Ambang navbar desktop (px). Di bawah ini navigasi memakai hamburger —
+ *  samakan dengan kelas `min-[1360px]:` pada deretan menu di bawah. */
+const AMBANG_MENU_DESKTOP = 1360;
+/** Lebar panel dropdown saat belum sempat diukur — samakan dgn `min-w-70`. */
+const LEBAR_PANEL_MIN = 280;
+/** Jarak aman panel dari tepi layar. */
+const MARGIN_LAYAR = 8;
+
 function DropdownMenu({
   title,
   items,
@@ -58,46 +67,109 @@ function DropdownMenu({
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
-  const contentRef = React.useRef<HTMLDivElement>(null);
+  const [terpasang, setTerpasang] = React.useState(false);
   const [contentHeight, setContentHeight] = React.useState(0);
+  const [perluScroll, setPerluScroll] = React.useState(false);
+  const [posisi, setPosisi] = React.useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  // Recalculate height on every render when open
+  // Portal hanya boleh dirakit di klien (tak ada `document` saat SSR).
+  React.useEffect(() => setTerpasang(true), []);
+
+  /** Panel hidup di <body> (portal) dengan position:fixed, jadi posisinya
+   *  dihitung sendiri dari rect tombol lalu dijepit ke dalam layar supaya
+   *  menu paling kanan tidak menjorok keluar viewport. */
+  const hitungPosisi = React.useCallback(() => {
+    const tombol = triggerRef.current;
+    if (!tombol) return;
+    const r = tombol.getBoundingClientRect();
+    const lebar = panelRef.current?.offsetWidth || LEBAR_PANEL_MIN;
+    const batasKanan = window.innerWidth - lebar - MARGIN_LAYAR;
+    setPosisi({
+      top: r.bottom + 8,
+      left: Math.max(MARGIN_LAYAR, Math.min(r.left, batasKanan)),
+    });
+  }, []);
+
+  // Selama terbuka: pantau tinggi konten (untuk animasi) + posisi panel.
+  // Scroll dipantau dengan capture supaya scroll di container mana pun ikut
+  // memperbarui posisi, bukan cuma scroll halaman.
   React.useEffect(() => {
-    if (isOpen && contentRef.current) {
-      const updateHeight = () => {
-        if (contentRef.current) {
-          setContentHeight(contentRef.current.scrollHeight);
-        }
-      };
-      updateHeight();
-      // Use ResizeObserver to watch for content changes
-      const resizeObserver = new ResizeObserver(updateHeight);
-      resizeObserver.observe(contentRef.current);
-      return () => resizeObserver.disconnect();
-    }
+    if (!isOpen) return;
+    const el = contentRef.current;
+    if (!el) return;
+    const perbarui = () => {
+      hitungPosisi();
+      const bawahTombol = triggerRef.current?.getBoundingClientRect().bottom ?? 0;
+      const ruang = window.innerHeight - bawahTombol - 24;
+      const penuh = el.scrollHeight;
+      // Layar pendek: panel dibatasi tinggi layar & isinya yang bergulir,
+      // bukan meluber keluar viewport.
+      setPerluScroll(penuh > ruang);
+      setContentHeight(Math.min(penuh, Math.max(160, ruang)));
+    };
+    perbarui();
+    const resizeObserver = new ResizeObserver(perbarui);
+    resizeObserver.observe(el);
+    window.addEventListener("resize", perbarui);
+    window.addEventListener("scroll", perbarui, true);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", perbarui);
+      window.removeEventListener("scroll", perbarui, true);
+    };
+  }, [isOpen, hitungPosisi]);
+
+  // Di bawah ambang desktop, deretan menu berganti jadi hamburger. Panel yang
+  // terlanjur terbuka TIDAK ikut tersembunyi (ia di <body>, bukan di dalam
+  // deretan menu), jadi harus ditutup sendiri saat layar mengecil.
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const cekLebar = () => {
+      if (window.innerWidth < AMBANG_MENU_DESKTOP) setIsOpen(false);
+    };
+    cekLebar();
+    window.addEventListener("resize", cekLebar);
+    return () => window.removeEventListener("resize", cekLebar);
   }, [isOpen]);
 
-  // click-outside
+  // click-outside (tombol maupun panel portal) + Escape
   React.useEffect(() => {
+    if (!isOpen) return;
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
+        dropdownRef.current?.contains(target) ||
+        panelRef.current?.contains(target)
+      )
+        return;
+      setIsOpen(false);
     };
-    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
   }, [isOpen]);
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={triggerRef}
         onClick={() => setIsOpen((prev) => !prev)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        aria-expanded={items ? isOpen : undefined}
         className={cn(
           "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
           "transition-all duration-300 ease-out",
@@ -132,16 +204,30 @@ function DropdownMenu({
         )}
       </button>
 
-      {/* Slide-down / slide-up panel — height animates from 0 to scrollHeight */}
-      {items && (
-        <div className="absolute top-full left-0 mt-2 z-50">
+      {/* Slide-down / slide-up panel — height animates from 0 to scrollHeight.
+          DIRENDER LEWAT PORTAL KE <body>, bukan sebagai anak deretan menu:
+          deretan menu adalah kotak `overflow-x-auto` (jaring pengaman
+          anti-bocor menyamping), dan overflow pada satu sumbu memaksa sumbu
+          lain ikut ter-clip. Panel `absolute` di dalamnya jadi terpotong
+          sepenuhnya — tak terlihat DAN tak bisa diklik. Dengan portal +
+          position:fixed, panel bebas dari kotak itu tanpa mengorbankan
+          jaring pengamannya. */}
+      {items &&
+        terpasang &&
+        createPortal(
           <div
-            className="min-w-70 transition-[height,opacity] duration-300 ease-out"
+            ref={panelRef}
+            className="fixed z-[60] min-w-70 transition-[height,opacity] duration-300 ease-out"
             style={{
+              top: posisi?.top ?? 0,
+              left: posisi?.left ?? 0,
               height: isOpen ? contentHeight : 0,
               opacity: isOpen ? 1 : 0,
               pointerEvents: isOpen ? "auto" : "none",
+              visibility: posisi ? "visible" : "hidden",
+              overflowY: isOpen && perluScroll ? "auto" : "visible",
             }}
+            aria-hidden={!isOpen}
           >
             <div
               ref={contentRef}
@@ -168,9 +254,9 @@ function DropdownMenu({
                 />
               ))}
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -884,23 +970,14 @@ export function Navbar() {
               `min-w-0` + `overflow-x-auto`: jaring pengaman. Admin bisa menambah
               menu sendiri (blok konten `navigasi.tambahan`), jadi lebar deretan
               ini tidak terbatas — kalau sampai melebihi ruang, yang bergeser
-              cukup deretan menunya, bukan seluruh halaman. */}
-          <div className="hidden min-[1360px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
-            <Link
-              href="/"
-              className={cn(
-                "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md group whitespace-nowrap text-slate-700",
-                "transition-all duration-300 ease-out",
-                "hover:text-[#495E57] hover:bg-[#495E57]/10",
-                "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
-                "before:transition-all before:duration-300 before:ease-out",
-                "hover:before:w-[calc(100%-1.25rem)]",
-              )}
-            >
-              {/* <Home className="h-4 w-4 flex-shrink-0 transition-transform duration-300 ease-out group-hover:scale-110" strokeWidth={2} />
-              <span>Beranda</span> */}
-            </Link>
+              cukup deretan menunya, bukan seluruh halaman.
+              ⚠️ Karena kotak ini ber-overflow, panel dropdown TIDAK boleh jadi
+              anaknya (pasti ter-clip & tak bisa diklik) — lihat portal di
+              `DropdownMenu`. Jangan tambahkan elemen mengambang di sini.
 
+              Menu "Beranda" sengaja tidak ada di deret desktop (logo di kiri
+              sudah menuju "/"); ia tetap tersedia di panel hamburger. */}
+          <div className="hidden min-[1360px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
             {menuItems.map((item) => {
               // Menu tanpa dropdown → link langsung (mis. Pelayanan Online).
               if (!item.items?.length && item.href) {
