@@ -64,6 +64,14 @@ if [[ "$SETUP_ONLY" == false ]]; then
 
   # ========================================================== RAKIT BUNDLE (artefak saja)
   log "Rakit bundle standalone (static + public + tessdata)..."
+  # ⚠️ WAJIB: `next build` ikut menyalin folder data runtime `storage/` (dan `app/uploads`)
+  # ke dalam standalone. Di laptop, storage/permohonan berisi 25.4rb SCAN KTP/KK WARGA (14 GB)
+  # hasil ekstraksi backup — kalau ikut ter-tar, deploy (a) mengirim 14 GB tak berguna
+  # tiap kali, (b) MENIMPA symlink storage/permohonan di server dengan direktori nyata
+  # berisi salinan separuh → lampiran 404 (persis insiden 2026-08-01 §I3-14; akarnya ini,
+  # bukan "transfer terputus"). Berkas warga hidup di /var/www/html/uploads dan HANYA
+  # ditunjuk symlink — jangan pernah ikut dikirim.
+  rm -rf .next/standalone/storage
   rm -rf .next/standalone/.next/static .next/standalone/public .next/standalone/tessdata
   mkdir -p .next/standalone/.next
   cp -r .next/static .next/standalone/.next/static
@@ -145,7 +153,9 @@ fi
 
 # ============================================================ TRANSFER BUNDLE
 log "Transfer bundle standalone ke server (source TIDAK ikut)..."
-tar czf - -C .next/standalone . | ssh "$REMOTE" "mkdir -p '$REMOTE_DIR' && tar xzf - -C '$REMOTE_DIR'"
+# --exclude ./storage: sabuk pengaman kedua (selain rm di atas) supaya berkas warga
+# tidak pernah ikut terkirim & tidak menimpa symlink storage/permohonan di server.
+tar czf - --exclude=./storage -C .next/standalone . | ssh "$REMOTE" "mkdir -p '$REMOTE_DIR' && tar xzf - -C '$REMOTE_DIR'"
 
 # .env produksi FINAL (setelah bundle, agar tak tertimpa): secrets deploy/.env + NEXT_PUBLIC_ dari build.
 log "Pasang .env produksi final di server..."
