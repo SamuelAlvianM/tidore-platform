@@ -31,7 +31,7 @@ import {
   OcrUploadButton,
   type OcrUploadResult,
 } from '@/components/permohonan-online/ocr-upload-button';
-import type { LayananForm, FieldDef } from '@/lib/layanan-forms';
+import { validateFieldValue, type LayananForm, type FieldDef } from '@/lib/layanan-forms';
 import {
   useStatusJamLayanan,
   PanelJamTutup,
@@ -54,24 +54,9 @@ interface Props {
 type Values = Record<string, string>;
 
 // ── Validasi per tipe ──
-function validateField(fd: FieldDef, value: string): string | null {
-  const v = (value ?? '').trim();
-  if (fd.required && !v) return `${fd.label} wajib diisi`;
-  if (!v) return null;
-  switch (fd.type) {
-    case 'nik':
-    case 'kk':
-      if (!/^\d{16}$/.test(v)) return `${fd.label} harus 16 digit angka`;
-      break;
-    case 'phone':
-      if (!/^0\d{9,12}$/.test(v)) return `${fd.label} harus 10–13 digit dan diawali 0`;
-      break;
-    case 'email':
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return `Format ${fd.label} tidak valid`;
-      break;
-  }
-  return null;
-}
+// Aturannya tinggal di lib/layanan-forms.ts supaya API memakai definisi yang
+// sama persis — form tidak boleh meloloskan data yang lalu ditolak server.
+const validateField = validateFieldValue;
 
 export function StaffPengajuanForm({
   layanan,

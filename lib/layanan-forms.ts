@@ -664,3 +664,44 @@ export const LAYANAN_FORMS: LayananForm[] = [
 ];
 
 export const getLayananForm = (slug: string) => LAYANAN_FORMS.find((l) => l.slug === slug);
+
+/**
+ * Validasi satu field — SATU SUMBER KEBENARAN untuk form (client) dan
+ * API (server), supaya keduanya tidak pernah berbeda pendapat. Aturan
+ * ditentukan oleh `type` di skema, bukan tebakan dari nama kolom: nama kolom
+ * pernah menipu (mis. `alasannumpangkk` berakhiran "kk" padahal isinya teks
+ * pilihan, dan `nikygpisah` bertipe textarea berisi BANYAK NIK per baris).
+ */
+export function validateFieldValue(fd: FieldDef, value: string): string | null {
+  const v = (value ?? '').trim();
+  if (fd.required && !v) return `${fd.label} wajib diisi`;
+  if (!v) return null;
+  switch (fd.type) {
+    case 'nik':
+    case 'kk':
+      if (!/^\d{16}$/.test(v)) return `${fd.label} harus 16 digit angka`;
+      break;
+    case 'phone':
+      if (!/^0\d{9,12}$/.test(v)) return `${fd.label} harus 10–13 digit dan diawali 0`;
+      break;
+    case 'email':
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return `Format ${fd.label} tidak valid`;
+      break;
+  }
+  return null;
+}
+
+/** Validasi seluruh field satu layanan; kembalikan semua alasan sekaligus. */
+export function validateLayananPayload(
+  layanan: LayananForm,
+  values: Record<string, unknown>,
+): string[] {
+  const errors: string[] = [];
+  for (const s of layanan.sections) {
+    for (const fd of s.fields) {
+      const err = validateFieldValue(fd, String(values?.[fd.name] ?? ''));
+      if (err) errors.push(err);
+    }
+  }
+  return errors;
+}
