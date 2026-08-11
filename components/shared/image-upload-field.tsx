@@ -27,12 +27,22 @@ const SISI_MAKS = 1600;
 export function ImageUploadField({
   value,
   onChange,
+  onFileAsli,
   disabled,
   label = 'Unggah Gambar',
   className,
 }: {
   value: string;
   onChange: (dataUrl: string) => void;
+  /**
+   * Berkas MENTAH yang dipilih, sebelum dikecilkan & di-encode ulang.
+   *
+   * 🔴 Dipakai OCR, dan bedanya nyata: gambar yang sama terbaca utuh pada
+   * kualitas JPEG 0.95 tapi NIK-nya salah baca dan No.KK hilang pada 0.85 —
+   * padahal 0.85 sudah cukup untuk dilihat mata petugas. Jadi yang disimpan
+   * tetap versi kecil, sedangkan yang dibaca mesin harus versi asli.
+   */
+  onFileAsli?: (file: File) => void;
   disabled?: boolean;
   label?: string;
   className?: string;
@@ -61,6 +71,7 @@ export function ImageUploadField({
     setMemproses(true);
     try {
       onChange(await kecilkan(file));
+      onFileAsli?.(file);
     } catch {
       setGalat('Gambar tidak dapat dibaca. Coba berkas lain.');
     } finally {

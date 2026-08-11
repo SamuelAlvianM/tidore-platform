@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -30,6 +30,7 @@ import {
   Camera,
   MapPin,
   IdCard,
+  ScanLine,
 } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import Image from 'next/image';
@@ -116,6 +117,24 @@ export default function RegisterPage() {
   const [foto, setFoto] = useState('');
   // Foto/scan KTP — diunggah dari berkas (bukan dipotret), lihat §Foto KTP.
   const [ktp, setKtp] = useState('');
+  // Hasil pembacaan OCR atas foto KTP (lihat `bacaKtpOtomatis`).
+  const [ocrJalan, setOcrJalan] = useState(false);
+  const [ocrPesan, setOcrPesan] = useState<string | null>(null);
+  /**
+   * Kolom yang nilainya datang dari OCR dan BELUM disentuh warga.
+   *
+   * 🔴 Alasannya bukan kosmetik. OCR bisa salah baca digit — pada pengujian,
+   * NIK 1801234503980001 pernah terbaca 1601254508950001, dan salah baca
+   * seperti itu tetap lolos pemeriksaan struktur NIK di server (tanggal &
+   * bulannya masih masuk akal). NIK salah yang terisi diam-diam lebih
+   * berbahaya daripada kolom kosong, jadi kolomnya ditandai supaya warga
+   * benar-benar melihatnya. Tanda hilang begitu kolomnya disunting.
+   */
+  const [ocrTerisi, setOcrTerisi] = useState<string[]>([]);
+  // Cermin `formData` yang selalu mutakhir, dipakai `bacaKtpOtomatis` untuk
+  // tahu kolom mana yang masih kosong tanpa bergantung pada closure lama.
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   // reCAPTCHA hanya aktif jika site key diisi. Tanpa key (mis. saat dev),
   // anggap langsung siap supaya tombol tidak "memuat" selamanya.
@@ -148,6 +167,18 @@ export default function RegisterPage() {
   const perluPerbaiki = (key: string) => modeUlang && kolomPerbaiki.includes(key);
   const cincinPerbaiki = (key: string) =>
     perluPerbaiki(key) ? 'ring-2 ring-rose-400 border-rose-400' : '';
+
+  /** Cincin amber pada kolom yang baru diisi OCR dan belum diperiksa warga. */
+  const cincinOcr = (key: string) =>
+    ocrTerisi.includes(key) ? 'ring-2 ring-amber-400 border-amber-400' : '';
+
+  /** Badge "dari scan KTP" di samping label kolom hasil OCR. */
+  const TandaOcr = ({ nama }: { nama: string }) =>
+    ocrTerisi.includes(nama) ? (
+      <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-wide text-amber-800 ring-1 ring-amber-300 dark:bg-amber-900/40 dark:text-amber-200 dark:ring-amber-700">
+        <ScanLine className="h-3 w-3" /> Dari scan — periksa
+      </span>
+    ) : null;
 
   // Daftar ulang setelah ditolak: isi NIK + bawa kembali seluruh data awal yang
   // dulu diinput warga (nama, KK, kecamatan, WhatsApp, email) supaya cukup
@@ -308,6 +339,8 @@ export default function RegisterPage() {
     if (validationErrors.length > 0) {
       setValidationErrors([]);
     }
+    // Kolom yang disunting warga bukan lagi "hasil OCR yang belum diperiksa".
+    setOcrTerisi((k) => (k.includes(name) ? k.filter((x) => x !== name) : k));
     // Nomor WhatsApp berubah → verifikasi OTP sebelumnya tidak berlaku.
     if (name === 'hp') {
       setOtpChallenge('');
@@ -315,6 +348,91 @@ export default function RegisterPage() {
       setOtpBukti('');
       setOtpDevKode('');
       setOtpCountdown(0);
+    }
+  };
+
+  /**
+   * Baca foto KTP yang baru diunggah lalu isikan NIK / No.KK / Nama.
+   *
+   * Sifatnya MEMBANTU, bukan menghakimi: kegagalan OCR tidak pernah
+   * menghalangi pendaftaran — warga tinggal mengetik sendiri. Karena itu
+   * galatnya ditampilkan sebagai keterangan kecil, bukan Alert merah.
+   *
+   * 🔴 Hanya mengisi kolom yang MASIH KOSONG. OCR bisa salah baca (angka 0/O,
+   * 1/I), jadi menimpa yang sudah diketik warga justru merusak.
+   */
+  const bacaKtpOtomatis = async (sumber: File) => {
+    // Endpoint menolak di atas 8 MB. Berkas sebesar itu jarang, dan kalau
+    // terjadi lebih baik OCR dilewati daripada menunggu lalu gagal —
+    // warga tetap bisa mengisi manual.
+    if (sumber.size > 8 * 1024 * 1024) {
+      setOcrPesan(
+        'Berkas terlalu besar untuk dipindai otomatis. Silakan isi NIK, No. KK, dan Nama secara manual.',
+      );
+      return;
+    }
+    setOcrPesan(null);
+    setOcrJalan(true);
+    try {
+      const form = new FormData();
+      form.append('file', sumber, sumber.name || 'ktp.jpg');
+
+      const res = await fetch('/api/ocr/ktp', { method: 'POST', body: form });
+      const json = await res.json();
+
+      if (!res.ok || json.error?.length) {
+        setOcrPesan(json.error?.[0] ?? 'Data KTP tidak terbaca. Silakan isi manual.');
+        return;
+      }
+
+      const hasil = (json.data ?? {}) as { nik?: string; nama?: string; nokk?: string };
+
+      // Keadaan terkini dibaca dari ref, BUKAN dari updater setFormData:
+      // updater baru dijalankan React saat render berikutnya, sehingga apa pun
+      // yang dikumpulkan di dalamnya belum tersedia di baris setelah ini.
+      const kini = formDataRef.current;
+      const tambalan: Partial<typeof kini> = {};
+      const terisi: { key: string; label: string }[] = [];
+      const dilewati: string[] = [];
+
+      const coba = (key: 'nik' | 'kk' | 'nama', label: string, nilai?: string) => {
+        if (!nilai) return;
+        if (kini[key].trim()) {
+          dilewati.push(label);
+          return;
+        }
+        tambalan[key] = key === 'nama' ? nilai.toUpperCase() : nilai;
+        terisi.push({ key, label });
+      };
+      coba('nik', 'NIK', hasil.nik);
+      coba('kk', 'No. KK', hasil.nokk);
+      coba('nama', 'Nama', hasil.nama);
+
+      if (terisi.length > 0) {
+        setFormData((f) => ({ ...f, ...tambalan }));
+        setOcrTerisi(terisi.map((t) => t.key));
+      }
+
+      const label = terisi.map((t) => t.label);
+      if (label.length > 0) {
+        setOcrPesan(
+          `Terisi otomatis dari KTP: ${label.join(', ')}. ` +
+            `🔴 Hasil pemindaian bisa salah baca — cocokkan dengan KTP Anda sebelum mengirim.`,
+        );
+        toast.success(`${label.join(', ')} terisi dari foto KTP — mohon dicocokkan`);
+      } else if (dilewati.length > 0) {
+        // Pesan dibedakan supaya jujur: bukan "tidak terbaca", melainkan
+        // kolomnya memang sudah diisi warga dan sengaja tidak ditimpa.
+        setOcrPesan(
+          `KTP terbaca (${dilewati.join(', ')}), tapi kolomnya sudah Anda isi — tidak ada yang ditimpa.`,
+        );
+      } else {
+        setOcrPesan('Data pada KTP tidak terbaca. Silakan isi NIK, No. KK, dan Nama secara manual.');
+      }
+    } catch {
+      setOcrPesan('Pemindaian gagal. Silakan isi data secara manual.');
+    } finally {
+      setOcrJalan(false);
     }
   };
 
@@ -616,6 +734,7 @@ export default function RegisterPage() {
                     <div className="space-y-2">
                       <LabelWajib htmlFor="nik">
                         NIK <TandaPerbaiki tampil={perluPerbaiki('nik')} />
+                        <TandaOcr nama="nik" />
                       </LabelWajib>
                       <Input
                         id="nik"
@@ -629,7 +748,7 @@ export default function RegisterPage() {
                         onBlur={() => setFocusedField(null)}
                         disabled={isLoading || !recaptchaReady}
                         maxLength={16}
-                        className={kelasInput('nik', !!formData.nik, cincinPerbaiki('nik'))}
+                        className={kelasInput('nik', !!formData.nik, `${cincinPerbaiki('nik')} ${cincinOcr('nik')}`)}
                       />
                       <Petunjuk
                         items={[
@@ -642,6 +761,7 @@ export default function RegisterPage() {
                     <div className="space-y-2">
                       <LabelWajib htmlFor="kk">
                         Nomor Kartu Keluarga <TandaPerbaiki tampil={perluPerbaiki('kk')} />
+                        <TandaOcr nama="kk" />
                       </LabelWajib>
                       <Input
                         id="kk"
@@ -655,7 +775,7 @@ export default function RegisterPage() {
                         onBlur={() => setFocusedField(null)}
                         disabled={isLoading || !recaptchaReady}
                         maxLength={16}
-                        className={kelasInput('kk', !!formData.kk, cincinPerbaiki('kk'))}
+                        className={kelasInput('kk', !!formData.kk, `${cincinPerbaiki('kk')} ${cincinOcr('kk')}`)}
                       />
                       <Petunjuk
                         items={[
@@ -670,6 +790,7 @@ export default function RegisterPage() {
                     <div className="space-y-2">
                       <LabelWajib htmlFor="nama">
                         Nama Lengkap <TandaPerbaiki tampil={perluPerbaiki('nama')} />
+                        <TandaOcr nama="nama" />
                       </LabelWajib>
                       <div className="relative">
                         <UserPlus className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -683,7 +804,7 @@ export default function RegisterPage() {
                           onFocus={() => setFocusedField('nama')}
                           onBlur={() => setFocusedField(null)}
                           disabled={isLoading || !recaptchaReady}
-                          className={kelasInput('nama', !!formData.nama, `pl-10 ${cincinPerbaiki('nama')}`)}
+                          className={kelasInput('nama', !!formData.nama, `pl-10 ${cincinPerbaiki('nama')} ${cincinOcr('nama')}`)}
                         />
                       </div>
                       <Petunjuk
@@ -992,16 +1113,46 @@ export default function RegisterPage() {
                       <div className={`rounded-xl ${cincinPerbaiki('ktp')}`}>
                         <ImageUploadField
                           value={ktp}
-                          onChange={setKtp}
+                          onChange={(v) => {
+                            setKtp(v);
+                            // Saat foto dihapus, keterangan lama ikut
+                            // dibersihkan supaya tidak menggantung tanpa
+                            // gambarnya. Pembacaan dipicu oleh onFileAsli.
+                            if (!v) setOcrPesan(null);
+                          }}
+                          onFileAsli={bacaKtpOtomatis}
                           disabled={isLoading || !recaptchaReady}
                           label="Pilih Foto KTP"
                         />
                       </div>
+
+                      {/* Status pembacaan otomatis. Sengaja bukan Alert merah:
+                          OCR itu bantuan, gagalnya tidak menghalangi warga. */}
+                      {(ocrJalan || ocrPesan) && (
+                        <p
+                          className="flex items-start gap-1.5 text-[0.72rem] leading-relaxed text-slate-600 dark:text-slate-300"
+                          aria-live="polite"
+                        >
+                          {ocrJalan ? (
+                            <>
+                              <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin text-primary" />
+                              Membaca data pada foto KTP…
+                            </>
+                          ) : (
+                            <>
+                              <ScanLine className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                              {ocrPesan}
+                            </>
+                          )}
+                        </p>
+                      )}
+
                       <Petunjuk
                         items={[
                           'Format JPG, JPEG, atau PNG — maksimal 10 MB',
                           'Boleh hasil scan maupun foto dari ponsel',
                           'Pastikan NIK, nama, dan alamat terbaca jelas',
+                          'NIK, No. KK, dan Nama akan dicoba diisi otomatis dari foto ini — periksa kembali hasilnya',
                         ]}
                       />
                     </div>

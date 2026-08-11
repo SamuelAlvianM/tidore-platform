@@ -4,6 +4,7 @@ import { createRequire } from "module";
 import { createWorker, OEM, type Worker } from "tesseract.js";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
+import { cekBatas, ipPemanggil } from "@/lib/rate-limit";
 
 // sharp dimuat via require CJS runtime, BUKAN import ESM. Di Next dev (turbopack)
 // import ESM sharp di-"externalImport" dan require file .node-nya mengembalikan
@@ -27,6 +28,33 @@ export const maxDuration = 60;
 
 const MAX_UPLOAD = 8 * 1024 * 1024; // 8 MB
 const OCR_TIMEOUT = 45_000; // gagal cepat, jangan menggantung berlama-lama
+
+/**
+ * Endpoint ini boleh dipanggil TANPA login — halaman pendaftaran memakainya
+ * untuk membaca foto KTP, dan pada saat itu warga memang belum punya sesi.
+ *
+ * Karena OCR berat di CPU, tamu dibatasi lajunya per-IP. Situs ini tidak
+ * memakai captcha, jadi pembatas inilah satu-satunya peredam penyalahgunaan —
+ * jangan dilonggarkan tanpa mengganti dengan penjaga lain.
+ *
+ * Angkanya sengaja longgar untuk warga (memotret ulang KTP beberapa kali itu
+ * wajar) tapi cukup rendah untuk mematikan pemanggilan beruntun oleh skrip.
+ */
+const BATAS_TAMU = 8; // percobaan
+const JENDELA_TAMU = 10 * 60_000; // per 10 menit
+/** Pengguna yang sudah login jauh lebih longgar: identitasnya sudah diketahui. */
+const BATAS_LOGIN = 40;
+const JENDELA_LOGIN = 10 * 60_000;
+
+/**
+ * Batas pekerjaan OCR yang boleh berjalan/mengantre bersamaan.
+ *
+ * Worker tesseract melayani satu gambar pada satu waktu, jadi permintaan yang
+ * menumpuk akan mengantre lalu habis waktunya bersama-sama — pengguna yang
+ * sabar pun ikut gagal. Lebih baik menolak cepat dengan pesan yang jelas.
+ */
+const MAKS_BERSAMAAN = 4;
+let sedangJalan = 0;
 // Data bahasa dibundel lokal (tessdata/ind.traineddata.gz) → tidak mengunduh
 // dari CDN saat runtime. Inilah kunci agar scan tidak menggantung.
 const TESSDATA_DIR = path.join(process.cwd(), "tessdata");
@@ -166,8 +194,31 @@ function parseKtpText(raw: string): KtpParsed {
  * disimpan; hanya diproses di memori.
  */
 export async function POST(req: NextRequest) {
+  // Tanpa sesi TIDAK ditolak: halaman pendaftaran memanggil ini sebelum warga
+  // punya akun. Sesi hanya menentukan seberapa longgar batas lajunya.
   const session = await getSession();
-  if (!session) return fail(["Silakan login terlebih dahulu"], 401);
+  const batas = cekBatas(
+    `ocr-ktp:${session ? `u${session.uid}` : `ip:${ipPemanggil(req)}`}`,
+    session ? BATAS_LOGIN : BATAS_TAMU,
+    session ? JENDELA_LOGIN : JENDELA_TAMU,
+  );
+  if (!batas.boleh) {
+    const menit = Math.ceil(batas.tungguDetik / 60);
+    return fail(
+      [
+        `Terlalu banyak percobaan pemindaian. Coba lagi dalam ${menit} menit, ` +
+          `atau isi NIK dan nama secara manual.`,
+      ],
+      429,
+    );
+  }
+
+  if (sedangJalan >= MAKS_BERSAMAAN) {
+    return fail(
+      ["Pemindaian sedang sibuk. Coba lagi sebentar lagi, atau isi datanya manual."],
+      503,
+    );
+  }
 
   let file: File | null = null;
   try {
@@ -206,6 +257,7 @@ export async function POST(req: NextRequest) {
   // saja disimpan sebagai cadangan bila tak ada nomor yang terbaca.
   let best: KtpParsed = {};
   let bestScore = -1;
+  sedangJalan++;
   try {
     const worker = await getWorker();
     for (const angle of [0, 90, 270, 180]) {
@@ -230,6 +282,10 @@ export async function POST(req: NextRequest) {
         ? "OCR terlalu lama. Coba foto lebih terang, lurus, dan dekat."
         : "Gagal menjalankan OCR di server";
     return fail([msg], 500);
+  } finally {
+    // Wajib di finally: jalur galat/timeout pun harus mengembalikan slotnya,
+    // kalau tidak penghitungnya merangkak naik dan endpoint mengunci diri.
+    sedangJalan--;
   }
 
   if (!best.nik && !best.nama && !best.nokk) {
