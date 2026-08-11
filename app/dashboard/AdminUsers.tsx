@@ -40,6 +40,7 @@ import { SearchSelect } from '@/components/shared/search-select';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { STATUS_AKUN, infoStatus } from '@/lib/akun-status';
 import { KOLOM_TOLAK, uraikanAlasanTolak, labelKolom } from '@/lib/akun-tolak';
+import { LEVEL_OPD } from '@/lib/akun-level';
 
 const EMPTY_FORM = {
   nama: '',
@@ -92,10 +93,18 @@ interface Kecamatan {
   nama: string;
 }
 
-// Kelompok akun (tab): warga, operator OPD, dan staff dinas (level 1 & 2).
+// Kelompok akun (tab).
+// 🔴 "Semua" sengaja ada dan sengaja jadi tab pertama: `m_userlevels` hasil
+// migrasi punya level yang tak diwakili tab mana pun (5 operator opd, 41
+// operator). Sebelum tab ini ada, 40 akun level 41 tak pernah muncul
+// dan tak bisa dicari — pencarian selalu dibatasi kelompok yang aktif.
+// Kalau menambah kelompok baru, tambahkan juga di KELOMPOK pada
+// app/api/admin/users/route.ts; jangan hapus "Semua".
 const GRUP_AKUN = [
+  { key: 'all', label: 'Semua', desc: 'Seluruh akun, apa pun levelnya' },
   { key: '3', label: 'Warga', desc: 'Masyarakat umum (NIK)' },
-  { key: '4', label: 'OPD', desc: 'Operator instansi pemerintah daerah' },
+  { key: 'operator', label: 'Operator', desc: 'Operator wilayah & akun warisan level 41' },
+  { key: 'opd', label: 'OPD', desc: 'Operator instansi pemerintah daerah' },
   { key: 'staff', label: 'Staff', desc: 'Petugas dinas (admin & operator)' },
 ] as const;
 type GrupKey = (typeof GRUP_AKUN)[number]['key'];
@@ -374,7 +383,8 @@ function IsiDetail({
 
 export function AdminUsers() {
   const [items, setItems] = useState<AdminUser[]>([]);
-  const [grup, setGrup] = useState<GrupKey>('3');
+  const [grup, setGrup] = useState<GrupKey>('all');
+  const [total, setTotal] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | '0' | '1' | '2' | '3'>('');
   const [q, setQ] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -415,12 +425,14 @@ export function AdminUsers() {
   const load = useCallback(async () => {
     setIsLoading(true);
     const params = new URLSearchParams();
-    params.set('level', grup);
+    // Tab "Semua" tidak mengirim `level` sama sekali → tanpa filter level.
+    if (grup !== 'all') params.set('level', grup);
     if (statusFilter) params.set('status', statusFilter);
     if (q.trim()) params.set('q', q.trim());
     const res = await fetch(`/api/admin/users?${params.toString()}`);
     const json = await res.json();
     setItems(json.data?.items ?? []);
+    setTotal(json.data?.total ?? null);
     setIsLoading(false);
   }, [grup, statusFilter, q]);
 
@@ -631,6 +643,16 @@ export function AdminUsers() {
             <Alert className="mb-4 border-warning/20 bg-warning/10">
               <AlertDescription className="text-slate-800">{message}</AlertDescription>
             </Alert>
+          )}
+
+          {/* Jumlah hasil + peringatan kalau daftar terpotong batas `take`.
+              Tanpa ini daftar berhenti diam-diam dan terbaca seolah datanya
+              memang cuma sebanyak yang tampil. */}
+          {!isLoading && total !== null && (
+            <p className="mb-3 text-xs text-slate-500">
+              Menampilkan <span className="font-semibold text-slate-700">{items.length}</span>
+              {total > items.length ? <> dari <span className="font-semibold text-slate-700">{total}</span> akun — persempit dengan pencarian atau filter untuk melihat sisanya</> : <> akun</>}
+            </p>
           )}
 
           {isLoading ? (
@@ -1038,7 +1060,7 @@ export function AdminUsers() {
                 {(
                   [
                     [3, 'Warga', 'Masyarakat umum'],
-                    [4, 'OPD', 'Instansi pemerintah daerah'],
+                    [LEVEL_OPD, 'OPD', 'Instansi pemerintah daerah'],
                     ...(myLevel === 1
                       ? ([[2, 'Staff', 'Petugas dinas']] as const)
                       : []),
@@ -1196,12 +1218,12 @@ export function AdminUsers() {
               /* ── Akun OPD & STAFF: tetap seperti sebelumnya ── */
               <>
                 <div className="space-y-1.5">
-                  <Label>Nama Lengkap {form.level === 4 ? '/ Nama Instansi' : ''} *</Label>
+                  <Label>Nama Lengkap {form.level === LEVEL_OPD ? '/ Nama Instansi' : ''} *</Label>
                   <Input
                     value={form.nama}
                     onChange={(e) => setForm((f) => ({ ...f, nama: e.target.value }))}
                     placeholder={
-                      form.level === 4 ? 'mis. Dinas Kesehatan Tidore Kepulauan' : 'Nama sesuai KTP'
+                      form.level === LEVEL_OPD ? 'mis. Dinas Kesehatan Tidore Kepulauan' : 'Nama sesuai KTP'
                     }
                   />
                 </div>
@@ -1209,14 +1231,14 @@ export function AdminUsers() {
                 {/* Identitas login: OPD & staff memakai username.
                     OPD juga mengisi NIK perwakilan (untuk lupa password). */}
                 <div className="space-y-1.5">
-                  <Label>{form.level === 4 ? 'Username Instansi *' : 'Username *'}</Label>
+                  <Label>{form.level === LEVEL_OPD ? 'Username Instansi *' : 'Username *'}</Label>
                   <Input
                     value={form.userId}
                     onChange={(e) => setForm((f) => ({ ...f, userId: e.target.value }))}
                     maxLength={30}
-                    placeholder={form.level === 4 ? 'mis. rs.tidore' : 'mis. staff_dinas'}
+                    placeholder={form.level === LEVEL_OPD ? 'mis. rs.tidore' : 'mis. staff_dinas'}
                   />
-                  {form.level === 4 && (
+                  {form.level === LEVEL_OPD && (
                     <p className="text-xs text-muted-foreground">
                       Username ini yang dipakai instansi untuk <b>login</b> (4-30 karakter,
                       huruf/angka/titik/underscore/strip).
@@ -1224,7 +1246,7 @@ export function AdminUsers() {
                   )}
                 </div>
 
-                {form.level === 4 && (
+                {form.level === LEVEL_OPD && (
                   <div className="space-y-1.5">
                     <Label>NIK Perwakilan (16 digit) *</Label>
                     <Input

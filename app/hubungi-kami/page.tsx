@@ -10,7 +10,6 @@ import {
   MessageSquareWarning,
   Phone,
 } from 'lucide-react';
-import { SurveyKepuasanForm } from '@/components/shared/survey-kepuasan-form';
 
 export const metadata = {
   title: 'Hubungi Kami — Disdukcapil Tidore Kepulauan',
@@ -128,17 +127,29 @@ export default function HubungiKamiPage() {
           )}
         </div>
 
-        {/* Survey kepuasan masyarakat — form SKM internal (dipindah dari menu
-            Media Informasi; data tersimpan di DB via /api/skm) */}
+        {/* Survei kepuasan masyarakat — AJAKAN saja, bukan salinan formulir.
+            Formulirnya punya rumah sendiri di /survei-kepuasan (halaman yang
+            ditunjuk navbar). Menyematkan salinan kedua di sini berarti dua
+            formulir yang harus dijaga tetap sama — cukup satu, sisanya menaut. */}
         <div id="survei" className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
           <div className="flex items-center gap-2 border-b border-slate-100 px-6 py-4">
             <ClipboardCheck className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-slate-900">
-              Survey Kepuasan Masyarakat
+              Survei Kepuasan Masyarakat
             </h2>
           </div>
-          <div className="mx-auto max-w-2xl px-6 py-6">
-            <SurveyKepuasanForm />
+          <div className="flex flex-col items-start gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-xl text-sm leading-relaxed text-slate-600">
+              Sudah pernah dilayani Disdukcapil Kota Tidore Kepulauan? Beri
+              penilaian Anda — hanya perlu beberapa menit, dan masukannya
+              langsung kami pakai untuk memperbaiki mutu pelayanan.
+            </p>
+            <Link
+              href="/survei-kepuasan"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:gap-3 hover:shadow-md"
+            >
+              Isi Survei <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 

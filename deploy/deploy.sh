@@ -78,8 +78,11 @@ if [[ "$SETUP_ONLY" == false ]]; then
   [[ -d public ]]   && cp -r public   .next/standalone/public
   [[ -d tessdata ]] && cp -r tessdata .next/standalone/tessdata
   # Buang .env DEV yg ikut disalin Next → jangan menimpa .env produksi server.
+  # `.env.development.local` ikut disebut: isinya nilai khusus laptop (mis.
+  # NEXT_PUBLIC_ANTRIAN_URL ke localhost:3000) yang tak boleh nyasar ke server.
   rm -f .next/standalone/.env .next/standalone/.env.local .next/standalone/.env.production \
-        .next/standalone/.env.development .next/standalone/.env.example
+        .next/standalone/.env.development .next/standalone/.env.development.local \
+        .next/standalone/.env.example
 fi
 
 # ============================================================ KIRIM CONFIG + PROVISION

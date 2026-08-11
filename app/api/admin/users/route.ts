@@ -10,8 +10,13 @@ import { catatAktivitas } from "@/lib/log-aktivitas";
 import { simpanFotoProfil } from "@/lib/foto-profil";
 import { STATUS_AKUN } from "@/lib/akun-status";
 import { susunAlasanTolak } from "@/lib/akun-tolak";
+import { LEVEL_OPD, LEVEL_OPERATOR, LEVEL_STAFF, LEVEL_ADMIN, LEVEL_WARGA } from "@/lib/akun-level";
 
-const NAMA_LEVEL: Record<number, string> = { 2: "Staff", 3: "Warga", 4: "Operator OPD" };
+const NAMA_LEVEL: Record<number, string> = {
+  [LEVEL_STAFF]: "Staff",
+  [LEVEL_WARGA]: "Warga",
+  [LEVEL_OPD]: "Operator OPD",
+};
 
 /** Pastikan pemanggil adalah operator/admin (level 1 atau 2). */
 async function requireAdmin() {
@@ -27,31 +32,50 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const statusParam = searchParams.get("status"); // "0" | "1" | null
-  // Kelompok akun: "3" = warga, "4" = operator OPD, "staff" = petugas dinas (1&2).
   const levelParam = searchParams.get("level");
   const q = searchParams.get("q")?.trim();
 
+  // Kelompok akun (tab). 🔴 "all" WAJIB ada dan wajib jadi jaring pengaman:
+  // `m_userlevels` hasil migrasi berisi level yang tidak dipakai UI —
+  // 4 developer, 5 operator opd, dan 41 operator (40 akun). Dulu tab hanya
+  // 3/4/staff sementara filter level SELALU dikirim, sehingga 40 akun level 41
+  // tidak muncul di daftar mana pun DAN tidak bisa dicari (pencarian
+  // selalu dibatasi kelompok yang sedang aktif). Kelompok baru boleh
+  // ditambahkan di sini, tapi "all" tidak boleh dihapus.
+  const KELOMPOK: Record<string, number[]> = {
+    staff: [LEVEL_ADMIN, LEVEL_STAFF],
+    [String(LEVEL_WARGA)]: [LEVEL_WARGA],
+    // Kelompok OPD sengaja memuat 4 DAN 5: level 5 adalah yang benar, level 4
+    // ikut supaya akun lama yang belum sempat dipindah tidak lenyap dari tab.
+    opd: [LEVEL_OPD, 4],
+    operator: [LEVEL_OPERATOR],
+  };
+  const levels = levelParam ? KELOMPOK[levelParam] : undefined;
+
+  const where = {
+    ...(["0", "1", "2", "3"].includes(statusParam ?? "")
+      ? { status: Number(statusParam) }
+      : {}),
+    ...(levels ? { userlevelId: { in: levels } } : {}),
+    ...(q
+      ? {
+          OR: [
+            { userId: { contains: q } },
+            { userFullname: { contains: q } },
+            { userEmail: { contains: q } },
+            { userNik: { contains: q } },
+          ],
+        }
+      : {}),
+  };
+
+  // `total` dipakai UI untuk memberi tahu kalau daftar terpotong `take`.
+  // Tanpa ini daftar diam-diam berhenti di batas dan terbaca seolah datanya
+  // memang cuma segitu.
+  const total = await prisma.user.count({ where });
+
   const items = await prisma.user.findMany({
-    where: {
-      ...(["0", "1", "2", "3"].includes(statusParam ?? "")
-        ? { status: Number(statusParam) }
-        : {}),
-      ...(levelParam === "staff"
-        ? { userlevelId: { in: [1, 2] } }
-        : levelParam === "3" || levelParam === "4"
-          ? { userlevelId: Number(levelParam) }
-          : {}),
-      ...(q
-        ? {
-            OR: [
-              { userId: { contains: q } },
-              { userFullname: { contains: q } },
-              { userEmail: { contains: q } },
-              { userNik: { contains: q } },
-            ],
-          }
-        : {}),
-    },
+    where,
     select: {
       id: true,
       userId: true,
@@ -68,16 +92,16 @@ export async function GET(req: NextRequest) {
       level: { select: { nama: true } },
     },
     orderBy: { createdAt: "desc" },
-    take: 200,
+    take: 500,
   });
 
-  return ok({ items });
+  return ok({ items, total });
 }
 
 /**
  * Buat akun baru oleh admin/operator.
- * Level yang bisa dibuat: 3 = Warga, 4 = Operator OPD (instansi pemerintah
- * daerah). Level 2 (Operator dinas) hanya bisa dibuat Super Admin (level 1).
+ * Level yang bisa dibuat: 3 = Warga, LEVEL_OPD (5) = Operator OPD (instansi
+ * pemerintah daerah). Level 2 (Operator dinas) hanya bisa dibuat Super Admin (level 1).
  * Akun langsung aktif karena dibuat petugas; email pemberitahuan dikirim
  * bila alamat email diisi.
  */
@@ -103,7 +127,7 @@ export async function POST(req: NextRequest) {
   if (!nama?.trim() || !userId?.trim() || !password) {
     return fail(["Info: Nama, NIK/Username, dan password wajib diisi"]);
   }
-  if (level !== 2 && level !== 3 && level !== 4) {
+  if (level !== 2 && level !== 3 && level !== LEVEL_OPD) {
     return fail(["Info: Level akun tidak valid"]);
   }
   if (level === 2 && session.level !== 1) {
@@ -123,7 +147,7 @@ export async function POST(req: NextRequest) {
   }
   // OPD login memakai USERNAME instansi (mis. rs.tidore); NIK perwakilan
   // disimpan terpisah untuk fitur lupa password.
-  if (level === 4) {
+  if (level === LEVEL_OPD) {
     if (!/^[a-z0-9][a-z0-9._-]{3,29}$/i.test(userId.trim())) {
       return fail([
         "Info: Username OPD 4-30 karakter (huruf/angka/titik/underscore/strip)",
@@ -150,8 +174,8 @@ export async function POST(req: NextRequest) {
 
     // Pastikan level Operator OPD ada (DB lama mungkin belum punya baris ini).
     await prisma.userLevel.upsert({
-      where: { id: 4 },
-      create: { id: 4, nama: "Operator OPD" },
+      where: { id: LEVEL_OPD },
+      create: { id: LEVEL_OPD, nama: "Operator OPD" },
       update: {},
     });
 
@@ -165,7 +189,7 @@ export async function POST(req: NextRequest) {
         // NIK untuk fitur lupa password: warga = NIK login-nya sendiri,
         // OPD = NIK perwakilan instansi (field terpisah dari username).
         userNik:
-          level === 4
+          level === LEVEL_OPD
             ? (nik ?? "").trim()
             : /^\d{16}$/.test(userId.trim())
               ? userId.trim()

@@ -3,6 +3,14 @@ import { getSession } from "@/lib/auth";
 import { Footer } from "@/components/shared/footer";
 import { TiketPanel } from "@/components/tiket/tiket-panel";
 import { Ticket } from "lucide-react";
+import type { Metadata } from "next";
+
+// Halaman akun/pribadi: tidak berguna di hasil pencarian dan hanya
+// mengencerkan halaman layanan yang justru dicari warga.
+export const metadata: Metadata = {
+  title: "Tiket Bantuan",
+  robots: { index: false, follow: false },
+};
 
 export const dynamic = "force-dynamic";
 

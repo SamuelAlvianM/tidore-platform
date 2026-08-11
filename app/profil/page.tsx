@@ -5,6 +5,14 @@ import { ProfilForm } from './ProfilForm';
 import { FotoProfilCard } from './FotoProfilCard';
 import { ChangePasswordForm } from './ChangePasswordForm';
 import { BackButton } from '@/components/shared/back-button';
+import type { Metadata } from "next";
+
+// Halaman akun/pribadi: tidak berguna di hasil pencarian dan hanya
+// mengencerkan halaman layanan yang justru dicari warga.
+export const metadata: Metadata = {
+  title: "Profil Akun",
+  robots: { index: false, follow: false },
+};
 
 export const dynamic = 'force-dynamic';
 

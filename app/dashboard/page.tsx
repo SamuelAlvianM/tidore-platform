@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { LEVEL_ADMIN, LEVEL_STAFF, LEVEL_WARGA, LEVEL_OPD, LEVEL_OPERATOR } from '@/lib/akun-level';
 import { statsKunjungan } from '@/lib/kunjungan';
 import {
   ProgressPermohonanChart,
@@ -27,6 +28,7 @@ import {
   ArrowRight,
   TrendingUp,
   Landmark,
+  MapPin,
   ShieldCheck,
   Eye,
   Wifi,
@@ -223,10 +225,14 @@ export default async function DashboardPage() {
   const levelCount = (ids: number[]) =>
     usersByLevel.filter((u) => ids.includes(u.userlevelId)).reduce((a, u) => a + u._count._all, 0);
   const totalUser = usersByLevel.reduce((a, u) => a + u._count._all, 0);
+  // 🔴 Kelompok ini harus MENJUMLAH jadi totalUser. Sebelumnya "Operator"
+  // (level 41, 40 akun) tidak punya kartu sama sekali sehingga angkanya raib,
+  // dan "Operator OPD" menghitung level 4 yang sebenarnya "developer".
   const akunGrup = [
-    { label: 'Warga', value: levelCount([3]), icon: Users },
-    { label: 'Operator OPD', value: levelCount([4]), icon: Landmark },
-    { label: 'Staff Dinas', value: levelCount([1, 2]), icon: ShieldCheck },
+    { label: 'Warga', value: levelCount([LEVEL_WARGA]), icon: Users },
+    { label: 'Operator', value: levelCount([LEVEL_OPERATOR]), icon: MapPin },
+    { label: 'Operator OPD', value: levelCount([LEVEL_OPD, 4]), icon: Landmark },
+    { label: 'Staff Dinas', value: levelCount([LEVEL_ADMIN, LEVEL_STAFF]), icon: ShieldCheck },
   ];
 
   const kpi = [

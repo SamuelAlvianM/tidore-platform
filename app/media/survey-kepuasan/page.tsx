@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation';
 
 /**
- * Survey Kepuasan Masyarakat dipindah ke halaman Hubungi Kami (Google Form,
- * seperti portal lama). Redirect dipertahankan untuk tautan/bookmark lama.
+ * Alamat warisan portal lama. Rumah resmi survei sekarang `/survei-kepuasan`
+ * (formulir internal, jawabannya masuk rekap SKM & IKM di dashboard).
+ * Redirect dipertahankan supaya tautan & bookmark lama tidak mati.
  */
 export default function SurveyKepuasanPage() {
-  redirect('/hubungi-kami#survei');
+  redirect('/survei-kepuasan');
 }

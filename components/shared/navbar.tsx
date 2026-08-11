@@ -25,6 +25,7 @@ import {
   Landmark,
   ShieldAlert,
   Gauge,
+  Ticket,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
@@ -529,6 +530,7 @@ function MobileMenuItem({
   items,
   onClose,
   icon: Icon,
+  aplikasiLuar,
 }: {
   title: string;
   /** Link langsung untuk menu tanpa dropdown. */
@@ -541,6 +543,8 @@ function MobileMenuItem({
   }>;
   onClose: () => void;
   icon?: React.ElementType;
+  /** Dilayani aplikasi lain (mis. Antrian) — lihat NavMenu.aplikasiLuar. */
+  aplikasiLuar?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [expandedSubMenu, setExpandedSubMenu] = React.useState<string | null>(
@@ -551,12 +555,14 @@ function MobileMenuItem({
     const resolvedHref = href ?? `/${title.toLowerCase().replace(/\s+/g, "-")}`;
     const className =
       "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]";
-    if (isExternalHref(resolvedHref)) {
+    // Aplikasi lain → `<a>` biasa di tab yang sama (muat-ulang penuh).
+    // Situs luar → `<a>` di tab baru. Sisanya baru boleh lewat router Next.
+    if (aplikasiLuar || isExternalHref(resolvedHref)) {
+      const tabBaru = !aplikasiLuar;
       return (
         <a
           href={resolvedHref}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(tabBaru ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           className={className}
           onClick={onClose}
         >
@@ -689,6 +695,7 @@ const navigationIcons: { [key: string]: React.ElementType } = {
   "Hubungi Kami": Phone,
   PPID: Landmark,
   "Survei Kepuasan Masyarakat": Gauge,
+  Antrian: Ticket,
 };
 
 // navigationItems dipindah ke lib/navigation.ts (dipakai juga oleh dashboard Konten).
@@ -982,7 +989,9 @@ export function Navbar() {
               // Menu tanpa dropdown → link langsung (mis. Pelayanan Online).
               if (!item.items?.length && item.href) {
                 const Icon = navigationIcons[item.title];
-                const external = isExternalHref(item.href);
+                // Aplikasi lain (Antrian) & situs luar sama-sama tidak boleh
+                // lewat router Next; bedanya cuma tab baru atau tidak.
+                const external = item.aplikasiLuar || isExternalHref(item.href);
                 const linkClassName = cn(
                   "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
                   "transition-all duration-300 ease-out",
@@ -992,12 +1001,14 @@ export function Navbar() {
                   "hover:before:w-[calc(100%-1.25rem)]",
                 );
                 if (external) {
+                  const tabBaru = !item.aplikasiLuar;
                   return (
                     <a
                       key={item.title}
                       href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      {...(tabBaru
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       className={linkClassName}
                     >
                       {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
@@ -1105,6 +1116,7 @@ export function Navbar() {
                     items={item.items}
                     onClose={() => setMobileOpen(false)}
                     icon={navigationIcons[item.title]}
+                    aplikasiLuar={item.aplikasiLuar}
                   />
                 ))}
 

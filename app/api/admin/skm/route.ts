@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
-import { SKM_ASPEK, SKM_SKALA_MAX } from "@/lib/skm";
+import { SKM_UNSUR, SKM_SKALA_MAX, nilaiPerUnsur, hitungIkm } from "@/lib/skm";
 
 /** Rekap Survei Kepuasan Masyarakat (admin/operator). */
 export async function GET() {
@@ -11,47 +11,67 @@ export async function GET() {
   const rows = await prisma.skmJawaban.findMany({ orderBy: { createdAt: "desc" } });
   const totalResponden = rows.length;
 
-  // Rata-rata per aspek.
-  const sum = SKM_ASPEK.map(() => 0);
-  const cnt = SKM_ASPEK.map(() => 0);
+  /**
+   * Satu bentuk jawaban untuk semua: kunci `u0`–`u8`, skala 1–4 — sama antara
+   * 107 responden warisan dan kiriman formulir portal (lihat `lib/skm.ts`).
+   *
+   * 🔴 Dua kesalahan yang pernah ada di sini, jangan diulang:
+   *  1. rekap hanya membaca kunci `"0".."5"` sehingga **seluruh** data warisan
+   *     tidak terhitung — dashboard menampilkan "107 responden" dengan
+   *     IKM 0,00 & mutu D. Angka yang salah, bukan sekadar kosong;
+   *  2. IKM dihitung `(rata / 5) × 100` padahal skala SKM adalah **1–4** dan
+   *     rumus Permenpan RB 14/2017 adalah **NRR × 25** = `(rata / 4) × 100`.
+   *     Membagi dengan 5 menyeret nilainya turun ± 20 poin — cukup untuk
+   *     memindahkan mutu dari A ke C.
+   */
+  const perUnsur = rows.map((r) =>
+    nilaiPerUnsur((r.jawaban ?? {}) as Record<string, unknown>),
+  );
 
-  for (const r of rows) {
-    const jawaban = (r.jawaban ?? {}) as Record<string, number>;
-    SKM_ASPEK.forEach((_, i) => {
-      const v = Number(jawaban[String(i)]);
-      if (v >= 1 && v <= SKM_SKALA_MAX) {
-        sum[i] += v;
-        cnt[i] += 1;
-      }
-    });
-  }
+  // Rata-rata per unsur (NRR). Unsur yang tak dijawab dilewati, bukan dihitung 0.
+  const rataPerAspek = SKM_UNSUR.map((u, i) => {
+    const nilai = perUnsur.map((n) => n[i]).filter((v): v is number => v !== null);
+    return {
+      aspek: u.judul,
+      pertanyaan: u.pertanyaan,
+      rata: nilai.length
+        ? Number((nilai.reduce((a, b) => a + b, 0) / nilai.length).toFixed(2))
+        : 0,
+      jumlahJawaban: nilai.length,
+    };
+  });
 
-  const rataPerAspek = SKM_ASPEK.map((aspek, i) => ({
-    aspek,
-    rata: cnt[i] ? Number((sum[i] / cnt[i]).toFixed(2)) : 0,
-  }));
+  // Responden yang menjawab setidaknya satu unsur — dasar rata-rata keseluruhan.
+  const rataTiapResponden = perUnsur
+    .map((n) => n.filter((v): v is number => v !== null))
+    .filter((v) => v.length > 0)
+    .map((v) => v.reduce((a, b) => a + b, 0) / v.length);
 
-  const rataKeseluruhan = rataPerAspek.length
-    ? rataPerAspek.reduce((a, b) => a + b.rata, 0) / rataPerAspek.length
+  const rataKeseluruhan = rataTiapResponden.length
+    ? rataTiapResponden.reduce((a, b) => a + b, 0) / rataTiapResponden.length
     : 0;
-  // Konversi ke skala 0-100 (Nilai IKM) dari skala 1-5.
-  const nilaiIKM = Number(((rataKeseluruhan / SKM_SKALA_MAX) * 100).toFixed(2));
+  const nilaiIKM = hitungIkm(rataKeseluruhan);
 
-  const respondenTerbaru = rows.slice(0, 15).map((r) => {
-    const jawaban = (r.jawaban ?? {}) as Record<string, number>;
-    const vals = SKM_ASPEK.map((_, i) => Number(jawaban[String(i)]) || 0);
-    const rata = vals.length ? Number((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)) : 0;
+  const respondenTerbaru = rows.slice(0, 15).map((r, idxAll) => {
+    const vals = perUnsur[idxAll].filter((v): v is number => v !== null);
+    const rata = vals.length
+      ? Number((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2))
+      : 0;
     return {
       id: r.id,
       nama: r.nama ?? "Anonim",
+      layanan: r.layanan,
       rataSkor: rata,
       saran: r.saran,
+      usulanLayanan: r.usulanLayanan,
+      masukanLayanan: r.masukanLayanan,
       createdAt: r.createdAt,
     };
   });
 
   return ok({
     totalResponden,
+    respondenMenjawab: rataTiapResponden.length,
     rataPerAspek,
     rataKeseluruhan: Number(rataKeseluruhan.toFixed(2)),
     nilaiIKM,

@@ -5,17 +5,29 @@ import { Loader2, Users, Gauge, Star, ClipboardCheck } from 'lucide-react';
 
 interface AspekRata {
   aspek: string;
+  pertanyaan: string;
   rata: number;
+  jumlahJawaban: number;
+}
+interface MasukanLayanan {
+  layanan: string;
+  aspek: string;
+  saran: string;
 }
 interface Responden {
   id: number;
   nama: string;
+  layanan: string | null;
   rataSkor: number;
   saran: string | null;
+  usulanLayanan: string | null;
+  masukanLayanan: MasukanLayanan[] | null;
   createdAt: string;
 }
 interface Data {
   totalResponden: number;
+  /** Responden yang menjawab minimal satu unsur — dasar rata-rata & IKM. */
+  respondenMenjawab: number;
   rataPerAspek: AspekRata[];
   rataKeseluruhan: number;
   nilaiIKM: number;
@@ -74,8 +86,14 @@ export function SkmDashboard() {
       {/* Bar chart per aspek */}
       <div className="glass-card rounded-2xl p-6">
         <h2 className="font-semibold text-slate-900 mb-1">Rata-rata Nilai per Aspek</h2>
-        <p className="text-xs text-slate-500 mb-5">Skala 1 (sangat kurang) - {data.skalaMax} (sangat baik)</p>
-        {data.totalResponden === 0 ? (
+        <p className="text-xs text-slate-500 mb-1">
+          9 unsur SKM · skala 1–{data.skalaMax} (Permenpan RB 14/2017) ·
+          Nilai IKM = rata-rata × 25
+        </p>
+        <p className="text-xs text-slate-400 mb-5">
+          Dihitung dari {data.respondenMenjawab} responden.
+        </p>
+        {data.respondenMenjawab === 0 ? (
           <p className="text-sm text-slate-500 py-6 text-center">Belum ada responden.</p>
         ) : (
           <div className="space-y-4">

@@ -38,6 +38,20 @@ export const siteConfig = {
   },
 
   recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "",
+
+  /**
+   * Alamat aplikasi ANTRIAN LOKET — aplikasi TERPISAH (repo `antrian-dukcapil`,
+   * folder `tidore-platform-manda`), bukan rute milik portal ini.
+   *
+   * Di produksi bernilai `/antrian`: Apache-lah yang meneruskan path itu ke
+   * proses antrian di 127.0.0.1:3000 (lihat deploy/apache-daga.conf), sehingga
+   * warga tetap melihat satu domain. Di laptop Apache tidak ada, jadi isi
+   * `.env.local` dengan alamat langsung, mis. http://localhost:3000/antrian.
+   *
+   * Karena yang melayani adalah aplikasi lain, tautannya WAJIB muat-ulang penuh
+   * (`<a>`, bukan <Link> Next) — lihat `aplikasiLuar` di lib/navigation.ts.
+   */
+  antrianUrl: process.env.NEXT_PUBLIC_ANTRIAN_URL ?? "/antrian",
 } as const;
 
 export type SiteConfig = typeof siteConfig;

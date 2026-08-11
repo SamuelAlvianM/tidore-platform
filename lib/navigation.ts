@@ -3,6 +3,8 @@
  * Konten Halaman di dashboard (sidebar + submenu preview).
  */
 
+import { siteConfig } from "@/lib/site-config";
+
 export interface NavSubItem {
   title: string;
   href: string;
@@ -21,6 +23,14 @@ export interface NavMenu {
   /** Link langsung (menu tanpa dropdown). Abaikan bila `items` diisi. */
   href?: string;
   items?: NavItem[];
+  /**
+   * Menu ini dilayani APLIKASI LAIN, bukan portal ini — walau alamatnya bisa
+   * terlihat satu domain (mis. `/antrian` yang diteruskan Apache ke proses
+   * lain). Navbar merendernya sebagai `<a>` biasa supaya terjadi muat-ulang
+   * penuh; `<Link>` Next akan mencari rute itu di dalam portal, tidak
+   * menemukannya, lalu berakhir 404.
+   */
+  aplikasiLuar?: boolean;
 }
 
 export const navigationItems: NavMenu[] = [
@@ -129,4 +139,15 @@ export const navigationItems: NavMenu[] = [
   // "Hubungi Kami" dihapus dari navbar atas permintaan user — informasi kontak
   // (alamat, email, jam layanan) sudah tersedia permanen di footer. Halaman
   // /hubungi-kami tetap ada dan dapat diakses lewat tautan footer.
+  {
+    // Paling kanan atas permintaan user. Ini PINTU ke aplikasi antrian loket
+    // yang berdiri sendiri (repo `antrian-dukcapil` / folder
+    // `tidore-platform-manda`) — portal cuma memanggil, tidak ikut memuat
+    // kodenya. Alamatnya dari env supaya laptop & server bisa berbeda tanpa
+    // ubah kode (lihat siteConfig.antrianUrl).
+    // Ikonnya diatur di `navigationIcons` (components/shared/navbar.tsx).
+    title: "Antrian",
+    href: siteConfig.antrianUrl,
+    aplikasiLuar: true,
+  },
 ];

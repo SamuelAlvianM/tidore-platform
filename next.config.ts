@@ -16,6 +16,23 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/permohonan/[id]/pdf": ["./node_modules/pdfkit/js/data/*.afm"],
   },
+  // `storage/` adalah DATA RUNTIME, bukan artefak build: 25rb+ scan KTP/KK warga
+  // (~14 GB) plus foto verifikasi antrian. Tanpa pengecualian ini, penelusuran
+  // berkas Next menyeret semuanya ke `.next/standalone` — bundle membengkak dari
+  // ~120 MB jadi 15 GB, dan pernah menimpa symlink `storage/permohonan` di server
+  // hingga lampiran 404 (lihat journal §O.1).
+  //
+  // deploy.sh sudah membuangnya lagi sebelum kirim, tapi mencegah lebih baik
+  // daripada membersihkan: build jadi jauh lebih cepat dan tidak ada 14 GB yang
+  // sempat ditulis ke disk. Berkas warga hidup di /var/www/html/uploads dan
+  // HANYA ditunjuk symlink.
+  outputFileTracingExcludes: {
+    // Pola ditulis DUA bentuk dengan sengaja: pencocokan glob Next menormalkan
+    // path relatif TANPA awalan "./", sehingga pola "./storage/**" saja tidak
+    // pernah cocok. Diukur: dengan pola lama, `next build` bersih tetap
+    // menyalin 25.410 berkas (14 GB) ke .next/standalone.
+    "**/*": ["storage/**", "./storage/**"],
+  },
   // Izinkan gambar dari domain resmi Disdukcapil Tana Tidung (storage publik) bila diperlukan.
   images: {
     remotePatterns: [

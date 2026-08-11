@@ -213,8 +213,22 @@ model SkmJawaban {
   umur      Int?
   jenisKel  String?  @map("jenis_kelamin")
   pekerjaan String?
-  jawaban   Json     // {pertanyaanId: nilai}
+  /// Kode m_options pendidikan (1–10). Ada di kuesioner asli dinas.
+  pendidikan String? @db.VarChar(20)
+  /// Layanan yang diurus responden — kode `m_jenis_permohonan.kode`.
+  layanan    String? @db.VarChar(60)
+  /// Kontak opsional; kuesioner lama mengumpulkan WhatsApp & email.
+  hp         String? @db.VarChar(25)
+  email      String? @db.VarChar(150)
+  /// Nilai 9 unsur SKM, berkunci "u0".."u8", skala 1–4. Bentuknya sama
+  /// dengan data warisan Laravel — lihat lib/skm.ts.
+  jawaban   Json
   saran     String?  @db.Text
+  /// Masukan per layanan: [{ layanan, aspek, saran }]. Kosong/null berarti
+  /// responden menyatakan semua layanan sudah baik.
+  masukanLayanan Json?   @map("masukan_layanan")
+  /// Usulan jenis layanan/permohonan baru yang diharapkan warga.
+  usulanLayanan  String? @map("usulan_layanan") @db.Text
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("t_skm_jawaban")

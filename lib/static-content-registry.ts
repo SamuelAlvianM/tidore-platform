@@ -315,10 +315,11 @@ STATIC_BLOCKS.push({
 
 // ───────────────────────────────────────────────────────────────────────────
 // Survei Kepuasan Masyarakat — halaman /survei-kepuasan.
-// Formulir survei DILAYANI PIHAK LUAR (mis. skm.go.id atau Google Form), jadi
-// yang disimpan cuma URL-nya; halaman menyematkannya sebagai iframe. URL
-// sengaja KOSONG secara bawaan: tautan resmi datang dari dinas, dan menebak
-// alamat instansi berarti mengirim warga mengisi survei milik instansi lain.
+// Formulirnya MILIK PORTAL INI (lihat components/shared/survey-kepuasan-form),
+// jadi yang editable tinggal judul & pengantar. Bidang "url" untuk menyematkan
+// formulir pihak luar SUDAH DIHAPUS: jawaban lewat layanan luar tak pernah
+// masuk rekap IKM, dan URL bebas tak bisa diperiksa mesin — di produksi sempat
+// terpasang formulir WBS milik instansi lain tanpa ada yang bisa menyadarinya.
 // ───────────────────────────────────────────────────────────────────────────
 export const SURVEI_KEPUASAN_KUNCI = "layanan.survei-kepuasan";
 
@@ -326,26 +327,20 @@ STATIC_BLOCKS.push({
   kunci: SURVEI_KEPUASAN_KUNCI,
   judul: "Halaman — Survei Kepuasan Masyarakat",
   deskripsi:
-    "Judul, pengantar, dan TAUTAN formulir survei. Tempelkan tautan resmi dari dinas — formulirnya otomatis tampil langsung di halaman.",
+    "Judul dan paragraf pengantar halaman survei. Formulirnya milik portal ini sendiri — jawaban warga langsung masuk ke rekap SKM & IKM di dashboard.",
   fields: [
+    { name: "judul", label: "Judul Halaman", type: "text" },
     {
-      name: "url",
-      label: "Tautan Formulir Survei",
-      type: "text",
-      placeholder: "https://…",
+      name: "intro",
+      label: "Paragraf Pengantar",
+      type: "textarea",
       catatan: [
-        "Tempel alamat formulir survei resmi (mis. Google Form atau skm.go.id). Formulir akan tampil langsung di halaman ini, dan tombol “Buka di website” mengarah ke alamat yang sama. Selama kosong, halaman memberi tahu bahwa survei belum tersedia.",
-        "PENTING — formulir harus bisa dibuka UMUM, kalau tidak bingkainya tampil kosong dan warga tidak bisa mengisi:",
-        "• Google Form → Settings → Responses: matikan “Restrict to users in …” dan “Limit to 1 response”; “Collect email addresses” jangan disetel “Verified”.",
-        "• Lalu Share/Bagikan → pilih “Anyone with the link”.",
-        "Cara memastikan: buka tautannya di jendela Incognito/Penyamaran. Kalau yang muncul halaman login Google, warga pun akan mentok di situ — bukan portal ini yang bermasalah.",
+        "Formulir survei TIDAK lagi memakai layanan luar (Google Form). Pertanyaannya ada di dalam sistem dan jawabannya otomatis terekap di menu SKM & IKM pada dashboard.",
+        "Kalau daftar aspek penilaian perlu diubah, itu bukan lewat Mode Edit — hubungi pengelola sistem (sumbernya lib/skm.ts, dipakai bersama oleh formulir dan rekap).",
       ].join("\n"),
     },
-    { name: "judul", label: "Judul Halaman", type: "text" },
-    { name: "intro", label: "Paragraf Pengantar", type: "textarea" },
   ],
   defaults: {
-    url: "",
     judul: "Survei Kepuasan Masyarakat",
     intro:
       "Penilaian Anda membantu kami meningkatkan mutu pelayanan administrasi kependudukan. Isi formulir survei resmi di bawah ini — cukup beberapa menit dan identitas Anda dijaga sesuai ketentuan.",

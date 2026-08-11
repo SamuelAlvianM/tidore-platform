@@ -1,6 +1,17 @@
 import Link from 'next/link';
 import { Footer } from '@/components/shared/footer';
 import { produkContent, ppidContent, hubungiKamiContent } from '@/lib/info-content';
+import type { Metadata } from "next";
+
+// Judul & deskripsi khas halaman ini. Tanpa ini halaman mewarisi judul
+// bawaan layout, sehingga semua halaman terlihat sama di hasil pencarian.
+export const metadata: Metadata = {
+  title: "Peta Situs",
+  description:
+    "Daftar seluruh halaman Portal DAGA Disdukcapil Kota Tidore Kepulauan.",
+  alternates: { canonical: "/sitemap" },
+  openGraph: { title: "Peta Situs", description: "Daftar seluruh halaman Portal DAGA Disdukcapil Kota Tidore Kepulauan.", url: "/sitemap" },
+};
 
 const sections: { title: string; links: { label: string; href: string }[] }[] = [
   {
