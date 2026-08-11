@@ -7,7 +7,7 @@ import { sendMail } from "@/lib/mail";
 import { tplRegistrasiDiterima } from "@/lib/mail-templates";
 import { cekBukti, normalisasiHp, otpWajib } from "@/lib/otp";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
-import { simpanFotoProfil } from "@/lib/foto-profil";
+import { simpanFotoKtp, simpanFotoProfil } from "@/lib/foto-profil";
 import { waRegistrasiDiterima } from "@/lib/notifikasi-wa";
 import { STATUS_AKUN } from "@/lib/akun-status";
 
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     pass2,
     kecamatan,
     foto,
+    ktp,
     recaptchaToken,
     otpBukti,
   } = body as Record<string, string>;
@@ -49,6 +50,9 @@ export async function POST(req: NextRequest) {
   }
   if (!foto?.trim()) {
     return fail(["Info: Foto wajah/selfie wajib dilampirkan (N-18)"]);
+  }
+  if (!ktp?.trim()) {
+    return fail(["Info: Foto KTP wajib diunggah (N-19)"]);
   }
   if (/^\d+$/.test(pass)) {
     return fail(["Info: Password Tidak Boleh Angka Semua (N-07)"]);
@@ -150,10 +154,14 @@ export async function POST(req: NextRequest) {
     // Foto baru bisa disimpan setelah akun ada — nama berkasnya diawali id
     // pemilik, dan itulah dasar kontrol akses di app/uploads/[...path].
     const urlFoto = await simpanFotoProfil(foto, userBaru.id);
-    if (urlFoto) {
+    const urlKtp = await simpanFotoKtp(ktp, userBaru.id);
+    if (urlFoto || urlKtp) {
       await prisma.user.update({
         where: { id: userBaru.id },
-        data: { userFoto: urlFoto },
+        data: {
+          ...(urlFoto ? { userFoto: urlFoto } : {}),
+          ...(urlKtp ? { userKtp: urlKtp } : {}),
+        },
       });
     }
 

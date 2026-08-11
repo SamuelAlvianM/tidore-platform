@@ -1,0 +1,25 @@
+-- TIDORE / DAGA — tambah kolom Foto KTP pada tabel users.
+--
+-- WAJIB DIJALANKAN SEBELUM deploy build yang memuat field Foto KTP.
+-- Tanpa kolom ini Prisma meng-SELECT kolom yang tidak ada → SEMUA query User
+-- balas 500 dan warga tidak bisa login.
+--
+-- Aditif & nullable: tidak menyentuh data yang sudah ada, tidak mengunci tabel
+-- lama-lama, dan aman dijalankan saat aplikasi hidup.
+--
+-- 🔴 JANGAN memakai `deploy.sh --db-sync` untuk ini — flag itu menimpa DB
+-- produksi dengan dump lokal dan menghapus permohonan & akun warga yang masuk
+-- sejak cutover. Perbaikan data produksi selalu lewat SQL bertarget.
+--
+-- Jalankan di server produksi (VPS 76.13.17.46), BUKAN dari laptop lewat
+-- `mysql < file.sql` — berkas ini tidak pernah ikut bundle deploy.
+-- Paste sebagai heredoc berkuota di shell server:
+--
+--   mysql -u root -p daga <<'SQL'
+--   ALTER TABLE users ADD COLUMN user_ktp VARCHAR(255) NULL AFTER user_foto;
+--   SQL
+--
+-- Verifikasi sesudahnya:
+--   SHOW COLUMNS FROM users LIKE 'user\_ktp';
+
+ALTER TABLE users ADD COLUMN user_ktp VARCHAR(255) NULL AFTER user_foto;

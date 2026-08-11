@@ -86,6 +86,8 @@ export const registerUser = createAsyncThunk(
       kecamatan: string;
       /** Foto wajah/selfie sebagai data URL JPEG. */
       foto: string;
+      /** Foto/scan KTP sebagai data URL JPEG (diunggah dari berkas). */
+      ktp: string;
       recaptchaToken?: string;
       /** Bukti verifikasi OTP WhatsApp dari /api/otp/verify. */
       otpBukti?: string;

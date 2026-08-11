@@ -7,7 +7,7 @@ import { sendMail } from "@/lib/mail";
 import { tplAkunDisetujui, tplAkunDitolak } from "@/lib/mail-templates";
 import { createNotifikasi, safeNotify } from "@/lib/notifikasi";
 import { catatAktivitas } from "@/lib/log-aktivitas";
-import { simpanFotoProfil } from "@/lib/foto-profil";
+import { simpanFotoKtp, simpanFotoProfil } from "@/lib/foto-profil";
 import { STATUS_AKUN } from "@/lib/akun-status";
 import { susunAlasanTolak } from "@/lib/akun-tolak";
 import { LEVEL_OPD, LEVEL_OPERATOR, LEVEL_STAFF, LEVEL_ADMIN, LEVEL_WARGA } from "@/lib/akun-level";
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
   if (!session) return fail(["Tidak diizinkan"], 403);
 
   const body = await req.json().catch(() => ({}));
-  const { nama, userId, nik, kk, hp, email, level, password, kecamatan, foto } =
+  const { nama, userId, nik, kk, hp, email, level, password, kecamatan, foto, ktp } =
     body as {
       nama?: string;
       userId?: string; // NIK (warga) atau username (OPD/staff)
@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
       password?: string;
       kecamatan?: string; // kecamatan domisili (khusus warga)
       foto?: string; // data URL selfie (opsional, khusus warga)
+      ktp?: string; // data URL foto/scan KTP (opsional, khusus warga)
     };
 
   if (!nama?.trim() || !userId?.trim() || !password) {
@@ -207,12 +208,16 @@ export async function POST(req: NextRequest) {
     // Foto wajah bersifat opsional di sini: warga belum tentu hadir saat
     // petugas membuatkan akunnya. Nama berkasnya diawali id pemilik — dasar
     // kontrol akses di app/uploads/[...path].
-    if (foto) {
-      const urlFoto = await simpanFotoProfil(foto, user.id);
-      if (urlFoto) {
+    if (foto || ktp) {
+      const urlFoto = foto ? await simpanFotoProfil(foto, user.id) : null;
+      const urlKtp = ktp ? await simpanFotoKtp(ktp, user.id) : null;
+      if (urlFoto || urlKtp) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { userFoto: urlFoto },
+          data: {
+            ...(urlFoto ? { userFoto: urlFoto } : {}),
+            ...(urlKtp ? { userKtp: urlKtp } : {}),
+          },
         });
       }
     }

@@ -20,6 +20,14 @@ export const ROOT_PROFIL = join(process.cwd(), "storage", "profil");
 export const FOLDER_SELFIE = "selfie";
 const DIR_SELFIE = join(ROOT_PROFIL, FOLDER_SELFIE);
 
+/**
+ * Foto/scan KTP pendaftar. Folder terpisah dari selfie supaya keduanya bisa
+ * dihapus/diaudit sendiri-sendiri, tapi tetap di bawah storage/profil sehingga
+ * kontrol akses app/uploads/[...path] berlaku sama (default-deny).
+ */
+export const FOLDER_KTP = "ktp";
+const DIR_KTP = join(ROOT_PROFIL, FOLDER_KTP);
+
 /** Batas data URL mentah. Klien sudah mengecilkan; ini jaring pengaman saja. */
 const MAKS_BYTE = 4 * 1024 * 1024;
 
@@ -71,4 +79,47 @@ export async function hapusFotoProfil(url: string | null | undefined) {
   const nama = url.split("/").pop();
   if (!nama || nama.includes("..")) return;
   await unlink(join(DIR_SELFIE, nama)).catch(() => {});
+}
+
+/**
+ * Simpan foto/scan KTP milik `userId`, kembalikan URL-nya (`/uploads/ktp/…`).
+ *
+ * Beda perlakuan dari selfie: KTP harus tetap TERBACA (NIK, nama, alamat),
+ * jadi sisi terpanjangnya 1600px dengan kualitas 85 — bukan 720px/80 seperti
+ * foto wajah. Tanpa itu tulisan pada KTP pecah dan petugas tidak bisa
+ * memverifikasi. Ukurannya tetap dibatasi agar tidak membebani penyimpanan.
+ */
+export async function simpanFotoKtp(
+  dataUrl: string,
+  userId: number,
+): Promise<string | null> {
+  if (!adalahDataUrlGambar(dataUrl)) return null;
+
+  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const mentah = Buffer.from(base64, "base64");
+  if (mentah.length === 0 || mentah.length > MAKS_BYTE) return null;
+
+  try {
+    const jpeg = await sharp(mentah)
+      .rotate()
+      .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
+      .flatten({ background: "#ffffff" })
+      .jpeg({ quality: 85 })
+      .toBuffer();
+
+    const nama = `${userId}_${Date.now()}.jpg`;
+    await mkdir(DIR_KTP, { recursive: true });
+    await writeFile(join(DIR_KTP, nama), jpeg);
+    return `/uploads/${FOLDER_KTP}/${nama}`;
+  } catch {
+    return null;
+  }
+}
+
+/** Hapus berkas foto KTP lama saat diganti; kegagalan diabaikan. */
+export async function hapusFotoKtp(url: string | null | undefined) {
+  if (!url) return;
+  const nama = url.split("/").pop();
+  if (!nama || nama.includes("..")) return;
+  await unlink(join(DIR_KTP, nama)).catch(() => {});
 }

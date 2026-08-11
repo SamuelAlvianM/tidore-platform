@@ -33,9 +33,11 @@ import {
   ChevronDown,
   Trash2,
   AlertTriangle,
+  IdCard,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CameraCapture } from '@/components/shared/camera-capture';
+import { ImageUploadField } from '@/components/shared/image-upload-field';
 import { SearchSelect } from '@/components/shared/search-select';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { STATUS_AKUN, infoStatus } from '@/lib/akun-status';
@@ -65,6 +67,7 @@ interface AdminUser {
   userEmail: string | null;
   userKecamatan: string | null;
   userFoto: string | null;
+  userKtp: string | null;
   status: number;
   createdAt: string;
   level: { nama: string } | null;
@@ -273,6 +276,34 @@ function IsiDetail({
           );
         })()}
 
+      {/* Foto KTP — ditaruh SEBELUM Data Diri karena inilah yang dicocokkan
+          petugas dengan NIK/nama di bawahnya saat memverifikasi pendaftaran.
+          Dibuka di tab baru untuk melihat versi penuhnya (tulisan KTP kecil). */}
+      {detail.userKtp && (
+        <div>
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Foto KTP
+          </h4>
+          <a
+            href={detail.userKtp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-primary/50"
+            title="Buka ukuran penuh di tab baru"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={detail.userKtp}
+              alt={`Foto KTP ${detail.userFullname ?? detail.userId}`}
+              className="h-auto w-full object-contain"
+            />
+          </a>
+          <p className="mt-1 text-[0.7rem] text-muted-foreground">
+            Klik gambar untuk membukanya dalam ukuran penuh.
+          </p>
+        </div>
+      )}
+
       {/* Data diri */}
       <div>
         <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -393,6 +424,7 @@ export function AdminUsers() {
   const [createOpen, setCreateOpen] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [foto, setFoto] = useState('');
+  const [ktp, setKtp] = useState('');
   const [creating, setCreating] = useState(false);
   const [kecamatanList, setKecamatanList] = useState<Kecamatan[]>([]);
   const myLevel = useAppSelector((s) => s.auth.user?.level ?? 2);
@@ -510,7 +542,11 @@ export function AdminUsers() {
     const res = await fetch('/api/admin/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, foto: foto || undefined }),
+      body: JSON.stringify({
+        ...form,
+        foto: foto || undefined,
+        ktp: ktp || undefined,
+      }),
     });
     const json = await res.json();
     setCreating(false);
@@ -541,6 +577,7 @@ export function AdminUsers() {
   const bukaFormBaru = () => {
     setForm({ ...EMPTY_FORM });
     setFoto('');
+    setKtp('');
     setCreateOpen(true);
   };
 
@@ -1211,6 +1248,24 @@ export function AdminUsers() {
                   <p className="text-[0.7rem] text-muted-foreground">
                     Ambil bila warga sedang berada di loket. Foto dipakai petugas untuk
                     mencocokkan dengan KTP sekaligus menjadi foto profil akun.
+                  </p>
+                </section>
+
+                {/* Foto KTP — diunggah dari berkas, bukan dipotret: di loket
+                    petugas biasanya sudah memegang hasil scan/fotokopi. */}
+                <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <IdCard className="h-4 w-4 text-primary" /> Foto KTP
+                    <span className="font-normal text-muted-foreground">(opsional)</span>
+                  </h4>
+                  <ImageUploadField
+                    value={ktp}
+                    onChange={setKtp}
+                    label="Pilih Foto KTP"
+                  />
+                  <p className="text-[0.7rem] text-muted-foreground">
+                    Format JPG, JPEG, atau PNG. Disimpan pada penyimpanan tertutup —
+                    hanya petugas yang dapat membukanya.
                   </p>
                 </section>
               </>

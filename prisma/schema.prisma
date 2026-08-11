@@ -34,6 +34,10 @@ model User {
   /// Foto wajah/selfie saat pendaftaran; dipakai petugas untuk mencocokkan
   /// dengan foto KTP sekaligus menjadi foto profil. Berisi URL /uploads/selfie/…
   userFoto          String?   @map("user_foto")
+  /// Foto/scan KTP yang diunggah pendaftar (JPG/JPEG/PNG). Inilah yang
+  /// disandingkan petugas dengan `userFoto` saat verifikasi akun.
+  /// Berisi URL /uploads/ktp/… — berkasnya di storage/, BUKAN public/.
+  userKtp           String?   @map("user_ktp")
   activationCode    String?   @map("activation_code")
   activationCodeUrl String?   @db.Text @map("activation_code_url")
   activationTime    DateTime? @map("activation_time")

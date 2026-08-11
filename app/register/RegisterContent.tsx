@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CameraCapture } from '@/components/shared/camera-capture';
+import { ImageUploadField } from '@/components/shared/image-upload-field';
 import { SearchSelect } from '@/components/shared/search-select';
 import {
   Loader2,
@@ -28,6 +29,7 @@ import {
   KeyRound,
   Camera,
   MapPin,
+  IdCard,
 } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import Image from 'next/image';
@@ -112,6 +114,8 @@ export default function RegisterPage() {
     kecamatan: '',
   });
   const [foto, setFoto] = useState('');
+  // Foto/scan KTP — diunggah dari berkas (bukan dipotret), lihat §Foto KTP.
+  const [ktp, setKtp] = useState('');
 
   // reCAPTCHA hanya aktif jika site key diisi. Tanpa key (mis. saat dev),
   // anggap langsung siap supaya tombol tidak "memuat" selamanya.
@@ -373,6 +377,13 @@ export default function RegisterPage() {
       errors.push('Foto wajah/selfie harus diambil');
     }
 
+    // Diwajibkan mengikuti foto selfie: keduanya baru berguna kalau
+    // disandingkan saat petugas memverifikasi. Bila dinas ingin opsional,
+    // cukup hapus blok ini (dan `LabelWajib` pada bagiannya).
+    if (!ktp) {
+      errors.push('Foto KTP harus diunggah');
+    }
+
     setValidationErrors(errors);
     return errors.length === 0;
   };
@@ -397,6 +408,7 @@ export default function RegisterPage() {
       const hasil = await dispatch(registerUser({
         ...formData,
         foto,
+        ktp,
         recaptchaToken,
         otpBukti: otpBukti || undefined,
       })).unwrap();
@@ -960,6 +972,56 @@ export default function RegisterPage() {
                         <li>
                           Petugas berhak menolak pendaftaran atau memblokir akun jika foto tidak
                           sesuai prosedur atau tidak jelas
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </Bagian>
+
+                {/* ── Foto KTP ──
+                    Sengaja UNGGAH BERKAS, bukan CameraCapture: KTP umumnya
+                    sudah ada sebagai hasil scan/foto, jadi memaksa memotret
+                    saat itu juga malah menyulitkan. Selfie tetap dipotret
+                    langsung karena di sana justru itu tujuannya. */}
+                <Bagian judul="Foto KTP" ikon={IdCard}>
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <LabelWajib>
+                        Unggah Foto KTP <TandaPerbaiki tampil={perluPerbaiki('ktp')} />
+                      </LabelWajib>
+                      <div className={`rounded-xl ${cincinPerbaiki('ktp')}`}>
+                        <ImageUploadField
+                          value={ktp}
+                          onChange={setKtp}
+                          disabled={isLoading || !recaptchaReady}
+                          label="Pilih Foto KTP"
+                        />
+                      </div>
+                      <Petunjuk
+                        items={[
+                          'Format JPG, JPEG, atau PNG — maksimal 10 MB',
+                          'Boleh hasil scan maupun foto dari ponsel',
+                          'Pastikan NIK, nama, dan alamat terbaca jelas',
+                        ]}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-slate-700 dark:text-slate-200">Perhatian</Label>
+                      <ul className="list-disc space-y-1 pl-4 text-[0.72rem] leading-relaxed text-slate-500 dark:text-slate-400">
+                        <li>Fotokan seluruh bagian KTP — jangan ada sudut yang terpotong</li>
+                        <li>Hindari pantulan cahaya/blitz yang menutupi tulisan</li>
+                        <li>KTP harus milik pendaftar sendiri, sesuai NIK yang diisi di atas</li>
+                        <li>
+                          Foto KTP disandingkan dengan foto selfie oleh petugas saat verifikasi
+                        </li>
+                        <li>
+                          Berkas disimpan pada penyimpanan tertutup dan hanya dapat dilihat
+                          petugas — tidak dapat diakses publik
+                        </li>
+                        <li>
+                          Petugas berhak menolak pendaftaran jika foto KTP tidak terbaca atau
+                          tidak sesuai data yang diisikan
                         </li>
                       </ul>
                     </div>

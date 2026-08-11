@@ -29,6 +29,7 @@ export const KOLOM_TOLAK: KolomTolak[] = [
   { key: 'email', label: 'Email' },
   { key: 'kecamatan', label: 'Kecamatan' },
   { key: 'foto', label: 'Foto selfie' },
+  { key: 'ktp', label: 'Foto KTP' },
 ];
 
 const LABEL_BY_KEY: Record<string, string> = Object.fromEntries(

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { catatAktivitas } from "@/lib/log-aktivitas";
-import { hapusFotoProfil } from "@/lib/foto-profil";
+import { hapusFotoKtp, hapusFotoProfil } from "@/lib/foto-profil";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,7 @@ export async function GET(
       userEmail: true,
       userKecamatan: true,
       userFoto: true,
+      userKtp: true,
       status: true,
       ket: true,
       ipAddress: true,
@@ -112,6 +113,7 @@ export async function DELETE(
       userFullname: true,
       userlevelId: true,
       userFoto: true,
+      userKtp: true,
       _count: { select: { permohonans: true, tikets: true, tiketPesan: true } },
     },
   });
@@ -131,6 +133,9 @@ export async function DELETE(
     // Notifikasi & log milik akun ini ikut terhapus lewat cascade di skema.
     await prisma.user.delete({ where: { id: uid } });
     await hapusFotoProfil(user.userFoto);
+    // Berkas KTP ikut dibuang bersama akunnya — kalau tidak, scan KTP warga
+    // tertinggal di storage tanpa pemilik.
+    await hapusFotoKtp(user.userKtp);
 
     await catatAktivitas(
       session,
