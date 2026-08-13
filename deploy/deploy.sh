@@ -77,6 +77,20 @@ if [[ "$SETUP_ONLY" == false ]]; then
   cp -r .next/static .next/standalone/.next/static
   [[ -d public ]]   && cp -r public   .next/standalone/public
   [[ -d tessdata ]] && cp -r tessdata .next/standalone/tessdata
+  # Mesin OCR (tesseract.js) — WAJIB disalin manual.
+  # Next TIDAK menelusuri berkas ini karena tesseract memuatnya lewat path saat
+  # runtime, bukan lewat import. Tanpa ini folder tesseract.js-core ikut terkirim
+  # TAPI KOSONG dari .wasm, lalu emscripten abort() dan permintaan OCR
+  # menggantung selamanya. Persis yang terjadi di produksi 11 Agu 2026.
+  for m in tesseract.js/dist tesseract.js-core; do
+    if [[ -d "node_modules/$m" ]]; then
+      mkdir -p ".next/standalone/node_modules/$m"
+      cp -r "node_modules/$m/." ".next/standalone/node_modules/$m/"
+    fi
+  done
+  # Gagal cepat kalau ternyata tetap kosong — lebih baik daripada deploy diam-diam rusak.
+  ls .next/standalone/node_modules/tesseract.js-core/*.wasm >/dev/null 2>&1   || err "tesseract.js-core/*.wasm tidak ikut ke bundle — OCR akan menggantung di server."
+
   # Buang .env DEV yg ikut disalin Next → jangan menimpa .env produksi server.
   # `.env.development.local` ikut disebut: isinya nilai khusus laptop (mis.
   # NEXT_PUBLIC_ANTRIAN_URL ke localhost:3000) yang tak boleh nyasar ke server.

@@ -54,6 +54,8 @@ const JENDELA_LOGIN = 10 * 60_000;
  * sabar pun ikut gagal. Lebih baik menolak cepat dengan pesan yang jelas.
  */
 const MAKS_BERSAMAAN = 4;
+/** Batas penyiapan worker OCR (muat wasm + data bahasa) — lihat POST. */
+const OCR_INIT_TIMEOUT = 30_000;
 let sedangJalan = 0;
 // Data bahasa dibundel lokal (tessdata/ind.traineddata.gz) → tidak mengunduh
 // dari CDN saat runtime. Inilah kunci agar scan tidak menggantung.
@@ -259,7 +261,18 @@ export async function POST(req: NextRequest) {
   let bestScore = -1;
   sedangJalan++;
   try {
-    const worker = await getWorker();
+    // 🔴 WAJIB pakai timeout. Kalau berkas mesin OCR tidak lengkap di server
+    // (tesseract.js-core/*.wasm & tesseract.js/dist/worker.min.js TIDAK ikut
+    // ditelusuri Next karena dimuat lewat path saat runtime), emscripten
+    // memanggil abort() dan promise-nya TIDAK PERNAH settle. Tanpa timeout,
+    // permintaan menggantung selamanya, slot MAKS_BERSAMAAN tidak pernah
+    // dikembalikan, lalu seluruh endpoint terkunci 503 — termasuk tombol scan
+    // di form permohonan yang memakai endpoint yang sama.
+    // Ini pernah terjadi di produksi SIDAKO & TIDORE (11 Agu 2026).
+    const worker = await withTimeout(getWorker(), OCR_INIT_TIMEOUT).catch((e) => {
+      workerPromise = null; // biar percobaan berikutnya menyiapkan ulang
+      throw e;
+    });
     for (const angle of [0, 90, 270, 180]) {
       const img =
         angle === 0 ? base : await sharp(base).rotate(angle).toBuffer();
@@ -279,7 +292,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     const msg =
       e instanceof Error && e.message === "timeout"
-        ? "OCR terlalu lama. Coba foto lebih terang, lurus, dan dekat."
+        ? "Pemindaian tidak selesai tepat waktu. Silakan isi datanya manual."
         : "Gagal menjalankan OCR di server";
     return fail([msg], 500);
   } finally {
