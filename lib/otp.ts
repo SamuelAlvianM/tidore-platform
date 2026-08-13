@@ -69,6 +69,21 @@ export function cekBukti(hp: string, bukti: string) {
  * - Production tanpa token → dilewati, agar pendaftaran tidak terkunci
  *   sebelum layanan OTP dikonfigurasi.
  */
+/**
+ * 🔴 SAKELAR MATI OTP — dimatikan atas permintaan user (11 Agu 2026),
+ * menyamakan dengan SAIBATIN yang sudah lebih dulu mematikannya.
+ *
+ * Selama `false`: OTP tidak diminta di server DAN tidak ditampilkan di
+ * formulir pendaftaran (klien punya sakelar kembarannya, `OTP_AKTIF` di
+ * app/register/RegisterContent.tsx — ubah keduanya bersamaan).
+ *
+ * Kode OTP-nya sengaja TIDAK dihapus: /api/otp/send & /api/otp/verify,
+ * buatOtp/verifikasiOtp/cekBukti, dan blok UI-nya semua masih utuh. Untuk
+ * menyalakan lagi cukup kembalikan konstanta ini ke `true`.
+ */
+const OTP_AKTIF = false;
+
 export function otpWajib() {
+  if (!OTP_AKTIF) return false;
   return !!process.env.FONNTE_TOKEN || process.env.NODE_ENV !== "production";
 }

@@ -217,6 +217,12 @@ export default function RegisterPage() {
   }, [modeUlang, nikUlang]);
 
   // ── OTP WhatsApp (Fonnte) ──
+  // 🔴 DIMATIKAN atas permintaan user (11 Agu 2026): blok verifikasi tidak
+  // ditampilkan dan tidak lagi menjadi syarat kirim. Sakelar kembarannya ada
+  // di lib/otp.ts (`OTP_AKTIF`) yang mematikannya di sisi server — ubah
+  // keduanya bersamaan. Kodenya sengaja dibiarkan utuh; menyalakan lagi cukup
+  // mengembalikan konstanta ini (dan yang di lib/otp.ts) ke `true`.
+  const OTP_AKTIF = false;
   const [otpChallenge, setOtpChallenge] = useState('');
   const [otpKode, setOtpKode] = useState('');
   const [otpBukti, setOtpBukti] = useState('');
@@ -224,7 +230,10 @@ export default function RegisterPage() {
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [otpDevKode, setOtpDevKode] = useState('');
-  const [otpNonaktif, setOtpNonaktif] = useState(false); // server: layanan OTP belum dikonfigurasi
+  // Nilai awal mengikuti sakelar di atas: saat OTP dimatikan, seluruh blok
+  // verifikasi ikut tersembunyi lewat jalur "nonaktif" yang memang sudah ada
+  // (dipakai bila server belum punya kanal OTP) — bukan cabang baru.
+  const [otpNonaktif, setOtpNonaktif] = useState(!OTP_AKTIF); // server: layanan OTP belum dikonfigurasi
 
   useEffect(() => {
     if (otpCountdown <= 0) return;
@@ -241,6 +250,7 @@ export default function RegisterPage() {
   }, []);
 
   const kirimOtp = async () => {
+    if (!OTP_AKTIF) return; // sakelar mati — tombolnya pun sudah tak dirender
     setOtpSending(true);
     try {
       // OTP dikirim via WhatsApp (Fonnte).
@@ -473,7 +483,7 @@ export default function RegisterPage() {
 
     // Syarat OTP berdiri sendiri: tujuannya email atau WhatsApp tergantung
     // konfigurasi server, jadi jangan ditempelkan ke salah satu kolom.
-    if (!otpNonaktif && !otpBukti) {
+    if (OTP_AKTIF && !otpNonaktif && !otpBukti) {
       errors.push('Verifikasi kode OTP terlebih dahulu');
     }
 
@@ -905,7 +915,7 @@ export default function RegisterPage() {
 
                   {/* Verifikasi OTP — tujuannya email ATAU WhatsApp, ditentukan
                       server, jadi diletakkan terpisah dari kedua kolom di atas. */}
-                  {!otpNonaktif && (
+                  {OTP_AKTIF && !otpNonaktif && (
                     <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5">
                       {otpBukti ? (
                         <p className="flex items-center gap-1.5 text-xs font-medium text-success">
