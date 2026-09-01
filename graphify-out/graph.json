@@ -14898,17 +14898,6 @@
       "source_location": "L1"
     },
     {
-      "id": "sharp_sharp",
-      "label": "sharp",
-      "_origin": "ast",
-      "community": 185,
-      "community_name": "sharp",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "sharp",
-      "source_file": "sharp"
-    },
-    {
       "id": "app_forgot_password_page",
       "label": "forgot-password/page.tsx",
       "_origin": "ast",
@@ -81240,5 +81229,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4378b2874ef2cfebf055bf4355fa4b9deebe673a"
+  "built_at_commit": "bc50ef5eacf0424d1e289f9aad779bf0e1e76760"
 }

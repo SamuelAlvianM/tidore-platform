@@ -1,15 +1,16 @@
 # Graph Report - tidore-platform  (2026-09-01)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 347 files · ~239,822 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1851 nodes · 5099 edges · 187 communities (86 shown, 92 thin omitted)
+- 1850 nodes · 5099 edges · 186 communities (86 shown, 92 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4378b287`
+- Built from commit: `bc50ef5e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -206,6 +207,8 @@
 10. `notifyError()` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `AlertTitle()` --calls--> `cn()`  [EXTRACTED]
+  components/ui/alert.tsx → lib/utils.ts
 - `DashboardBeritaPage()` --calls--> `getSession()`  [EXTRACTED]
   app/dashboard/berita/page.tsx → lib/auth.ts
 - `DashboardDemografiPage()` --calls--> `getSession()`  [EXTRACTED]
@@ -214,13 +217,11 @@
   app/dashboard/galeri/page.tsx → lib/auth.ts
 - `DashboardKontenPage()` --calls--> `getSession()`  [EXTRACTED]
   app/dashboard/konten/page.tsx → lib/auth.ts
-- `DashboardKritikSaranPage()` --calls--> `getSession()`  [EXTRACTED]
-  app/dashboard/kritik-saran/page.tsx → lib/auth.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (187 total, 92 thin omitted)
+## Communities (186 total, 92 thin omitted)
 
 ### Community 0 - "AktaKelahiranNikAdaModal.tsx"
 Cohesion: 0.07
@@ -567,20 +568,20 @@ Cohesion: 0.67
 Nodes (3): GROUPS, main(), norm()
 
 ## Knowledge Gaps
-- **564 isolated node(s):** `graphify`, `LAYANAN_KODE`, `SUBMIT_ACTIONS`, `FETCH_ACTIONS`, `ALLOWED_EXT` (+559 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 703 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **564 isolated node(s):** `BASE`, `AktaKelahiranNikAdaModalProps`, `FormData`, `UploadedFile`, `AktaKelahiranNikTidakAdaModalProps` (+559 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 702 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **92 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `cn` to `AktaKelahiranNikAdaModal.tsx`, `struktur-editor.tsx`, `AdminPermohonan.tsx`, `utils.ts`, `KKPerubahanBiodataModal.tsx`, `button.tsx`, `inline-edit.tsx`, `useStaticContent`, `informasi-index.tsx`, `statistik-kartu-editor.tsx`, `RegisterContent.tsx`, `PengajuanBaruClient.tsx`, `stats.tsx`, `info-page.tsx`, `jam-layanan.ts`, `dashboard-sidebar.tsx`, `ppid/[...slug]/page.tsx`, `accessibility-widget.tsx`, `demografi-view.tsx`, `[layanan]/page.tsx`, `ppid-layanan-halaman.tsx`, `navbar.tsx`, `AdminKonten.tsx`, `rich-editor.tsx`, `getIcon`, `notification-bell.tsx`, `pengaturan-pelayanan.tsx`, `KIAModal.tsx`, `baru/page.tsx`, `AktaKematianModal.tsx`?**
-  _High betweenness centrality (0.108) - this node is a cross-community bridge._
+  _High betweenness centrality (0.156) - this node is a cross-community bridge._
 - **Why does `getSession()` connect `getSession` to `ok`, `statistik-export.ts`, `users/route.ts`, `AdminPermohonan.tsx`, `auth.ts`, `informasi-index.tsx`, `prisma`, `PengajuanBaruClient.tsx`, `ktp/route.ts`, `back-button.tsx`, `footer.tsx`, `dashboard-sidebar.tsx`, `users/[id]/route.ts`, `demografi-kategori.ts`, `parse/route.ts`, `admin/skm/route.ts`, `[layanan]/page.tsx`, `berita/[id]/route.ts`, `profil/page.tsx`, `pengajuan/page.tsx`, `skm/page.tsx`, `AdminKonten.tsx`, `AdminPengaduan.tsx`, `dashboard/kritik-saran/page.tsx`, `media/page.tsx`, `produk/page.tsx`, `baru/page.tsx`, `users/page.tsx`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 - **Why does `prisma` connect `prisma` to `ok`, `statistik-export.ts`, `users/route.ts`, `AdminPermohonan.tsx`, `auth.ts`, `informasi-index.tsx`, `getSession`, `statistik-kartu-editor.tsx`, `produk/[...slug]/page.tsx`, `halaman/[slug]/page.tsx`, `info-page.tsx`, `ppid/[...slug]/page.tsx`, `users/[id]/route.ts`, `demografi-kategori.ts`, `parse/route.ts`, `admin/skm/route.ts`, `static-content-registry.ts`, `ppid-layanan-halaman.tsx`, `berita/[id]/route.ts`, `profil/page.tsx`, `kunjungan/route.ts`, `berita/[slug]/page.tsx`, `sitemap.xml/route.ts`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **What connects `graphify`, `LAYANAN_KODE`, `SUBMIT_ACTIONS` to the rest of the system?**
+  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **What connects `BASE`, `AktaKelahiranNikAdaModalProps`, `FormData` to the rest of the system?**
   _564 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AktaKelahiranNikAdaModal.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.07316118935837246 - nodes in this community are weakly interconnected._
