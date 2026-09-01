@@ -2116,5 +2116,719 @@
     "seen": 1788253572.2000663,
     "ast_hash": "e9d38d9e52b17837612c9d9b5860ba85",
     "semantic_hash": "e9d38d9e52b17837612c9d9b5860ba85"
+  },
+  "CLAUDE.md": {
+    "mtime": 1788252686.1491263,
+    "seen": 1788253764.6804516,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": ""
+  },
+  "HANDOFF-SIDAKO-2026-07-21.md": {
+    "mtime": 1784568223.889677,
+    "seen": 1788253764.6804557,
+    "ast_hash": "c4f4949914186b129a3252c4c5c48cee",
+    "semantic_hash": ""
+  },
+  "JOURNAL.md": {
+    "mtime": 1786653731.8954742,
+    "seen": 1788253764.680458,
+    "ast_hash": "9a2a9cd2442293ea82f90f3a94cd5f00",
+    "semantic_hash": ""
+  },
+  "PROMPT-DISABILITAS.md": {
+    "mtime": 1784122952.7762294,
+    "seen": 1788253764.6804597,
+    "ast_hash": "7d0b49c52534a5e7f7cad8372719e47b",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786642667.5876796,
+    "seen": 1788253764.6804614,
+    "ast_hash": "962e6de7fbfb81ba9607d636c7ccc902",
+    "semantic_hash": ""
+  },
+  "deploy/README.md": {
+    "mtime": 1785578173.7119007,
+    "seen": 1788253764.6804643,
+    "ast_hash": "f5e897626c0f63e7070d9f9076f65641",
+    "semantic_hash": ""
+  },
+  "deploy/RUNBOOK-ANTRIAN-PROXY.md": {
+    "mtime": 1785922063.4564831,
+    "seen": 1788253764.680466,
+    "ast_hash": "9719b59c171f6f70fc32fec2074d34b4",
+    "semantic_hash": ""
+  },
+  "PANDUAN-UI-DAGA.pdf": {
+    "mtime": 1784125138.451272,
+    "seen": 1788253764.6804683,
+    "ast_hash": "e9af44c92bdc25cae54bc3c709893184",
+    "semantic_hash": ""
+  },
+  "public/uploads/produk/1_1783587415369.pdf": {
+    "mtime": 1783587415.3717372,
+    "seen": 1788253764.6804695,
+    "ast_hash": "0f57bfc49ba3a851daaa2012231d7435",
+    "semantic_hash": ""
+  },
+  "public/uploads/produk/1_1784566434291.pdf": {
+    "mtime": 1784566434.3128793,
+    "seen": 1788253764.6804712,
+    "ast_hash": "e9af44c92bdc25cae54bc3c709893184",
+    "semantic_hash": ""
+  },
+  "public/uploads/produk/profil-kependudukan-2021.pdf": {
+    "mtime": 1786640928.9595275,
+    "seen": 1788253764.6804729,
+    "ast_hash": "32d1aab82f1c924c2c1e6256edda0d2c",
+    "semantic_hash": ""
+  },
+  "public/uploads/produk/profil-kependudukan-2022.pdf": {
+    "mtime": 1786640928.9975271,
+    "seen": 1788253764.680475,
+    "ast_hash": "8999f20f993f76bc22313b1b8f6e4f11",
+    "semantic_hash": ""
+  },
+  "public/uploads/produk/profil-kependudukan-2023.pdf": {
+    "mtime": 1786640929.034293,
+    "seen": 1788253764.6804767,
+    "ast_hash": "cd2731f96f468b481208c8dee09a5ad8",
+    "semantic_hash": ""
+  },
+  "app/apple-icon.png": {
+    "mtime": 1786595980.369,
+    "seen": 1788253764.6804786,
+    "ast_hash": "146da6b37f97f8d035c7d5f4c03dc491",
+    "semantic_hash": ""
+  },
+  "app/icon.png": {
+    "mtime": 1786595980.242,
+    "seen": 1788253764.68048,
+    "ast_hash": "e2c5a57ed6743904e652cc92efaed5c4",
+    "semantic_hash": ""
+  },
+  "public/LOGO-dinas_tidore.png": {
+    "mtime": 1785424514.9657443,
+    "seen": 1788253764.6804814,
+    "ast_hash": "08b22101c84cdc30b9953c9edd4fc1be",
+    "semantic_hash": ""
+  },
+  "public/file.svg": {
+    "mtime": 1782714100.2169771,
+    "seen": 1788253764.680483,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": ""
+  },
+  "public/globe.svg": {
+    "mtime": 1782714100.2308156,
+    "seen": 1788253764.6804855,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": ""
+  },
+  "public/highlights/berita-info.jpg": {
+    "mtime": 1782876710.4578018,
+    "seen": 1788253764.680487,
+    "ast_hash": "1979fde0cfd07565d68befd6e5c2273e",
+    "semantic_hash": ""
+  },
+  "public/highlights/layanan-online.jpg": {
+    "mtime": 1782876710.1944335,
+    "seen": 1788253764.6804883,
+    "ast_hash": "c748b57a1bf81a412c7581442dab92d4",
+    "semantic_hash": ""
+  },
+  "public/highlights/pantau-status.png": {
+    "mtime": 1782876710.271511,
+    "seen": 1788253764.6804903,
+    "ast_hash": "98e610f663c5d899f0b19cabb6d362ce",
+    "semantic_hash": ""
+  },
+  "public/highlights/unduh-bukti.png": {
+    "mtime": 1782876710.3603692,
+    "seen": 1788253764.680492,
+    "ast_hash": "4cf316ecdfb23a77e58759cebb666d73",
+    "semantic_hash": ""
+  },
+  "public/img/berita/0.png": {
+    "mtime": 1684588038.0,
+    "seen": 1788253764.6804936,
+    "ast_hash": "4ab162a6c1c9415d5287a007c04823c6",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1.jpg": {
+    "mtime": 1684588038.0,
+    "seen": 1788253764.680495,
+    "ast_hash": "8c4a1fa7ddfb2f0c62ab97e4ebc8f05b",
+    "semantic_hash": ""
+  },
+  "public/img/berita/10.jpg": {
+    "mtime": 1684588039.0,
+    "seen": 1788253764.6804967,
+    "ast_hash": "1121f6dd6f6394bdbea2d7a29e1cd10b",
+    "semantic_hash": ""
+  },
+  "public/img/berita/11.jpeg": {
+    "mtime": 1684588038.0,
+    "seen": 1788253764.6804981,
+    "ast_hash": "9d74985ec44fec7f3782db238f0a95e4",
+    "semantic_hash": ""
+  },
+  "public/img/berita/12.jpg": {
+    "mtime": 1684588038.0,
+    "seen": 1788253764.6805,
+    "ast_hash": "f85c620c34695ae43b69ea8b548f0a03",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1627708333_1627632533WhatsApp Image 2021-07-30 at 14.52.34.jpeg": {
+    "mtime": 1684588049.0,
+    "seen": 1788253764.6805015,
+    "ast_hash": "f63fb9bed156bdffefc4a2cf74a6f2a2",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1646453202_1632930927ZUDAN-AF.jpg": {
+    "mtime": 1684588054.0,
+    "seen": 1788253764.6805034,
+    "ast_hash": "d554ebbd34ebedae828d45d61648fb01",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1657628972_Piagam_pengharghaan_dari_Ombudsman_RI_Perwakilan_Maluku_Utara_dengan_predikat_Kepatuhan_Tinggi_Standar_Pelayanan_Publik_Tahun_2021_diserahkan_kepada_Kadis_Dukcapil_Kota_Tidore.jpeg": {
+    "mtime": 1684588058.0,
+    "seen": 1788253764.680505,
+    "ast_hash": "1ac95eb7af9b6d3765da734140136a92",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1657629219_tikep170_pjs_walikota_tidore_kepulauan_ansar_daaly_saat_membacakan_sambutan_pada_kegiatan_penerapan_dukcapil_go_digital_dan_inovasi_pelayanan_administrasi_kependudukan_tahun_2020.jpeg": {
+    "mtime": 1684588058.0,
+    "seen": 1788253764.6805067,
+    "ast_hash": "3055efbf7a9a82d2c96f20f186b04287",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1657629309_SUNARYAH-SARIPAN.jpeg": {
+    "mtime": 1684588058.0,
+    "seen": 1788253764.6805081,
+    "ast_hash": "d89c84404fe79c424c511f2a57095570",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1662763726_IMG-20220909-WA0016.jpg": {
+    "mtime": 1684588057.0,
+    "seen": 1788253764.6805098,
+    "ast_hash": "31e251504a1f1044dee9f3b7ef1d5863",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1665731428_IMG-20221013-WA0104.jpg": {
+    "mtime": 1684588059.0,
+    "seen": 1788253764.6805115,
+    "ast_hash": "198ebd1538ae42fa6dfe63ce75e398ea",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1665817704_1665633508WhatsApp Image 2022-10-13 at 10.45.02 (1).jpeg": {
+    "mtime": 1684588062.0,
+    "seen": 1788253764.680513,
+    "ast_hash": "737bf0fac97d4202f43af761e7803239",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1670456761_1670417257WhatsApp Image 2022-12-07 at 19.42.31.jpeg": {
+    "mtime": 1684588063.0,
+    "seen": 1788253764.6805148,
+    "ast_hash": "35386e5259379b23cf83ca35e0336535",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1677407518_1677119701WhatsApp Image 2023-02-22 at 21.13.59.jpeg": {
+    "mtime": 1684588065.0,
+    "seen": 1788253764.6805167,
+    "ast_hash": "31c1d1c102653b588792750baec98565",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1677407847_1677073156WhatsApp Image 2023-02-22 at 20.10.21.jpeg": {
+    "mtime": 1684588063.0,
+    "seen": 1788253764.6805184,
+    "ast_hash": "a4c30296561d5e8a9dd786fffce75940",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1677408112_1677072395WhatsApp Image 2023-02-22 at 20.19.40.jpeg": {
+    "mtime": 1684588065.0,
+    "seen": 1788253764.6805198,
+    "ast_hash": "f38c8300886aa699a1180463007b82be",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1677408288_1677020735IMG-20230222-WA0001.jpg": {
+    "mtime": 1684588064.0,
+    "seen": 1788253764.6805215,
+    "ast_hash": "fdd230b6189d51b8243be9705152b9d8",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1677408626_1676977202WhatsApp Image 2023-02-21 at 17.53.50 (1).jpeg": {
+    "mtime": 1684588067.0,
+    "seen": 1788253764.6805239,
+    "ast_hash": "0f15a6d7d8fedf98f7e356deeaf5bc9a",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1683178851_IMG-20230503-WA0011-768x485.jpg": {
+    "mtime": 1684588064.0,
+    "seen": 1788253764.6805255,
+    "ast_hash": "c38680ed96d5527f2e73f65276642153",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1683179038_1683160731WhatsApp Image 2023-05-02 at 20.56.48.jpeg": {
+    "mtime": 1684588066.0,
+    "seen": 1788253764.6805272,
+    "ast_hash": "b230b8fb5a6925177c5fd0c993b3e6ce",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1683179347_1683069249WhatsApp Image 2023-05-02 at 20.56.49.jpeg": {
+    "mtime": 1684588067.0,
+    "seen": 1788253764.6805289,
+    "ast_hash": "5a9b55a1052960f9b96f104fe5ee1d06",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1697757618_admin-tidore_news_6531b9b2768cf.png": {
+    "mtime": 1697757618.0,
+    "seen": 1788253764.6805305,
+    "ast_hash": "49df4032d3babb61cfbdcc8113874f63",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1697758035_admin-tidore_news_6531bb5380856.jpeg": {
+    "mtime": 1697758035.0,
+    "seen": 1788253764.6805322,
+    "ast_hash": "fcf08b6315773f8d93a993940255edf1",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1697758592_admin-tidore_news_6531bd8045b21.jpeg": {
+    "mtime": 1697758592.0,
+    "seen": 1788253764.6805341,
+    "ast_hash": "739eda16e6859be8fc5eca48eaec92aa",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1723354021_galang-admin_news_66b84ba51fa95.jpg": {
+    "mtime": 1723354021.0,
+    "seen": 1788253764.6805356,
+    "ast_hash": "ba46e74e65a9cfc9f8ca9a52c4018cf6",
+    "semantic_hash": ""
+  },
+  "public/img/berita/1770513190_galang-admin_news_6987e3265ddf9.jpg": {
+    "mtime": 1770513190.0,
+    "seen": 1788253764.680537,
+    "ast_hash": "342e8e459296b43ff6431295c3d147bc",
+    "semantic_hash": ""
+  },
+  "public/img/berita/2.jpg": {
+    "mtime": 1684588067.0,
+    "seen": 1788253764.680539,
+    "ast_hash": "cb8e791b923204f3f24152caf0f1a085",
+    "semantic_hash": ""
+  },
+  "public/img/berita/2.png": {
+    "mtime": 1684588073.0,
+    "seen": 1788253764.6805406,
+    "ast_hash": "debd16549a76fc7a5c8d681bf0120067",
+    "semantic_hash": ""
+  },
+  "public/img/berita/3.jpg": {
+    "mtime": 1684588067.0,
+    "seen": 1788253764.6805425,
+    "ast_hash": "eac43d7dc05a46857fc8bee6b8f792ee",
+    "semantic_hash": ""
+  },
+  "public/img/berita/4.jpg": {
+    "mtime": 1684588068.0,
+    "seen": 1788253764.6805446,
+    "ast_hash": "00a46ebd048d2646496b37fc97ea193d",
+    "semantic_hash": ""
+  },
+  "public/img/berita/5.jpeg": {
+    "mtime": 1684588068.0,
+    "seen": 1788253764.680546,
+    "ast_hash": "20e3450dbcf1475e782f0245b0084c34",
+    "semantic_hash": ""
+  },
+  "public/img/berita/6.jpg": {
+    "mtime": 1684588070.0,
+    "seen": 1788253764.680548,
+    "ast_hash": "4e682c15099f1cefe23fef7fa11c6cd7",
+    "semantic_hash": ""
+  },
+  "public/img/berita/7.jpg": {
+    "mtime": 1684588070.0,
+    "seen": 1788253764.6805494,
+    "ast_hash": "51fed1db2775af5bec9a1261abed5fa7",
+    "semantic_hash": ""
+  },
+  "public/img/berita/8.jpeg": {
+    "mtime": 1684588069.0,
+    "seen": 1788253764.6805508,
+    "ast_hash": "87b579048b0961ba56ea239d9db37cdd",
+    "semantic_hash": ""
+  },
+  "public/img/berita/9.jpg": {
+    "mtime": 1684588069.0,
+    "seen": 1788253764.6805527,
+    "ast_hash": "4730d5f291245a30ee13a2ac1d56ba45",
+    "semantic_hash": ""
+  },
+  "public/img/berita/tual1.jpeg": {
+    "mtime": 1684588073.0,
+    "seen": 1788253764.6805542,
+    "ast_hash": "9a2104c1e046fc16a559efcc3525cb55",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1630295168_1630062952WhatsApp Image 2021-08-23 at 12.21.15.jpeg": {
+    "mtime": 1684588205.0,
+    "seen": 1788253764.6805558,
+    "ast_hash": "47a2c8a604cc02852748abaa6891d09a",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1657589248_Tidore_GoDigital.jpeg": {
+    "mtime": 1684588222.0,
+    "seen": 1788253764.6805575,
+    "ast_hash": "b42627aa32527d34384f85d98e1b211e",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1657589336_Tidore_UrusDokumenMudah.jpeg": {
+    "mtime": 1684588225.0,
+    "seen": 1788253764.6805594,
+    "ast_hash": "3df3697da231a28b05592b797ae2c930",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1657589734_Tidore_VisiMisi.jpeg": {
+    "mtime": 1684588237.0,
+    "seen": 1788253764.6805608,
+    "ast_hash": "578280501eaff398e130b25da46de062",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1657681121_Tidore_GoDigital_2.jpeg": {
+    "mtime": 1684588238.0,
+    "seen": 1788253764.6805627,
+    "ast_hash": "18641e88c81603f2e20dc43e733db45b",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1657714999_kontak.jpeg": {
+    "mtime": 1684588239.0,
+    "seen": 1788253764.6805642,
+    "ast_hash": "631fe38b2a1c516bd556e9e0e2b04331",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1663523244_WhatsApp Image 2022-09-15 at 21.56.08.jpeg": {
+    "mtime": 1684588246.0,
+    "seen": 1788253764.6805658,
+    "ast_hash": "2e30a8d5b5231578540460d1867dbd3e",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1664370532_walikota.jpeg": {
+    "mtime": 1684588248.0,
+    "seen": 1788253764.6805673,
+    "ast_hash": "e659147fbaa44be5f33b0ec03ad33687",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1665971014_WhatsApp Image 2022-10-17 at 07.18.15.jpeg": {
+    "mtime": 1684588250.0,
+    "seen": 1788253764.6805692,
+    "ast_hash": "75c2e12506659519f0cb0adb731e20f1",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1678899739_1678856428_dukcapil-admin_galleries_641150ec75060.jpeg": {
+    "mtime": 1684588253.0,
+    "seen": 1788253764.6805706,
+    "ast_hash": "e0cd5012f3689fcda716051467060694",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1683177015_WhatsApp Image 2023-05-04 at 10.59.23.jpeg": {
+    "mtime": 1684588253.0,
+    "seen": 1788253764.6805718,
+    "ast_hash": "9569c5dc30c908fed48268395a9c3170",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1694151996_admin-tidore_galleries_64fab53c4c81d.jpeg": {
+    "mtime": 1694151996.0,
+    "seen": 1788253764.6805737,
+    "ast_hash": "7b224b9296ca5e240d96899bb8030647",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1749008993_galang-admin_galleries_683fc2617c2cf.png": {
+    "mtime": 1749008993.0,
+    "seen": 1788253764.680575,
+    "ast_hash": "9c384eb6b92a1bc4aa0201017e94597f",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1750153281_admin-sri_galleries_68513841e293b.jpg": {
+    "mtime": 1750153281.0,
+    "seen": 1788253764.6805768,
+    "ast_hash": "53f4b55e3317cf325cffbe8363f51951",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1750153596_admin-sri_galleries_6851397c664a1.jpeg": {
+    "mtime": 1750153596.0,
+    "seen": 1788253764.6805785,
+    "ast_hash": "5529348def7791acb54c6dfa5e92a6e3",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1750153903_admin-sri_galleries_68513aafca056.jpeg": {
+    "mtime": 1750153903.0,
+    "seen": 1788253764.6805801,
+    "ast_hash": "9fa2e2d1ed6bee1966f288767216e32b",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1750154022_admin-sri_galleries_68513b260acc2.jpeg": {
+    "mtime": 1750154022.0,
+    "seen": 1788253764.6805816,
+    "ast_hash": "9871f8836d70e4a2d528fd3126b2f210",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1750154083_admin-sri_galleries_68513b63b32bb.jpeg": {
+    "mtime": 1750154083.0,
+    "seen": 1788253764.6805832,
+    "ast_hash": "241b4fd2320b85f66f69273195fa9b37",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1782980021_admin-galang_galleries_6a461db5d564d.jpg": {
+    "mtime": 1782980021.0,
+    "seen": 1788253764.6805863,
+    "ast_hash": "bc8339c19540893766ae3a24f58ec01b",
+    "semantic_hash": ""
+  },
+  "public/img/gallery/1782980073_admin-galang_galleries_6a461de97352e.jpg": {
+    "mtime": 1782980073.0,
+    "seen": 1788253764.6805878,
+    "ast_hash": "7e4e9090b7465b126123774a5695be64",
+    "semantic_hash": ""
+  },
+  "public/next.svg": {
+    "mtime": 1782714100.242351,
+    "seen": 1788253764.6805902,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": ""
+  },
+  "public/og-tidore.png": {
+    "mtime": 1785955234.043,
+    "seen": 1788253764.6805916,
+    "ast_hash": "1ca0681e4faf18b5387f09415b82eee5",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/catatanpinggir.png": {
+    "mtime": 1783602215.298391,
+    "seen": 1788253764.6805933,
+    "ast_hash": "184ca5531b54b6e0737a9854d15382fa",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/catatanpinggirkewarganegaraan.png": {
+    "mtime": 1783602215.3144612,
+    "seen": 1788253764.6805947,
+    "ast_hash": "7a9ed0fbf3728aa2c3e72af061ca2ab3",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/catatanpinggirpengangkatananak.png": {
+    "mtime": 1783602215.3240552,
+    "seen": 1788253764.6805966,
+    "ast_hash": "e417f496a4db80a28c2ff60058dd3cd8",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/catatanpinggirperubahannama.png": {
+    "mtime": 1783602215.334583,
+    "seen": 1788253764.6805985,
+    "ast_hash": "ec856d206b4d833d1b39710867747ec5",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/kelahiran.png": {
+    "mtime": 1783602215.3462622,
+    "seen": 1788253764.6806002,
+    "ast_hash": "eb1b3267e4922441c3e56b86a0484415",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/kematian.png": {
+    "mtime": 1783602215.3582935,
+    "seen": 1788253764.6806018,
+    "ast_hash": "bd86b7046643fd500edc650b0050e836",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/kutipankedua.png": {
+    "mtime": 1783602215.3688097,
+    "seen": 1788253764.6806037,
+    "ast_hash": "adfc7f282528f9ab383de8ff4391315d",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/layanan.png": {
+    "mtime": 1783602215.379347,
+    "seen": 1788253764.6806052,
+    "ast_hash": "3e6b45780f00a0c94afae80eccdebf7a",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/legalisasidokumen.png": {
+    "mtime": 1783602215.3918822,
+    "seen": 1788253764.680607,
+    "ast_hash": "d3e2d48ff1b53f4725e70c4419ab3c45",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/pengakuananak.png": {
+    "mtime": 1783602215.4049199,
+    "seen": 1788253764.6806087,
+    "ast_hash": "7970fd4a4e689e5b326fe212638ee1a5",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/perceraian.png": {
+    "mtime": 1783602215.4159904,
+    "seen": 1788253764.6806104,
+    "ast_hash": "56a2af3b0ba7898d4d0dcbf35fd14a1d",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/perkawinan.png": {
+    "mtime": 1783602215.433626,
+    "seen": 1788253764.6806118,
+    "ast_hash": "05d59045def1912f492916d29ac1c359",
+    "semantic_hash": ""
+  },
+  "public/produk-layanan/suratketerangan.png": {
+    "mtime": 1783602215.4446795,
+    "seen": 1788253764.6806135,
+    "ast_hash": "26c45f8d97ab59308f7e8308a45b3ad6",
+    "semantic_hash": ""
+  },
+  "public/relasi/dinas.png": {
+    "mtime": 1785424515.1061175,
+    "seen": 1788253764.6806154,
+    "ast_hash": "08b22101c84cdc30b9953c9edd4fc1be",
+    "semantic_hash": ""
+  },
+  "public/relasi/kemendagri.png": {
+    "mtime": 1782876156.1470077,
+    "seen": 1788253764.6806173,
+    "ast_hash": "39e1d26da0396489a46fcdd392624cfc",
+    "semantic_hash": ""
+  },
+  "public/relasi/kotaku.png": {
+    "mtime": 1782876156.1881528,
+    "seen": 1788253764.6806188,
+    "ast_hash": "615dbcc0dc5fc78f333d76ad9618a5cf",
+    "semantic_hash": ""
+  },
+  "public/relasi/lapor.png": {
+    "mtime": 1782876156.2294257,
+    "seen": 1788253764.6806202,
+    "ast_hash": "a84fb6ecc42493f78ab0fa95f04a585b",
+    "semantic_hash": ""
+  },
+  "public/relasi/lpse.png": {
+    "mtime": 1782876156.2681572,
+    "seen": 1788253764.6806219,
+    "ast_hash": "895c014ef5420c2078f5608f257592a0",
+    "semantic_hash": ""
+  },
+  "public/relasi/ombudsman.jpg": {
+    "mtime": 1782876156.309752,
+    "seen": 1788253764.6806233,
+    "ast_hash": "1432d23be4676f2d7adcc2f2e46eeb29",
+    "semantic_hash": ""
+  },
+  "public/relasi/panrb.png": {
+    "mtime": 1782876156.3538444,
+    "seen": 1788253764.680625,
+    "ast_hash": "abb9250fbf640dc09303d0a3b8b82303",
+    "semantic_hash": ""
+  },
+  "public/relasi/siapp.svg": {
+    "mtime": 1782876156.3999267,
+    "seen": 1788253764.6806266,
+    "ast_hash": "dd98b4fa41daa32929737d8854455432",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/adminduk-online-daga.jpg": {
+    "mtime": 1784121063.9573553,
+    "seen": 1788253764.6806283,
+    "ast_hash": "e4f6876df25db7a1ccd8049e2d3724b4",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/akta-pekon-marang-daga.jpg": {
+    "mtime": 1784121064.0158489,
+    "seen": 1788253764.68063,
+    "ast_hash": "5189d21f89d90e0a1cbae3f29fc8b983",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/jemput-bola-lansia-daga.jpg": {
+    "mtime": 1784121064.0678556,
+    "seen": 1788253764.6806314,
+    "ast_hash": "4615b335f302b833a0c19156f9277827",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/perekaman-disabilitas-daga.jpg": {
+    "mtime": 1784121064.1246557,
+    "seen": 1788253764.680633,
+    "ast_hash": "f3292d1fd070dc571b7d2ad0214d5289",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/perekaman-pekon-kuripan-daga.jpg": {
+    "mtime": 1784121064.1690967,
+    "seen": 1788253764.6806347,
+    "ast_hash": "0d4f039be0c660aa3663b20b48c196a2",
+    "semantic_hash": ""
+  },
+  "public/uploads/berita/tips-persyaratan-daga.jpg": {
+    "mtime": 1784121064.2153916,
+    "seen": 1788253764.680636,
+    "ast_hash": "f8cd5abfabdb7692a05ba62da4de6489",
+    "semantic_hash": ""
+  },
+  "public/uploads/galeri/1_1782833186938.jpeg": {
+    "mtime": 1782833186.946479,
+    "seen": 1788253764.6806376,
+    "ast_hash": "52553ae68ecfc3f449467c8fce8c024b",
+    "semantic_hash": ""
+  },
+  "public/uploads/galeri/1_1782919225900.png": {
+    "mtime": 1782919225.9027467,
+    "seen": 1788253764.6806395,
+    "ast_hash": "07900742200cf6eed3ecf04e8dd8f1c7",
+    "semantic_hash": ""
+  },
+  "public/uploads/media/2026/07/a1b2c3d4-0001-4001-8001-media000001-ktt.webp": {
+    "mtime": 1784114821.9787726,
+    "seen": 1788253764.680641,
+    "ast_hash": "8e58cc141803499c92463fba07294108",
+    "semantic_hash": ""
+  },
+  "public/uploads/media/2026/07/a1b2c3d4-0002-4002-8002-media000002-ktt.webp": {
+    "mtime": 1784114822.0137718,
+    "seen": 1788253764.6806428,
+    "ast_hash": "ca920e0442569e2760b67cad7852604f",
+    "semantic_hash": ""
+  },
+  "public/uploads/media/2026/07/a1b2c3d4-0003-4003-8003-media000003-ktt.webp": {
+    "mtime": 1784114822.0487692,
+    "seen": 1788253764.6806443,
+    "ast_hash": "ad902e782481e309f8cf90d570102c37",
+    "semantic_hash": ""
+  },
+  "public/uploads/media/2026/07/a1b2c3d4-0004-4004-8004-media000004-ktt.webp": {
+    "mtime": 1784114822.0827823,
+    "seen": 1788253764.680646,
+    "ast_hash": "7a74beeb8a798ca124a383e62ed970b3",
+    "semantic_hash": ""
+  },
+  "public/uploads/ppid/1_1784966414359.png": {
+    "mtime": 1784966414.3637125,
+    "seen": 1788253764.6806476,
+    "ast_hash": "ce153a597fc095b4c7bcdbdc261c85ff",
+    "semantic_hash": ""
+  },
+  "public/uploads/ppid/1_1785229241512.jpg": {
+    "mtime": 1785229241.5177772,
+    "seen": 1788253764.6806493,
+    "ast_hash": "073a60b88edd932021f6b79bbdbf3efe",
+    "semantic_hash": ""
+  },
+  "public/uploads/ppid/1_1785229246928.png": {
+    "mtime": 1785229246.93226,
+    "seen": 1788253764.680651,
+    "ast_hash": "1fb5fbb848563c18a7c36656f7cce790",
+    "semantic_hash": ""
+  },
+  "public/vercel.svg": {
+    "mtime": 1782714100.2532976,
+    "seen": 1788253764.6806529,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": ""
+  },
+  "public/window.svg": {
+    "mtime": 1782714100.2653496,
+    "seen": 1788253764.6806543,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
   }
 }
