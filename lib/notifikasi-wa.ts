@@ -36,6 +36,28 @@ export function waRegistrasiDiterima(hp: string | null | undefined, nama: string
   );
 }
 
+/*
+ * 🔴 DIMATIKAN — SENGAJA BELUM DISAMBUNG (keputusan user, 1 Sep 2026).
+ *
+ * `waAkunDisetujui()` dan `waAkunDitolak()` di bawah **tidak punya satu pun
+ * pemanggil**. Alur setujui/tolak di `app/api/admin/users/route.ts` hanya
+ * mengirim SUREL (`sendMail` + `tplAkunDisetujui`/`tplAkunDitolak`).
+ *
+ * Jadi warga dapat WhatsApp **saat mendaftar** (`waRegistrasiDiterima`, yang
+ * memang dipakai), lalu **cuma surel** saat akunnya disetujui/ditolak.
+ *
+ * Ini BUKAN kode mati yang boleh dibuang begitu saja, dan BUKAN bug yang harus
+ * langsung ditambal: fungsinya sudah jadi, tinggal dipanggil. Dibiarkan mati
+ * sampai dinas memang mau notifikasi WA untuk tahap ini — menyambungkannya
+ * berarti mulai mengirim pesan ke nomor warga sungguhan.
+ *
+ * CARA MENGHIDUPKAN (kalau nanti diminta): impor keduanya di
+ * `app/api/admin/users/route.ts`, panggil bersebelahan dengan `sendMail` di
+ * cabang setujui & tolak. Tidak ada perubahan lain yang diperlukan.
+ *
+ * Ditemukan lewat `tools/fungsi-yatim.py` — lihat `tools/README.md`.
+ */
+
 /** Akun disetujui/diaktifkan petugas. */
 export function waAkunDisetujui(hp: string | null | undefined, nama: string) {
   return kirim(

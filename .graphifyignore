@@ -1,0 +1,16 @@
+# .gitignore sudah dihormati otomatis (node_modules, .next, dist).
+# Yang di bawah ini tambahan khusus project Next.js ini:
+
+# Aset & data, bukan kode
+public/
+storage/
+uploads/
+
+# Kode hasil bangkitan — bukan tulisan kita, dan besar
+prisma/generated/
+*.generated.ts
+next-env.d.ts
+
+# Dokumen: dipetakan terpisah, tidak perlu jadi node kode
+deploy/
+sync-sam-journals/
