@@ -25,7 +25,16 @@ async function requireAdmin() {
   return session;
 }
 
-/** Daftar user untuk panel admin (filter status, kelompok level & pencarian). */
+/**
+ * Daftar user untuk panel admin (filter status, kelompok level & pencarian).
+ *
+ * Paginasi BERNOMOR (page/limit), pola yang sama dengan
+ * `app/api/admin/permohonan/route.ts`. Sebelumnya endpoint ini memakai
+ * `take: 500` tanpa `skip`: 563 akun produksi berarti sisanya tidak pernah
+ * bisa dibuka lewat UI sama sekali. Pencarian & filter tetap dijalankan di
+ * DATABASE (bukan menyaring baris yang sedang tampil), jadi akun di halaman
+ * 9 tetap ketemu walau kita sedang berada di halaman 1.
+ */
 export async function GET(req: NextRequest) {
   const session = await requireAdmin();
   if (!session) return fail(["Tidak diizinkan"], 403);
@@ -34,6 +43,11 @@ export async function GET(req: NextRequest) {
   const statusParam = searchParams.get("status"); // "0" | "1" | null
   const levelParam = searchParams.get("level");
   const q = searchParams.get("q")?.trim();
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+  const limit = Math.min(
+    100,
+    Math.max(10, parseInt(searchParams.get("limit") ?? "20", 10) || 20),
+  );
 
   // Kelompok akun (tab). 🔴 "all" WAJIB ada dan wajib jadi jaring pengaman:
   // `m_userlevels` hasil migrasi berisi level yang tidak dipakai UI —
@@ -69,33 +83,38 @@ export async function GET(req: NextRequest) {
       : {}),
   };
 
-  // `total` dipakai UI untuk memberi tahu kalau daftar terpotong `take`.
-  // Tanpa ini daftar diam-diam berhenti di batas dan terbaca seolah datanya
-  // memang cuma segitu.
-  const total = await prisma.user.count({ where });
+  // Hitungan total & baris halaman diambil sekaligus.
+  const [total, items] = await Promise.all([
+    prisma.user.count({ where }),
+    prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        userId: true,
+        userlevelId: true,
+        userFullname: true,
+        userNik: true,
+        userNokk: true,
+        userHp: true,
+        userEmail: true,
+        userKecamatan: true,
+        userFoto: true,
+        status: true,
+        createdAt: true,
+        level: { select: { nama: true } },
+      },
+      // `id` sebagai kunci kedua: banyak akun hasil migrasi punya `createdAt`
+      // identik, dan urutan yang tidak deterministik membuat baris yang sama
+      // muncul dua kali / hilang saat berpindah halaman.
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+  ]);
 
-  const items = await prisma.user.findMany({
-    where,
-    select: {
-      id: true,
-      userId: true,
-      userlevelId: true,
-      userFullname: true,
-      userNik: true,
-      userNokk: true,
-      userHp: true,
-      userEmail: true,
-      userKecamatan: true,
-      userFoto: true,
-      status: true,
-      createdAt: true,
-      level: { select: { nama: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 500,
-  });
+  const totalHalaman = Math.max(1, Math.ceil(total / limit));
 
-  return ok({ items, total });
+  return ok({ items, total, page, limit, totalHalaman });
 }
 
 /**

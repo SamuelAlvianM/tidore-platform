@@ -436,19 +436,6 @@ export default function ProfileTabs() {
 
   return (
     <section ref={containerRef} className="relative py-14 overflow-hidden bg-white border-t border-slate-100">
-      {editMode && bisaEdit && (
-        <button
-          onClick={() =>
-            activeTab === 'struktur'
-              ? setStrukturEditorOpen(true)
-              : openEditor(`profil.${activeTab}`)
-          }
-          className="absolute top-4 right-4 z-50 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-primary/90"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-          Edit {activeTabConfig.label}
-        </button>
-      )}
       {activeTab === 'struktur' && (
         <StrukturEditor open={strukturEditorOpen} onOpenChange={setStrukturEditorOpen} />
       )}
@@ -542,6 +529,22 @@ export default function ProfileTabs() {
                     <h3 className="text-lg font-semibold text-slate-900">{activeTabConfig.label}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">{activeTabConfig.description}</p>
                   </div>
+                  {/* Tombol edit duduk DI DALAM kartu, sebaris dengan judul panel.
+                      Sebelumnya ia `absolute` milik <section> sehingga mendarat di
+                      pojok halaman, jauh dari kotak yang sedang diedit. */}
+                  {editMode && bisaEdit && (
+                    <button
+                      onClick={() =>
+                        activeTab === 'struktur'
+                          ? setStrukturEditorOpen(true)
+                          : openEditor(`profil.${activeTab}`)
+                      }
+                      className="ml-auto shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-primary/90"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit {activeTabConfig.label}
+                    </button>
+                  )}
                 </div>
 
                 {/* Panel content */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,11 +34,14 @@ import {
   Trash2,
   AlertTriangle,
   IdCard,
+  ZoomIn,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ImageViewer, type GambarItem } from '@/components/shared/image-viewer';
 import { CameraCapture } from '@/components/shared/camera-capture';
 import { ImageUploadField } from '@/components/shared/image-upload-field';
 import { SearchSelect } from '@/components/shared/search-select';
+import { Pagination } from '@/components/shared/pagination';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { STATUS_AKUN, infoStatus } from '@/lib/akun-status';
 import { KOLOM_TOLAK, uraikanAlasanTolak, labelKolom } from '@/lib/akun-tolak';
@@ -205,6 +208,9 @@ function IsiDetail({
   onTolak: () => void;
   onNonaktif: () => void;
 }) {
+  // Indeks foto identitas yang sedang dibuka di penampil layar penuh.
+  const [lihatFoto, setLihatFoto] = useState<number | null>(null);
+
   if (memuat || !detail) {
     return (
       <div className="flex justify-center py-16">
@@ -214,27 +220,45 @@ function IsiDetail({
   }
 
   const info = infoStatus(detail.status);
+  const nama = detail.userFullname ?? detail.userId;
+
+  // Foto identitas akun, urutan tetap: KTP dulu (yang diperiksa petugas), lalu
+  // foto profil. Dipakai bersama oleh thumbnail KTP dan avatar di atas supaya
+  // keduanya membuka penampil yang sama dan bisa dibolak-balik dengan ←/→.
+  const fotoIdentitas: GambarItem[] = [
+    ...(detail.userKtp ? [{ src: detail.userKtp, judul: `Foto KTP — ${nama}` }] : []),
+    ...(detail.userFoto ? [{ src: detail.userFoto, judul: `Foto Profil — ${nama}` }] : []),
+  ];
+  const idxFotoProfil = detail.userKtp ? 1 : 0;
 
   return (
     <div className="space-y-5">
       {/* Identitas ringkas */}
       <div className="flex items-start gap-4">
         {detail.userFoto ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={detail.userFoto}
-            alt={`Foto ${detail.userFullname ?? detail.userId}`}
-            className="h-20 w-20 shrink-0 rounded-xl border border-slate-200 object-cover"
-          />
+          <button
+            type="button"
+            onClick={() => setLihatFoto(idxFotoProfil)}
+            className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-primary/50"
+            title="Klik untuk perbesar"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={detail.userFoto}
+              alt={`Foto ${nama}`}
+              className="h-full w-full object-cover"
+            />
+            <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+              <ZoomIn className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
+          </button>
         ) : (
           <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-300">
             <UserRound className="h-8 w-8" />
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-slate-900">
-            {detail.userFullname ?? detail.userId}
-          </p>
+          <p className="truncate font-semibold text-slate-900">{nama}</p>
           <p className="font-mono text-xs text-slate-500">{detail.userId}</p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[0.68rem] font-medium text-slate-600">
@@ -278,28 +302,34 @@ function IsiDetail({
 
       {/* Foto KTP — ditaruh SEBELUM Data Diri karena inilah yang dicocokkan
           petugas dengan NIK/nama di bawahnya saat memverifikasi pendaftaran.
-          Dibuka di tab baru untuk melihat versi penuhnya (tulisan KTP kecil). */}
+          Thumbnail sengaja KECIL: gambar setinggi panel mendorong Data Diri —
+          yang justru harus dibandingkan dengannya — turun ke luar layar.
+          Klik membuka penampil yang sama dengan berkas permohonan (zoom, putar,
+          geser, unduh), bukan tab baru yang memutus alur verifikasi. */}
       {detail.userKtp && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Foto KTP
           </h4>
-          <a
-            href={detail.userKtp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-primary/50"
-            title="Buka ukuran penuh di tab baru"
+          <button
+            type="button"
+            onClick={() => setLihatFoto(0)}
+            className="group relative w-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left transition-colors hover:border-primary/50"
+            title="Klik untuk perbesar, zoom & putar"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={detail.userKtp}
-              alt={`Foto KTP ${detail.userFullname ?? detail.userId}`}
-              className="h-auto w-full object-contain"
+              alt={`Foto KTP ${nama}`}
+              loading="lazy"
+              className="h-24 w-full object-cover transition-transform group-hover:scale-105"
             />
-          </a>
+            <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+              <ZoomIn className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
+          </button>
           <p className="mt-1 text-[0.7rem] text-muted-foreground">
-            Klik gambar untuk membukanya dalam ukuran penuh.
+            Klik untuk memperbesar, memutar, dan menggeser.
           </p>
         </div>
       )}
@@ -408,6 +438,15 @@ function IsiDetail({
           </div>
         )}
       </div>
+
+      {/* Penampil layar penuh — komponen yang sama dengan berkas permohonan. */}
+      {lihatFoto !== null && fotoIdentitas.length > 0 && (
+        <ImageViewer
+          items={fotoIdentitas}
+          indexAwal={Math.min(lihatFoto, fotoIdentitas.length - 1)}
+          onClose={() => setLihatFoto(null)}
+        />
+      )}
     </div>
   );
 }
@@ -415,9 +454,17 @@ function IsiDetail({
 export function AdminUsers() {
   const [items, setItems] = useState<AdminUser[]>([]);
   const [grup, setGrup] = useState<GrupKey>('all');
-  const [total, setTotal] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<'' | '0' | '1' | '2' | '3'>('');
   const [q, setQ] = useState('');
+  // Paginasi bernomor. Pencarian & filter dijalankan di server, jadi hasilnya
+  // menjangkau SELURUH akun — akun di halaman 9 tetap ketemu walau kita sedang
+  // berada di halaman 1.
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
+  const [totalHalaman, setTotalHalaman] = useState(1);
+  // Token anti-race: tab/filter/pencarian bisa berganti sebelum respons tiba.
+  const reqId = useRef(0);
   const [isLoading, setIsLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -454,23 +501,57 @@ export function AdminUsers() {
     return () => clearInterval(t);
   }, [konfirmasi]);
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const params = new URLSearchParams();
-    // Tab "Semua" tidak mengirim `level` sama sekali → tanpa filter level.
-    if (grup !== 'all') params.set('level', grup);
-    if (statusFilter) params.set('status', statusFilter);
-    if (q.trim()) params.set('q', q.trim());
-    const res = await fetch(`/api/admin/users?${params.toString()}`);
-    const json = await res.json();
-    setItems(json.data?.items ?? []);
-    setTotal(json.data?.total ?? null);
-    setIsLoading(false);
-  }, [grup, statusFilter, q]);
+  const load = useCallback(
+    async (halaman = 1, baris = limit) => {
+      const my = ++reqId.current;
+      setIsLoading(true);
+      const params = new URLSearchParams({
+        page: String(halaman),
+        limit: String(baris),
+      });
+      // Tab "Semua" tidak mengirim `level` sama sekali → tanpa filter level.
+      if (grup !== 'all') params.set('level', grup);
+      if (statusFilter) params.set('status', statusFilter);
+      if (q.trim()) params.set('q', q.trim());
+      const res = await fetch(`/api/admin/users?${params.toString()}`);
+      const json = await res.json();
+      if (my !== reqId.current) return; // tab/filter/pencarian sudah berganti
+      setItems(json.data?.items ?? []);
+      setTotal(json.data?.total ?? 0);
+      setTotalHalaman(json.data?.totalHalaman ?? 1);
+      setIsLoading(false);
+    },
+    [grup, statusFilter, q, limit],
+  );
 
+  // Ganti tab/filter → selalu balik ke halaman 1, kalau tidak bisa terdampar di
+  // halaman yang sudah tidak ada isinya (mis. halaman 20 lalu pindah ke tab
+  // Staff yang cuma punya 18 akun).
   useEffect(() => {
-    load();
+    setPage(1);
+    load(1);
   }, [grup, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const gantiHalaman = (p: number) => {
+    setPage(p);
+    load(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Ganti jumlah baris → mulai lagi dari halaman 1 supaya posisi tidak melompat
+  // ke luar jangkauan.
+  const gantiLimit = (l: number) => {
+    setLimit(l);
+    setPage(1);
+    load(1, l);
+  };
+
+  // Pencarian juga wajib balik ke halaman 1: hasil pencarian adalah kumpulan
+  // baru, nomor halaman lama tidak ada artinya di sana.
+  const cari = () => {
+    setPage(1);
+    load(1);
+  };
 
   // Pindah tab/filter → detail lama tidak lagi relevan.
   useEffect(() => {
@@ -556,7 +637,10 @@ export function AdminUsers() {
     }
     toast.success(json.success?.[0] ?? 'Akun berhasil dibuat');
     setCreateOpen(false);
-    load();
+    // Akun baru selalu paling atas (urut `createdAt desc`) → lompat ke halaman 1
+    // supaya petugas langsung melihat hasil kerjanya.
+    setPage(1);
+    load(1);
   };
 
   const hapusAkun = async (id: number) => {
@@ -569,9 +653,15 @@ export function AdminUsers() {
       return;
     }
     toast.success(json.success?.[0] ?? 'Akun dihapus');
-    setItems((prev) => prev.filter((u) => u.id !== id));
     if (detailId === id) setDetailId(null);
     setKonfirmasi(null);
+    // Muat ulang, bukan sekadar mencoret barisnya: total & jumlah halaman ikut
+    // berubah, dan baris pertama halaman berikutnya harus naik mengisi tempat
+    // yang kosong. Kalau yang dihapus adalah satu-satunya isi halaman terakhir,
+    // mundur satu halaman — kalau tidak, layarnya jadi kosong melompong.
+    const tujuan = Math.min(page, Math.max(1, Math.ceil((total - 1) / limit)));
+    setPage(tujuan);
+    load(tujuan);
   };
 
   const bukaFormBaru = () => {
@@ -661,7 +751,7 @@ export function AdminUsers() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                load();
+                cari();
               }}
               className="flex flex-1 gap-2"
             >
@@ -680,16 +770,6 @@ export function AdminUsers() {
             <Alert className="mb-4 border-warning/20 bg-warning/10">
               <AlertDescription className="text-slate-800">{message}</AlertDescription>
             </Alert>
-          )}
-
-          {/* Jumlah hasil + peringatan kalau daftar terpotong batas `take`.
-              Tanpa ini daftar berhenti diam-diam dan terbaca seolah datanya
-              memang cuma sebanyak yang tampil. */}
-          {!isLoading && total !== null && (
-            <p className="mb-3 text-xs text-slate-500">
-              Menampilkan <span className="font-semibold text-slate-700">{items.length}</span>
-              {total > items.length ? <> dari <span className="font-semibold text-slate-700">{total}</span> akun — persempit dengan pencarian atau filter untuk melihat sisanya</> : <> akun</>}
-            </p>
           )}
 
           {isLoading ? (
@@ -866,6 +946,18 @@ export function AdminUsers() {
                 </tbody>
               </table>
             </div>
+
+            {/* Satu paginasi untuk dua tampilan (kartu ponsel & tabel desktop) —
+                keduanya memakai `items` yang sama. */}
+            <Pagination
+              page={page}
+              totalHalaman={totalHalaman}
+              total={total}
+              limit={limit}
+              onChange={gantiHalaman}
+              onLimitChange={gantiLimit}
+              disabled={isLoading}
+            />
             </>
           )}
         </div>

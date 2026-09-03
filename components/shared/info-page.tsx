@@ -281,8 +281,11 @@ export function InfoPage({
  * Panel unggah dokumen (mode edit) — tampil di halaman publik yang punya
  * kategori dokumen. Alur sama dengan dashboard Dokumen Publikasi:
  * upload file → simpan ke t_produk dgn `jenis` kategori halaman ini.
+ *
+ * Diekspor karena halaman Profil Kependudukan memakai panel yang sama di luar
+ * InfoPage — satu alur unggah, bukan dua yang harus dijaga sejalan.
  */
-function TambahDokumen({
+export function TambahDokumen({
   jenis,
   onAdded,
 }: {
