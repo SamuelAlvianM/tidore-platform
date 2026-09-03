@@ -347,6 +347,40 @@ STATIC_BLOCKS.push({
   },
 });
 
+// ───────────────────────────────────────────────────────────────────────────
+// Profil Kependudukan — halaman /profil-kependudukan (menu navbar sendiri).
+// Yang editable di sini HANYA teks pembungkusnya; daftar bukunya sendiri
+// berasal dari dokumen t_produk kategori BUKU_PROFIL (diunggah/dihapus lewat
+// Mode Edit di halaman itu atau dashboard Dokumen Publikasi), bukan dari blok
+// ini — supaya menambah terbitan tahun baru tidak perlu menyunting JSON.
+// ───────────────────────────────────────────────────────────────────────────
+export const PROFIL_KEPENDUDUKAN_KUNCI = "profil-kependudukan.halaman";
+
+STATIC_BLOCKS.push({
+  kunci: PROFIL_KEPENDUDUKAN_KUNCI,
+  judul: "Halaman — Profil Kependudukan",
+  deskripsi:
+    "Judul, paragraf pengantar, dan keterangan sumber data pada halaman Profil Kependudukan.",
+  fields: [
+    { name: "judul", label: "Judul Halaman", type: "text" },
+    { name: "intro", label: "Paragraf Pengantar", type: "textarea" },
+    {
+      name: "sumber",
+      label: "Keterangan Sumber Data",
+      type: "text",
+      catatan:
+        "Tampil kecil di bawah penampil dokumen. Buku profilnya sendiri (PDF per tahun) ditambah lewat tombol unggah pada halaman ini saat Mode Edit aktif — tidak lewat editor ini.",
+    },
+  ],
+  defaults: {
+    judul: "Profil Perkembangan Kependudukan",
+    intro:
+      "Buku Profil Perkembangan Kependudukan Kota Tidore Kepulauan disusun setiap tahun sebagai penyajian data dan informasi kondisi kependudukan — jumlah dan persebaran penduduk, karakteristik demografi dan sosial, keluarga, kualitas penduduk, mobilitas, serta kepemilikan dokumen kependudukan. Pilih tahun terbitan di bawah ini untuk membaca atau mengunduh bukunya.",
+    sumber:
+      "Sumber data: Sistem Informasi Administrasi Kependudukan (SIAK) hasil konsolidasi Ditjen Dukcapil Kementerian Dalam Negeri, diolah Dinas Kependudukan dan Pencatatan Sipil Kota Tidore Kepulauan.",
+  },
+});
+
 /** Kunci blok konten statis untuk label periode data DKB (badge beranda). */
 export const DKB_PERIODE_KUNCI = "beranda.dkb-periode";
 

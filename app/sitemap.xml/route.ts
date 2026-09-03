@@ -32,6 +32,7 @@ const RUTE_TETAP: Entri[] = [
   { path: "/galeri", prioritas: 0.6, ubah: "monthly" },
   { path: "/media/gis", prioritas: 0.6, ubah: "monthly" },
   { path: "/media/demografi", prioritas: 0.7, ubah: "monthly" },
+  { path: "/profil-kependudukan", prioritas: 0.7, ubah: "yearly" },
   { path: "/cek-status", prioritas: 0.8, ubah: "yearly" },
   { path: "/hubungi-kami", prioritas: 0.7, ubah: "yearly" },
   { path: "/hubungi-kami/kritik-saran", prioritas: 0.5, ubah: "yearly" },

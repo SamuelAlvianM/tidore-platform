@@ -93,6 +93,16 @@ export const navigationItems: NavMenu[] = [
     ],
   },
   {
+    // Buku Profil Perkembangan Kependudukan (terbitan tahunan dinas). Tanpa
+    // dropdown: satu halaman berisi pemilih tahun + penampil PDF, karena
+    // jumlah tahunnya bertambah tiap tahun dan dinas menambahnya sendiri lewat
+    // Mode Edit — kalau tiap tahun jadi sub-menu, navbar harus disunting kode
+    // tiap terbitan baru. Dokumennya kategori `BUKU_PROFIL` (t_produk), sama
+    // dengan yang tampil di PPID → Buku Profil Kependudukan.
+    title: "Profil Kependudukan",
+    href: "/profil-kependudukan",
+  },
+  {
     // Disederhanakan dari 3 item jadi 2 menu utama — tiap menu mendarat di
     // halaman yang punya sub-tab sendiri (lihat components/ppid/ppid-subnav.tsx):
     // "Tentang PPID" → 6 tab (profil, pembentukan, visi-misi, struktur,
@@ -133,7 +143,12 @@ export const navigationItems: NavMenu[] = [
     // melempar ke skm.go.id). Halaman itu menyematkan formulir SKM resmi lewat
     // iframe + tombol untuk membukanya penuh di tab baru. Lihat
     // app/survei-kepuasan/page.tsx.
-    title: "Survei Kepuasan Masyarakat",
+    //
+    // Label navbar sengaja dipendekkan dari "Survei Kepuasan Masyarakat":
+    // yang panjang memakan 231px sendirian dan membuat deretan menu meluber
+    // setelah "Profil Kependudukan" masuk. Judul lengkapnya tetap utuh di
+    // halaman tujuan, footer, dan dashboard SKM.
+    title: "Survei Kepuasan",
     href: "/survei-kepuasan",
   },
   // "Hubungi Kami" dihapus dari navbar atas permintaan user — informasi kontak

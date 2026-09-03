@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   Gauge,
   Ticket,
+  BookOpen,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
@@ -51,6 +52,25 @@ const AMBANG_MENU_DESKTOP = 1360;
 const LEBAR_PANEL_MIN = 280;
 /** Jarak aman panel dari tepi layar. */
 const MARGIN_LAYAR = 8;
+
+/** Kelas satu item di deretan menu desktop — dipakai tombol dropdown MAUPUN
+ *  tautan langsung supaya keduanya tidak pernah beda tinggi/padding. */
+const KELAS_ITEM_MENU = cn(
+  "relative px-2 py-2 text-sm font-medium flex items-center gap-1 rounded-md whitespace-nowrap text-slate-700",
+  "transition-all duration-300 ease-out",
+  "hover:text-[#495E57] hover:bg-[#495E57]/10",
+  "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
+  "before:transition-all before:duration-300 before:ease-out",
+  // Lebar garis bawah = lebar item dikurangi padding kiri+kanan (px-2 = 1rem).
+  "hover:before:w-[calc(100%-1rem)]",
+);
+
+/** Ikon item menu desktop. Disembunyikan di bawah 1500px: tiap ikon memakan
+ *  ±22px (16px + gap) × 7 menu = 154px, dan sesudah "Profil Kependudukan"
+ *  masuk, deretan menu tidak lagi muat di ambang 1360px. Yang dikorbankan
+ *  hiasannya, bukan labelnya — jauh lebih baik daripada menu yang meluber
+ *  atau harus dipindah ke hamburger di laptop 1440px. */
+const KELAS_IKON_MENU = "h-4 w-4 flex-shrink-0 max-[1499px]:hidden";
 
 function DropdownMenu({
   title,
@@ -172,19 +192,15 @@ function DropdownMenu({
         onMouseLeave={() => setIsHovered(false)}
         aria-expanded={items ? isOpen : undefined}
         className={cn(
-          "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
-          "transition-all duration-300 ease-out",
-          "hover:text-[#495E57] hover:bg-[#495E57]/10",
-          "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
-          "before:transition-all before:duration-300 before:ease-out",
-          "hover:before:w-[calc(100%-1.25rem)]",
+          KELAS_ITEM_MENU,
           isOpen && "text-[#495E57] bg-[#495E57]/10",
         )}
       >
         {Icon && (
           <Icon
             className={cn(
-              "h-4 w-4 flex-shrink-0 transition-transform duration-300 ease-out",
+              KELAS_IKON_MENU,
+              "transition-transform duration-300 ease-out",
               isHovered && "scale-110",
             )}
             strokeWidth={2}
@@ -694,7 +710,8 @@ const navigationIcons: { [key: string]: React.ElementType } = {
   Gallery: ImageIcon,
   "Hubungi Kami": Phone,
   PPID: Landmark,
-  "Survei Kepuasan Masyarakat": Gauge,
+  "Profil Kependudukan": BookOpen,
+  "Survei Kepuasan": Gauge,
   Antrian: Ticket,
 };
 
@@ -820,7 +837,12 @@ function AuthArea({
         <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#495E57]/12 text-[#45474B] ring-1 ring-[#495E57]/25">
           <UserIcon className="h-4 w-4" />
         </span>
-        <span className="max-w-[10rem] truncate text-slate-700">{displayName}</span>
+        {/* Nama dipangkas lebih pendek di bawah 1500px — sama alasannya dengan
+            KELAS_IKON_MENU: di ambang 1360px, blok akun yang melebar (mis.
+            "Galang (Administrator)") memakan ruang deretan menu sampai meluber. */}
+        <span className="max-w-[8rem] min-[1500px]:max-w-[10rem] truncate text-slate-700">
+          {displayName}
+        </span>
         <ChevronDown
           className={cn(
             "h-4 w-4 text-slate-500 transition-transform",
@@ -924,7 +946,9 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex min-h-16 items-center justify-between gap-4">
+        {/* gap-2, bukan gap-4: tiga celah antar-blok × 16px = 48px yang di
+            ambang 1360px justru ruang yang dibutuhkan deretan menu. */}
+        <nav className="flex min-h-16 items-center justify-between gap-2">
           {/* Logo */}
           <Link
             href="/"
@@ -984,7 +1008,7 @@ export function Navbar() {
 
               Menu "Beranda" sengaja tidak ada di deret desktop (logo di kiri
               sudah menuju "/"); ia tetap tersedia di panel hamburger. */}
-          <div className="hidden min-[1360px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
+          <div className="hidden min-[1360px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center">
             {menuItems.map((item) => {
               // Menu tanpa dropdown → link langsung (mis. Pelayanan Online).
               if (!item.items?.length && item.href) {
@@ -992,14 +1016,7 @@ export function Navbar() {
                 // Aplikasi lain (Antrian) & situs luar sama-sama tidak boleh
                 // lewat router Next; bedanya cuma tab baru atau tidak.
                 const external = item.aplikasiLuar || isExternalHref(item.href);
-                const linkClassName = cn(
-                  "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-slate-700",
-                  "transition-all duration-300 ease-out",
-                  "hover:text-[#495E57] hover:bg-[#495E57]/10",
-                  "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#F4CE14]",
-                  "before:transition-all before:duration-300 before:ease-out",
-                  "hover:before:w-[calc(100%-1.25rem)]",
-                );
+                const linkClassName = KELAS_ITEM_MENU;
                 if (external) {
                   const tabBaru = !item.aplikasiLuar;
                   return (
@@ -1011,14 +1028,14 @@ export function Navbar() {
                         : {})}
                       className={linkClassName}
                     >
-                      {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
+                      {Icon && <Icon className={KELAS_IKON_MENU} strokeWidth={2} />}
                       {item.title}
                     </a>
                   );
                 }
                 return (
                   <Link key={item.title} href={item.href} className={linkClassName}>
-                    {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
+                    {Icon && <Icon className={KELAS_IKON_MENU} strokeWidth={2} />}
                     {item.title}
                   </Link>
                 );

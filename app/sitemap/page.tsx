@@ -44,6 +44,12 @@ const sections: { title: string; links: { label: string; href: string }[] }[] = 
     ],
   },
   {
+    title: 'Profil Kependudukan',
+    links: [
+      { label: 'Buku Profil Perkembangan Kependudukan', href: '/profil-kependudukan' },
+    ],
+  },
+  {
     title: 'PPID',
     links: Object.entries(ppidContent).map(([slug, c]) => ({
       label: c.title,

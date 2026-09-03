@@ -109,7 +109,14 @@ export const DOKUMEN_KATEGORI: DokumenKategori[] = [
     key: "BUKU_PROFIL",
     label: "Buku Profil Kependudukan",
     group: "PPID / Transparansi",
-    halaman: [{ label: "PPID → Buku Profil Kependudukan", href: "/ppid/buku-profil-kependudukan" }],
+    // Dua halaman, SATU kategori: PDF yang diunggah muncul di keduanya.
+    // /profil-kependudukan = menu navbar sendiri (penampil PDF per tahun),
+    // /ppid/buku-profil-kependudukan = daftar berkas versi PPID (tetap ada
+    // supaya kewajiban keterbukaan informasi tidak pindah tempat).
+    halaman: [
+      { label: "Profil Kependudukan", href: "/profil-kependudukan" },
+      { label: "PPID → Buku Profil Kependudukan", href: "/ppid/buku-profil-kependudukan" },
+    ],
   },
   {
     key: "DPA",
