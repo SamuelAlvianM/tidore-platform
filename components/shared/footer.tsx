@@ -115,7 +115,7 @@ export function Footer() {
                 </li> */}
                 <li className="flex items-center gap-3">
                   <Clock className="w-4 h-4 text-[#F4CE14] flex-shrink-0" />
-                  <span>Senin – Jumat: 08.00 – 16.00 WITA</span>
+                  <span>Senin – Jumat: 08.00 – 16.00 WIT</span>
                 </li>
               </ul>
             </div>

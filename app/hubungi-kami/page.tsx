@@ -31,7 +31,7 @@ const INFO = [
     icon: Clock,
     judul: 'Jam Pelayanan',
     gradasi: 'from-emerald-400 to-emerald-600',
-    baris: ['Senin – Jumat: 08.00 – 16.00 WITA', 'Sabtu, Minggu & hari libur nasional: tutup'],
+    baris: ['Senin – Jumat: 08.00 – 16.00 WIT', 'Sabtu, Minggu & hari libur nasional: tutup'],
   },
   {
     icon: Phone,

@@ -12,7 +12,7 @@ export const ONLINE_WINDOW_MS = 5 * 60_000;
 /**
  * Tanggal "hari ini" untuk kolom DATE MySQL: pakai komponen tanggal lokal
  * server yang dibungkus UTC agar tidak bergeser sehari saat Prisma
- * mengonversi ke UTC (WITA = UTC+8).
+ * mengonversi ke UTC. Zona server produksi = Asia/Jayapura (WIT, UTC+9).
  */
 export function tanggalHariIni() {
   const now = new Date();

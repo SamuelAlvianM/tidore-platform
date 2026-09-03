@@ -319,7 +319,7 @@ export const hubungiKamiContent: Record<string, InfoPageContent> = {
     list: [
       'Telepon: (0553) 2022XXX',
       'Email: disdukcapil@tidorekab.go.id',
-      'Jam Layanan: Senin–Jumat, 08.00–16.00 WITA',
+      'Jam Layanan: Senin–Jumat, 08.00–16.00 WIT',
     ],
   },
   'kritik-saran': {
