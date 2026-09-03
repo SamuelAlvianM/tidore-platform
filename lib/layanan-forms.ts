@@ -27,6 +27,14 @@ export interface FieldDef {
   label: string;
   type: FieldType;
   required?: boolean;
+  /**
+   * Wajib BERSYARAT: hanya bila field lain berisi salah satu nilai berikut.
+   * Mengembalikan aturan form lama, yang mewajibkan kolom biodata beserta
+   * dokumen pendukungnya sesuai "jenis biodata" yang dipilih pemohon
+   * (KKPerubahanBiodataController: `str_contains($jenisbiodata, …)`).
+   * Tanpa ini, permohonan ubah biodata bisa terkirim tanpa data barunya.
+   */
+  requiredIf?: { field: string; anyOf: string[] };
   placeholder?: string;
   options?: string[];
   half?: boolean; // tampil setengah lebar (grid 2 kolom)
@@ -224,27 +232,50 @@ export const LAYANAN_FORMS: LayananForm[] = [
           f('kk', 'Nomor KK', 'kk', { required: true, half: true }),
           f('nik', 'Nomor NIK', 'nik', { required: true, half: true }),
           f('jenisbiodata', 'Jenis Biodata yang Diubah', 'select', { required: true, options: OPT_JENIS_BIODATA }),
-          f('namalengkap', 'Nama Lengkap', 'text', { half: true }),
-          f('jeniskelamin', 'Jenis Kelamin', 'select', { half: true, options: OPT_JENIS_KELAMIN }),
-          f('tempatlahir', 'Tempat Lahir', 'text', { half: true }),
-          f('tanggallahir', 'Tanggal Lahir', 'date', { half: true }),
-          f('golongandarah', 'Golongan Darah', 'select', { half: true, options: OPT_GOLDAR }),
-          f('agama', 'Agama', 'select', { half: true, options: OPT_AGAMA }),
-          f('pendidikan', 'Pendidikan', 'select', { half: true, options: OPT_PENDIDIKAN }),
-          f('pekerjaan', 'Pekerjaan', 'text', { half: true }),
-          f('namaayah', 'Nama Ayah', 'text', { half: true }),
-          f('namaibu', 'Nama Ibu', 'text', { half: true }),
-          f('statusperkawinan', 'Status Perkawinan', 'select', { half: true, options: OPT_STATUS_KAWIN }),
+          // Kolom biodata di bawah ini wajib mengikuti pilihan di atas — persis
+          // aturan KKPerubahanBiodataController pada portal lama.
+          ...OPT_JENIS_BIODATA.map((pilihan) => {
+            const dasar: Record<string, FieldDef> = {
+              'Nama Lengkap': f('namalengkap', 'Nama Lengkap', 'text', { half: true }),
+              'Jenis Kelamin': f('jeniskelamin', 'Jenis Kelamin', 'select', { half: true, options: OPT_JENIS_KELAMIN }),
+              'Tempat Lahir': f('tempatlahir', 'Tempat Lahir', 'text', { half: true }),
+              'Tanggal Lahir': f('tanggallahir', 'Tanggal Lahir', 'date', { half: true }),
+              'Golongan Darah': f('golongandarah', 'Golongan Darah', 'select', { half: true, options: OPT_GOLDAR }),
+              Agama: f('agama', 'Agama', 'select', { half: true, options: OPT_AGAMA }),
+              Pendidikan: f('pendidikan', 'Pendidikan', 'select', { half: true, options: OPT_PENDIDIKAN }),
+              Pekerjaan: f('pekerjaan', 'Pekerjaan', 'text', { half: true }),
+              'Nama Ayah': f('namaayah', 'Nama Ayah', 'text', { half: true }),
+              'Nama Ibu': f('namaibu', 'Nama Ibu', 'text', { half: true }),
+              'Status Perkawinan': f('statusperkawinan', 'Status Perkawinan', 'select', { half: true, options: OPT_STATUS_KAWIN }),
+            };
+            return { ...dasar[pilihan], requiredIf: { field: 'jenisbiodata', anyOf: [pilihan] } };
+          }),
         ],
       },
       {
         title: 'Dokumen Syarat',
         fields: [
           f('filekk', 'File Kartu Keluarga', 'file', { required: true }),
-          f('fileaktalahir', 'File Akta Lahir', 'file'),
-          f('fileijazah', 'File Ijazah', 'file'),
-          f('filebukunikah', 'File Buku Nikah', 'file'),
-          f('filependukung1', 'File Pendukung', 'file'),
+          // Dokumen pendukung wajib sesuai jenis perubahannya — sama seperti
+          // form lama; tanpa ini petugas menerima permohonan tanpa bukti.
+          f('fileaktalahir', 'File Akta Lahir', 'file', {
+            requiredIf: {
+              field: 'jenisbiodata',
+              anyOf: ['Nama Lengkap', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Nama Ayah', 'Nama Ibu'],
+            },
+          }),
+          f('fileijazah', 'File Ijazah', 'file', {
+            requiredIf: {
+              field: 'jenisbiodata',
+              anyOf: ['Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir', 'Pendidikan'],
+            },
+          }),
+          f('filebukunikah', 'File Buku Nikah', 'file', {
+            requiredIf: { field: 'jenisbiodata', anyOf: ['Status Perkawinan'] },
+          }),
+          f('filependukung1', 'File Pendukung', 'file', {
+            requiredIf: { field: 'jenisbiodata', anyOf: ['Golongan Darah', 'Agama', 'Pekerjaan'] },
+          }),
         ],
       },
       catatanSection,
@@ -666,15 +697,35 @@ export const LAYANAN_FORMS: LayananForm[] = [
 export const getLayananForm = (slug: string) => LAYANAN_FORMS.find((l) => l.slug === slug);
 
 /**
+ * Apakah field ini wajib PADA KEADAAN ISIAN SEKARANG — `required` tetap, atau
+ * `requiredIf` yang terpenuhi. Dipakai form (menandai bintang & memvalidasi) dan
+ * API, supaya keduanya menilai dengan aturan yang sama.
+ *
+ * Pemeriksaannya `includes`, bukan sama-dengan, supaya tetap benar bila kelak
+ * `jenisbiodata` kembali multi-pilih seperti form lama (nilainya gabungan).
+ */
+export function wajibSekarang(fd: FieldDef, values?: Record<string, unknown>): boolean {
+  if (fd.required) return true;
+  if (!fd.requiredIf || !values) return false;
+  const pemicu = String(values[fd.requiredIf.field] ?? '');
+  return fd.requiredIf.anyOf.some((o) => pemicu.includes(o));
+}
+
+/**
  * Validasi satu field — SATU SUMBER KEBENARAN untuk form (client) dan
  * API (server), supaya keduanya tidak pernah berbeda pendapat. Aturan
  * ditentukan oleh `type` di skema, bukan tebakan dari nama kolom: nama kolom
  * pernah menipu (mis. `alasannumpangkk` berakhiran "kk" padahal isinya teks
  * pilihan, dan `nikygpisah` bertipe textarea berisi BANYAK NIK per baris).
  */
-export function validateFieldValue(fd: FieldDef, value: string): string | null {
+export function validateFieldValue(
+  fd: FieldDef,
+  value: string,
+  /** Seluruh isian form — hanya perlu untuk field ber-`requiredIf`. */
+  values?: Record<string, unknown>,
+): string | null {
   const v = (value ?? '').trim();
-  if (fd.required && !v) return `${fd.label} wajib diisi`;
+  if (wajibSekarang(fd, values) && !v) return `${fd.label} wajib diisi`;
   if (!v) return null;
   switch (fd.type) {
     case 'nik':
@@ -699,7 +750,7 @@ export function validateLayananPayload(
   const errors: string[] = [];
   for (const s of layanan.sections) {
     for (const fd of s.fields) {
-      const err = validateFieldValue(fd, String(values?.[fd.name] ?? ''));
+      const err = validateFieldValue(fd, String(values?.[fd.name] ?? ''), values);
       if (err) errors.push(err);
     }
   }

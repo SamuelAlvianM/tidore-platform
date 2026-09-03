@@ -31,7 +31,12 @@ import {
   OcrUploadButton,
   type OcrUploadResult,
 } from '@/components/permohonan-online/ocr-upload-button';
-import { validateFieldValue, type LayananForm, type FieldDef } from '@/lib/layanan-forms';
+import {
+  validateFieldValue,
+  wajibSekarang,
+  type LayananForm,
+  type FieldDef,
+} from '@/lib/layanan-forms';
 import {
   useStatusJamLayanan,
   PanelJamTutup,
@@ -75,7 +80,7 @@ export function StaffPengajuanForm({
   const [dragField, setDragField] = useState<string | null>(null);
   // Penampil berkas layar penuh (zoom + maju/mundur antar dokumen terunggah).
   const { viewer, bukaGambar, tutupGambar } = useImageViewer();
-  // Status jam pelayanan (WIB) — form dinonaktifkan bila di luar jam aktif.
+  // Status jam pelayanan (WIT) — form dinonaktifkan bila di luar jam aktif.
   const { loading: loadingJam, status: statusJam, tertutup: jamTutup } =
     useStatusJamLayanan();
 
@@ -145,7 +150,7 @@ export function StaffPengajuanForm({
     // Validasi seluruh field, kumpulkan alasan
     const nextErrors: Record<string, string> = {};
     for (const fd of allFields) {
-      const err = validateField(fd, values[fd.name] ?? '');
+      const err = validateField(fd, values[fd.name] ?? '', values);
       if (err) nextErrors[fd.name] = err;
     }
     setErrors(nextErrors);
@@ -197,7 +202,8 @@ export function StaffPengajuanForm({
       return (
         <div id={`fld-${fd.name}`} className="space-y-1.5">
           <Label className="text-xs">
-            {fd.label} {fd.required && <span className="text-destructive">*</span>}
+            {fd.label}{' '}
+            {wajibSekarang(fd, values) && <span className="text-destructive">*</span>}
           </Label>
           {uploaded ? (
             // Pratinjau gambar + tombol batal.
@@ -270,7 +276,8 @@ export function StaffPengajuanForm({
     return (
       <div id={`fld-${fd.name}`} className="space-y-1.5">
         <Label htmlFor={fd.name}>
-          {fd.label} {fd.required && <span className="text-destructive">*</span>}
+          {fd.label}{' '}
+          {wajibSekarang(fd, values) && <span className="text-destructive">*</span>}
         </Label>
         {fd.type === 'textarea' ? (
           <Textarea id={fd.name} rows={3} value={val} placeholder={fd.placeholder} className={errCls} onChange={(e) => setVal(fd.name, e.target.value)} />
