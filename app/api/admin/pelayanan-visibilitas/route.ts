@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
+import { isPetugas } from "@/lib/akun-level";
 import { PELAYANAN_VISIBILITY_KEY, PELAYANAN_LIST } from "@/lib/pelayanan-list";
 import { catatAktivitas } from "@/lib/log-aktivitas";
 
@@ -12,7 +13,10 @@ const VALID = new Set(PELAYANAN_LIST.map((p) => p.modalType));
 /** Ambil daftar layanan yang disembunyikan dari permohonan online (admin). */
 export async function GET() {
   const session = await getSession();
-  if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
+  // Staf ikut boleh: merekalah yang tahu lebih dulu saat blangko habis
+  // atau server SIAK padam, dan menunggu admin berarti warga terus
+  // mengirim permohonan yang sudah pasti tidak bisa diproses.
+  if (!session || !isPetugas(session.level)) return fail(["Tidak diizinkan"], 403);
 
   const row = await prisma.staticContent.findUnique({
     where: { kunci: PELAYANAN_VISIBILITY_KEY },
@@ -28,7 +32,10 @@ export async function GET() {
 /** Simpan daftar layanan yang disembunyikan (upsert). */
 export async function PUT(req: NextRequest) {
   const session = await getSession();
-  if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
+  // Staf ikut boleh: merekalah yang tahu lebih dulu saat blangko habis
+  // atau server SIAK padam, dan menunggu admin berarti warga terus
+  // mengirim permohonan yang sudah pasti tidak bisa diproses.
+  if (!session || !isPetugas(session.level)) return fail(["Tidak diizinkan"], 403);
 
   const body = await req.json().catch(() => ({}));
   const raw = (body as { hidden?: unknown }).hidden;

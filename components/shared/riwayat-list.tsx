@@ -11,6 +11,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
+import { AlasanDitolak, type UraianTolak } from '@/components/shared/alasan-ditolak';
 
 interface Permohonan {
   id: number;
@@ -19,6 +20,8 @@ interface Permohonan {
   status: string;
   createdAt: string;
   updatedAt: string;
+  /** Terisi hanya bila DITOLAK — lihat `app/api/permohonan/route.ts`. */
+  tolak?: UraianTolak | null;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -167,27 +170,38 @@ export function RiwayatList() {
                 <Link
                   key={item.id}
                   href={`/riwayat/${item.id}`}
-                  className="glass-card rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg hover:border-primary/30 transition-all group"
+                  className="glass-card rounded-2xl p-5 block hover:shadow-lg hover:border-primary/30 transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(202,138,4,0.08)' }}>
-                    <FileText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-slate-900 text-sm">{item.jenisNama}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">No. {item.noregister}</p>
-                      </div>
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 flex items-center gap-1 ${cfg.color}`}>
-                        <Icon className="w-3 h-3" />
-                        {cfg.label}
-                      </span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(202,138,4,0.08)' }}>
+                      <FileText className="w-5 h-5 text-primary" />
                     </div>
-                    <p className="text-xs text-slate-400 mt-1.5">
-                      Diajukan {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-slate-900 text-sm">{item.jenisNama}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">No. {item.noregister}</p>
+                        </div>
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 flex items-center gap-1 ${cfg.color}`}>
+                          <Icon className="w-3 h-3" />
+                          {cfg.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-1.5">
+                        Diajukan {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors flex-shrink-0" />
+
+                  {/* Alasan penolakan langsung di kartunya — tidak di balik
+                      satu klik lagi. Inilah satu hal yang dicari pemohon yang
+                      baru saja ditolak. */}
+                  {item.status === 'DITOLAK' && (
+                    <div className="mt-3">
+                      <AlasanDitolak tolak={item.tolak} ringkas />
+                    </div>
+                  )}
                 </Link>
               );
             })}

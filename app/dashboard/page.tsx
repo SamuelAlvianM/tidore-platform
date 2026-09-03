@@ -2,7 +2,15 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { LEVEL_ADMIN, LEVEL_STAFF, LEVEL_WARGA, LEVEL_OPD, LEVEL_OPERATOR } from '@/lib/akun-level';
+import {
+  LEVEL_ADMIN,
+  LEVEL_STAFF,
+  LEVEL_WARGA,
+  LEVEL_OPD,
+  LEVEL_OPERATOR,
+  isPengajuInstansi,
+  isPetugas,
+} from '@/lib/akun-level';
 import { statsKunjungan } from '@/lib/kunjungan';
 import {
   ProgressPermohonanChart,
@@ -123,7 +131,17 @@ function SectionCard({
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
-  if (session.level > 2) redirect('/user/pengajuan');
+  /*
+   * Statistik Rekap seluruh kota tetap milik petugas dinas.
+   *
+   * Pengaju instansi (OPD & operator wilayah) dipulangkan ke daftar
+   * permohonannya sendiri, BUKAN ke halaman warga: ia kini punya kerangka
+   * dashboard, dan melemparnya ke `/user/pengajuan` berarti mengeluarkannya
+   * dari sidebar yang baru saja diberikan — berputar-putar antara dua
+   * tampilan tanpa pernah sampai.
+   */
+  if (isPengajuInstansi(session.level)) redirect('/dashboard/permohonan');
+  if (!isPetugas(session.level)) redirect('/user/pengajuan');
 
   const now = new Date();
   const startBulanIni = new Date(now.getFullYear(), now.getMonth(), 1);

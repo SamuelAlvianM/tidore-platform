@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { getSession } from "@/lib/auth";
+import { uraikan } from "@/lib/tolak-permohonan";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
 
@@ -44,6 +45,19 @@ export async function GET(req: NextRequest) {
     createdAt: i.createdAt,
     updatedAt: i.updatedAt,
     jenisNama: i.jenis?.nama ?? String(i.jenisId),
+    /*
+     * 🔴 Alasan penolakan ikut di DAFTAR, bukan hanya di halaman detail.
+     *
+     * Sampai sekarang daftar ini cuma memunculkan lencana "DITOLAK", dan
+     * penjelasannya dikirim lewat surel — kanal yang bisa terlewat. Warga
+     * sungguhan melaporkan ditolak berulang kali "karena data tidak lengkap"
+     * tanpa pernah tahu data mana yang dimaksud, sebab portalnya sendiri
+     * tidak pernah mengatakannya.
+     *
+     * Dikirim hanya untuk yang DITOLAK: pada status lain `catatan` berisi
+     * catatan kerja petugas yang bukan urusan pemohon.
+     */
+    tolak: i.status === "DITOLAK" ? uraikan(i.catatan) : null,
   }));
   const nextCursor = hasMore ? page[page.length - 1].id : null;
 

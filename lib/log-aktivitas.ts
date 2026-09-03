@@ -1,13 +1,20 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { SessionPayload } from "@/lib/auth";
+import { bolehDashboard } from "@/lib/akun-level";
 
 /**
  * Audit ringan aktivitas petugas/admin.
  *
  * Dipakai di endpoint dashboard yang mengubah data. Prinsip:
- * - HANYA mencatat pelaku petugas (level 1/2). Warga/OPD (level > 2) diabaikan
- *   supaya log tetap soal "kegiatan admin".
+ * - HANYA mencatat pelaku yang memakai dashboard: petugas dinas DAN Operator
+ *   OPD. Warga diabaikan — mengurus permohonannya sendiri bukan "kegiatan
+ *   admin", dan mencatatnya akan menenggelamkan log yang justru dibaca.
+ *
+ *   🔴 OPD sengaja IKUT dicatat. Ia mengajukan atas nama ORANG LAIN, dan
+ *   itu persis keadaan yang membuat jejak audit ada: bila kelak ada sengketa
+ *   soal permohonan yang diajukan sebuah kecamatan, log inilah satu-satunya
+ *   catatan siapa mengirim apa dan kapan.
  * - TIDAK PERNAH melempar. Audit tidak boleh menggagalkan aksi utama; kegagalan
  *   pencatatan cukup diabaikan.
  */
@@ -37,8 +44,8 @@ export async function catatAktivitas(
   opsi: OpsiLog = {},
 ): Promise<void> {
   try {
-    // Hanya petugas/admin (level 1 & 2). Sesi lain diabaikan.
-    if (!pelaku || (pelaku.level !== 1 && pelaku.level !== 2)) return;
+    // Pemakai dashboard saja (petugas & OPD). Warga diabaikan.
+    if (!pelaku || !bolehDashboard(pelaku.level)) return;
 
     await prisma.logAktivitas.create({
       data: {

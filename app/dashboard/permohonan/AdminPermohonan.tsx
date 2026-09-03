@@ -1,18 +1,21 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import { Pagination } from '@/components/shared/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  Loader2, Search, ClipboardList, X, Clock, CheckCircle2, XCircle, FileText,
-  Eye, Lock, AlertTriangle, ArrowLeft, Download, User, Phone, Mail,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Loader2, Search, ClipboardList, Clock, CheckCircle2, XCircle, FileText,
+  Eye, Lock,
 } from 'lucide-react';
-import { BerkasGallery, PermohonanJourney } from '@/components/shared/permohonan-detail';
-import { labelField, payloadDataEntries, payloadBerkasEntries } from '@/lib/permohonan-display';
 
 /** Status final — data terkunci, hanya bisa dibuka lewat halaman Master. */
 const FINAL_STATUS = ['SELESAI', 'DITOLAK'];
@@ -29,28 +32,6 @@ interface Item {
   pemohonId: string;
   hp: string;
   jumlahBerkas: number;
-}
-
-interface BerkasItem {
-  id: number;
-  namaFile: string;
-  path: string;
-  mimeType: string | null;
-}
-
-interface Detail {
-  id: number;
-  noregister: string;
-  status: string;
-  catatan: string | null;
-  createdAt: string;
-  updatedAt: string;
-  prosesByName?: string | null;
-  prosesAt?: string | null;
-  payload: Record<string, unknown> | null;
-  jenis: { nama: string; kategori: string } | null;
-  user: { userId: string; userFullname: string | null; userHp: string | null; userEmail: string | null } | null;
-  berkas: BerkasItem[];
 }
 
 /** Pilihan alasan penolakan yang lazim; "Lainnya" -> alasan diketik bebas. */
@@ -85,7 +66,21 @@ export function AdminPermohonan() {
   const [items, setItems] = useState<Item[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [statusFilter, setStatusFilter] = useState('');
+  const [jenisFilter, setJenisFilter] = useState('');
+  const [wilayahFilter, setWilayahFilter] = useState('');
   const [q, setQ] = useState('');
+  /*
+   * Pilihan saringan datang dari server, bukan disusun dari baris yang sedang
+   * tampil: saringan yang cuma berisi pilihan yang sudah kelihatan tidak
+   * menyaring apa pun.
+   *
+   * ⚠️ `daftarWilayah` sengaja KOSONG untuk Operator OPD — server tidak
+   * mengirimnya. Seluruh permohonannya berasal dari satu wilayah, jadi
+   * saringannya tak berguna, dan daftar kecamatan se-kabupaten di panelnya
+   * menyiratkan data yang memang bukan haknya.
+   */
+  const [daftarJenis, setDaftarJenis] = useState<{ id: number; nama: string }[]>([]);
+  const [daftarWilayah, setDaftarWilayah] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   // Paginasi bernomor. Pencarian & filter dijalankan di server, jadi hasilnya
   // menjangkau SELURUH data — data di halaman 3 tetap ketemu walau kita sedang
@@ -96,17 +91,7 @@ export function AdminPermohonan() {
   const [totalHalaman, setTotalHalaman] = useState(1);
   // Token anti-race saat filter/pencarian berubah.
   const reqId = useRef(0);
-  // Panel detail inline (menggantikan tabel — bukan pindah halaman).
-  const [detail, setDetail] = useState<Detail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [editing, setEditing] = useState<Item | null>(null);
-  const [editStatus, setEditStatus] = useState('');
-  const [editCatatan, setEditCatatan] = useState('');
-  // Alasan penolakan terpilih (dropdown). '' = belum pilih; 'Lainnya' = ketik bebas.
-  const [rejectPreset, setRejectPreset] = useState('');
-  const [saving, setSaving] = useState(false);
-  // Konfirmasi ekstra sebelum status dijadikan final (Selesai/Ditolak).
-  const [confirmFinal, setConfirmFinal] = useState(false);
+  const router = useRouter();
 
   const load = useCallback(
     async (halaman: number, baris = limit) => {
@@ -117,6 +102,8 @@ export function AdminPermohonan() {
         page: String(halaman),
       });
       if (statusFilter) params.set('status', statusFilter);
+      if (jenisFilter) params.set('jenis', jenisFilter);
+      if (wilayahFilter) params.set('wilayah', wilayahFilter);
       if (q.trim()) params.set('q', q.trim());
       const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
       const json = await res.json();
@@ -125,9 +112,13 @@ export function AdminPermohonan() {
       setTotal(json.data?.total ?? 0);
       setTotalHalaman(json.data?.totalHalaman ?? 1);
       if (json.data?.counts) setCounts(json.data.counts);
+      // Hanya dikirim di halaman 1; jangan menimpanya dengan array kosong saat
+      // petugas berpindah halaman.
+      if (json.data?.daftarJenis) setDaftarJenis(json.data.daftarJenis);
+      if (json.data?.daftarWilayah) setDaftarWilayah(json.data.daftarWilayah);
       setLoading(false);
     },
-    [statusFilter, q, limit],
+    [statusFilter, jenisFilter, wilayahFilter, q, limit],
   );
 
   // Ganti filter → selalu balik ke halaman 1, kalau tidak bisa terdampar di
@@ -135,7 +126,7 @@ export function AdminPermohonan() {
   useEffect(() => {
     setPage(1);
     load(1);
-  }, [statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [statusFilter, jenisFilter, wilayahFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const gantiHalaman = (p: number) => {
     setPage(p);
@@ -151,234 +142,21 @@ export function AdminPermohonan() {
     load(1, l);
   };
 
-  const openDetail = async (it: Item) => {
-    setDetailLoading(true);
-    setDetail(null);
-    const res = await fetch(`/api/admin/permohonan/${it.id}`);
-    const json = await res.json();
-    setDetailLoading(false);
-    if (json.data?.permohonan) {
-      setDetail(json.data.permohonan);
-    } else {
-      toast.error(json.error?.[0] ?? 'Gagal memuat detail');
-    }
-  };
-
-  const closeDetail = () => {
-    setDetail(null);
-  };
-
-  const openEdit = (it: { id: number; noregister: string; status: string; catatan: string | null; pemohon: string; jenisNama: string }) => {
-    setEditing(it as Item);
-    setEditStatus(it.status);
-    setEditCatatan(it.catatan ?? '');
-    setRejectPreset('');
-    setConfirmFinal(false);
-  };
-
-  const closeEdit = () => {
-    setEditing(null);
-    setConfirmFinal(false);
-  };
-
-  /** Klik Simpan: status final butuh konfirmasi ekstra dulu. */
-  const save = async () => {
-    if (!editing) return;
-    // Penolakan wajib disertai alasan (pilih dari dropdown atau ketik bila "Lainnya").
-    if (editStatus === 'DITOLAK' && !editCatatan.trim()) {
-      toast.error(
-        rejectPreset === 'Lainnya'
-          ? 'Tulis alasan penolakan'
-          : 'Pilih alasan penolakan'
-      );
-      return;
-    }
-    if (FINAL_STATUS.includes(editStatus) && !confirmFinal) {
-      setConfirmFinal(true);
-      return;
-    }
-    setConfirmFinal(false);
-    setSaving(true);
-    const res = await fetch(`/api/admin/permohonan/${editing.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: editStatus, catatan: editCatatan }),
-    });
-    const json = await res.json();
-    setSaving(false);
-    if (json.error?.length) {
-      toast.error(json.error[0]);
-    } else {
-      toast.success(json.success?.[0] ?? 'Tersimpan');
-      setItems((prev) =>
-        prev.map((p) => (p.id === editing.id ? { ...p, status: editStatus, catatan: editCatatan } : p))
-      );
-      // Detail tetap terbuka — status & catatan ikut diperbarui (mis. agar
-      // tombol Unduh Dokumen langsung muncul saat Selesai).
-      setDetail((prev) =>
-        prev && prev.id === editing.id ? { ...prev, status: editStatus, catatan: editCatatan } : prev
-      );
-      setEditing(null);
-    }
-  };
-
-  const payload: Record<string, unknown> =
-    detail?.payload && typeof detail.payload === 'object' ? (detail.payload as Record<string, unknown>) : {};
-  // Semua isian form (tanpa field berkas/internal), berlabel bahasa manusia.
-  const payloadEntries = payloadDataEntries(payload);
-  // Berkas: gabungan t_berkas + berkas yang hanya tercatat di payload.
-  const berkasPaths = new Set((detail?.berkas ?? []).map((b) => b.path));
-  const berkasView = [
-    ...(detail?.berkas ?? []).map((b) => ({ label: b.namaFile, path: b.path })),
-    ...payloadBerkasEntries(payload).filter((b) => !berkasPaths.has(b.path)),
-  ];
-  const detailFinal = detail ? FINAL_STATUS.includes(detail.status) : false;
+  /*
+   * Detail kini HALAMAN SENDIRI (`/dashboard/permohonan/[id]`), bukan panel
+   * yang menggantikan tabel ini.
+   *
+   * 🔴 Panel lama tidak punya URL: tidak bisa dikirim ke rekan, tidak bisa
+   * di-bookmark, dan tombol Kembali peramban melempar petugas keluar dari
+   * daftar alih-alih menutup panel. Operator OPD pun tidak punya jalan sama
+   * sekali untuk membaca alasan penolakan permohonannya.
+   *
+   * Formulir prosesnya ikut pindah ke sana — satu tempat, bukan dua.
+   */
+  const bukaDetail = (it: Item) => router.push(`/dashboard/permohonan/${it.id}`);
 
   return (
     <div className="glass-card rounded-2xl p-5 md:p-6">
-      {/* ─────────── PANEL DETAIL INLINE ─────────── */}
-      {(detail || detailLoading) ? (
-        <div>
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <Button variant="outline" size="sm" onClick={closeDetail}>
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Kembali ke tabel
-            </Button>
-            {detail && <StatusBadge status={detail.status} />}
-          </div>
-
-          {detailLoading ? (
-            <div className="flex justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-          ) : detail && (
-            <div className="space-y-4">
-              {/* Header permohonan */}
-              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                <h3 className="font-semibold text-slate-900">{detail.jenis?.nama ?? 'Permohonan'}</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  <span className="font-mono font-semibold">{detail.noregister}</span>
-                  {' '}&middot; {detail.jenis?.kategori ?? '-'}
-                  {' '}&middot; diajukan {new Date(detail.createdAt).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}
-                </p>
-              </div>
-
-              {/* Journey status */}
-              <div className="rounded-xl border border-slate-200 p-4">
-                <PermohonanJourney
-                  status={detail.status}
-                  createdAt={detail.createdAt}
-                  prosesAt={detail.prosesAt}
-                  updatedAt={detail.updatedAt}
-                />
-              </div>
-
-              {/* Pemohon */}
-              <div className="rounded-xl border border-slate-200 p-4">
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Pemohon</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                  <p className="flex items-center gap-2 text-slate-700">
-                    <User className="h-4 w-4 text-slate-400 shrink-0" />
-                    <span>
-                      {detail.user?.userFullname ?? '-'}
-                      <span className="block text-xs font-mono text-slate-400">{detail.user?.userId ?? '-'}</span>
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2 text-slate-700">
-                    <Phone className="h-4 w-4 text-slate-400 shrink-0" /> {detail.user?.userHp ?? '-'}
-                  </p>
-                  <p className="flex items-center gap-2 text-slate-700 break-all">
-                    <Mail className="h-4 w-4 text-slate-400 shrink-0" /> {detail.user?.userEmail ?? '-'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Data permohonan (payload) */}
-              {payloadEntries.length > 0 && (
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Data Permohonan</h4>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {payloadEntries.map(([k, v]) => (
-                      <div key={k} className="bg-slate-50/80 rounded-lg px-3 py-2">
-                        <dt className="text-xs text-slate-400">{labelField(k)}</dt>
-                        <dd className="text-sm font-medium text-slate-800 mt-0.5 break-words">{v}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )}
-
-              {/* Berkas lampiran — preview gambar (t_berkas ∪ payload) */}
-              <div className="rounded-xl border border-slate-200 p-4">
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
-                  Berkas Lampiran ({berkasView.length})
-                </h4>
-                <BerkasGallery items={berkasView} />
-              </div>
-
-              {/* Catatan petugas + jejak pemroses */}
-              {(detail.catatan || detail.prosesByName) && (
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  {detail.catatan && (
-                    <>
-                      <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">Catatan Petugas</h4>
-                      <p className="text-sm text-slate-700">{detail.catatan}</p>
-                    </>
-                  )}
-                  {detail.prosesByName && (
-                    <p className={`flex items-center gap-1.5 text-xs text-slate-500 ${detail.catatan ? 'mt-2 pt-2 border-t border-slate-200' : ''}`}>
-                      <User className="h-3.5 w-3.5 text-slate-400" />
-                      Diproses oleh <b className="text-slate-700">{detail.prosesByName}</b>
-                      {detail.prosesAt && (
-                        <> &middot; {new Date(detail.prosesAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</>
-                      )}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Aksi: proses (baca dulu detail di atas, baru proses di sini) */}
-              <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
-                {detail.status === 'SELESAI' && (
-                  <a
-                    href={`/api/permohonan/${detail.id}/pdf`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline" className="border-success/40 text-success hover:bg-success/10 hover:text-success">
-                      <Download className="h-4 w-4 mr-1.5" /> Unduh Dokumen (PDF)
-                    </Button>
-                  </a>
-                )}
-                {detailFinal ? (
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-500"
-                    title="Permohonan final — buka kunci lewat halaman Master"
-                  >
-                    <Lock className="h-3.5 w-3.5" /> Permohonan final &amp; terkunci
-                  </span>
-                ) : (
-                  <Button
-                    onClick={() =>
-                      openEdit({
-                        id: detail.id,
-                        noregister: detail.noregister,
-                        status: detail.status,
-                        catatan: detail.catatan,
-                        pemohon: detail.user?.userFullname ?? detail.user?.userId ?? '-',
-                        jenisNama: detail.jenis?.nama ?? '-',
-                      })
-                    }
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    Proses Permohonan
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
           {/* ─────────── TABEL ─────────── */}
           <div className="flex items-center gap-2 mb-4">
             <ClipboardList className="h-5 w-5 text-slate-700" />
@@ -431,6 +209,59 @@ export function AdminPermohonan() {
             </form>
           </div>
 
+          {/* Saringan jenis & wilayah — baris sendiri supaya tidak berdesakan
+              dengan chip status dan kotak pencarian di layar sedang. */}
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row">
+            <Select
+              value={jenisFilter || 'semua'}
+              onValueChange={(v) => setJenisFilter(v === 'semua' ? '' : v)}
+            >
+              <SelectTrigger className="w-full sm:w-72">
+                <SelectValue placeholder="Semua jenis layanan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semua">Semua jenis layanan</SelectItem>
+                {daftarJenis.map((j) => (
+                  <SelectItem key={j.id} value={String(j.id)}>
+                    {j.nama}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {daftarWilayah.length > 0 && (
+              <Select
+                value={wilayahFilter || 'semua'}
+                onValueChange={(v) => setWilayahFilter(v === 'semua' ? '' : v)}
+              >
+                <SelectTrigger className="w-full sm:w-60">
+                  <SelectValue placeholder="Semua kecamatan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="semua">Semua kecamatan</SelectItem>
+                  {daftarWilayah.map((w) => (
+                    <SelectItem key={w} value={w}>
+                      {w}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {(jenisFilter || wilayahFilter) && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setJenisFilter('');
+                  setWilayahFilter('');
+                }}
+                className="shrink-0 text-slate-500"
+              >
+                Bersihkan saringan
+              </Button>
+            )}
+          </div>
+
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -448,7 +279,7 @@ export function AdminPermohonan() {
                 <li key={it.id}>
                   <button
                     type="button"
-                    onClick={() => openDetail(it)}
+                    onClick={() => bukaDetail(it)}
                     title="Lihat detail, berkas & proses"
                     className="flex w-full items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left transition-colors hover:border-primary/40"
                   >
@@ -522,7 +353,7 @@ export function AdminPermohonan() {
                       <td className="py-2.5 pr-4">
                         <div className="flex items-center gap-2">
                           {/* Proses dilakukan dari DETAIL — baca data & berkas dulu. */}
-                          <Button size="sm" variant="outline" onClick={() => openDetail(it)} title="Lihat detail, berkas & proses">
+                          <Button size="sm" variant="outline" onClick={() => bukaDetail(it)} title="Lihat detail, berkas & proses">
                             <Eye className="h-3.5 w-3.5 mr-1.5" /> Detail
                           </Button>
                           {FINAL_STATUS.includes(it.status) && (
@@ -548,159 +379,7 @@ export function AdminPermohonan() {
             />
             </>
           )}
-        </>
-      )}
 
-      {/* Modal edit status */}
-      {editing && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={closeEdit}
-        >
-          <div
-            className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-slate-900">Proses Permohonan</h3>
-                <p className="text-xs text-slate-500 font-mono">{editing.noregister}</p>
-              </div>
-              <button onClick={closeEdit} className="text-slate-400 hover:text-slate-600">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="rounded-lg bg-slate-50 p-3 text-sm">
-                <p><span className="text-slate-500">Pemohon:</span> {editing.pemohon}</p>
-                <p><span className="text-slate-500">Jenis:</span> {editing.jenisNama}</p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">Status</label>
-                <div className="mt-1.5 grid grid-cols-2 gap-2">
-                  {STATUS_KEYS.map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      onClick={() => {
-                        setEditStatus(k);
-                        // Keluar dari DITOLAK -> reset pilihan alasan.
-                        if (k !== 'DITOLAK') setRejectPreset('');
-                      }}
-                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                        editStatus === k ? STATUS[k].cls : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      {STATUS[k].label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {editStatus === 'DITOLAK' ? (
-                <div>
-                  <label className="text-sm font-medium text-slate-700">
-                    Alasan Penolakan <span className="text-destructive">*</span>
-                  </label>
-                  <Select
-                    value={rejectPreset}
-                    onValueChange={(v) => {
-                      setRejectPreset(v);
-                      // Preset langsung jadi catatan; "Lainnya" -> kosongkan utk diketik.
-                      setEditCatatan(v === 'Lainnya' ? '' : v);
-                    }}
-                  >
-                    <SelectTrigger className="mt-1.5">
-                      <SelectValue placeholder="Pilih alasan penolakan..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ALASAN_TOLAK.map((a) => (
-                        <SelectItem key={a} value={a}>{a}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {rejectPreset === 'Lainnya' && (
-                    <Textarea
-                      className="mt-2"
-                      rows={3}
-                      value={editCatatan}
-                      onChange={(e) => setEditCatatan(e.target.value)}
-                      placeholder="Tulis alasan penolakan..."
-                      autoFocus
-                    />
-                  )}
-                  <p className="mt-1.5 text-xs text-slate-400">Alasan ini dikirim ke pemohon sebagai catatan.</p>
-                </div>
-              ) : (
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Catatan Petugas</label>
-                  <Textarea
-                    className="mt-1.5"
-                    rows={3}
-                    value={editCatatan}
-                    onChange={(e) => setEditCatatan(e.target.value)}
-                    placeholder="Catatan untuk pemohon (opsional)..."
-                  />
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" onClick={closeEdit}>Batal</Button>
-                <Button onClick={save} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  <span className={saving ? 'ml-1.5' : ''}>Simpan</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Konfirmasi ekstra: status final mengunci data */}
-            {confirmFinal && (
-              <div
-                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 p-4"
-                onClick={() => setConfirmFinal(false)}
-              >
-                <div
-                  className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="mb-3 flex items-center gap-2 text-amber-600">
-                    <AlertTriangle className="h-5 w-5" />
-                    <h4 className="font-semibold text-slate-900">
-                      Jadikan {STATUS[editStatus]?.label ?? editStatus}?
-                    </h4>
-                  </div>
-                  <p className="text-sm leading-relaxed text-slate-600">
-                    Setelah status diubah menjadi <b>{STATUS[editStatus]?.label}</b>,
-                    permohonan ini <b>terkunci dan tidak dapat diubah lagi</b> —
-                    tombol Proses akan hilang. Membuka kunci hanya bisa
-                    dilakukan lewat <b>halaman Master</b>.
-                  </p>
-                  <div className="mt-4 flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setConfirmFinal(false)}>
-                      Batal
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={save}
-                      disabled={saving}
-                      className={
-                        editStatus === 'DITOLAK'
-                          ? 'bg-destructive text-white hover:bg-destructive/90'
-                          : 'bg-success text-white hover:bg-success/90'
-                      }
-                    >
-                      {saving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
-                      Ya, saya mengerti
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

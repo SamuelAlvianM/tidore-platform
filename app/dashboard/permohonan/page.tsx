@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
+import { bolehDashboard } from '@/lib/akun-level';
 import { AdminPermohonan } from './AdminPermohonan';
 import { BackButton } from '@/components/shared/back-button';
 
@@ -8,7 +9,9 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardPermohonanPage() {
   const session = await getSession();
   if (!session) redirect('/login');
-  if (session.level > 2) redirect('/dashboard');
+  // OPD ikut — daftarnya disaring `lingkupPermohonan()` di API menjadi
+  // permohonan yang ia ajukan sendiri.
+  if (!bolehDashboard(session.level)) redirect('/dashboard');
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
+import { bolehDashboard } from '@/lib/akun-level';
 import { Footer } from '@/components/shared/footer';
 import { RiwayatList } from '@/components/shared/riwayat-list';
 import { FilePlus2, ClipboardList } from 'lucide-react';
@@ -8,13 +9,18 @@ import { FilePlus2, ClipboardList } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 /**
- * Halaman utama warga/OPD setelah login — tidak ada "dashboard":
- * langsung riwayat pengajuan + tombol ajukan permohonan & pengaturan akun.
+ * Halaman utama WARGA setelah login — tidak ada "dashboard": langsung
+ * riwayat pengajuan + tombol ajukan permohonan & pengaturan akun.
+ *
+ * ⚠️ Operator OPD dulu ikut mendarat di sini, sebab ia bukan level 1/2.
+ * Sejak ia punya kerangka dashboard sendiri, tempatnya `/dashboard/permohonan`
+ * — daftar yang sama, tapi di dalam sidebar yang memang disediakan untuknya.
  */
 export default async function UserPengajuanPage() {
   const session = await getSession();
   if (!session) redirect('/login?redirect=/user/pengajuan');
-  if (session.level <= 2) redirect('/dashboard'); // petugas tetap ke dashboard admin
+  // Petugas & OPD sama-sama memakai dashboard, bukan halaman warga ini.
+  if (bolehDashboard(session.level)) redirect('/dashboard');
 
   return (
     <div className="min-h-screen bg-background">

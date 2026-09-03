@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
+import { isPengajuInstansi } from "@/lib/akun-level";
 
 /** Menu tanpa dropdown yang href-nya situs luar (mis. portal SKM resmi)
  *  harus dibuka di tab baru, bukan lewat router Next di tab yang sama. */
@@ -906,9 +907,18 @@ export function Navbar() {
   const [logoHovered, setLogoHovered] = React.useState(false);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-  // Akun OPD (level 4): navbar disederhanakan — hanya Permohonan; pengaturan
-  // akun tetap lewat dropdown profil.
-  const isOpd = isAuthenticated && user?.level === 4;
+  /*
+   * Pengaju instansi: navbar disederhanakan — hanya Permohonan; pengaturan
+   * akun tetap lewat dropdown profil.
+   *
+   * 🔴 DULU `user?.level === 4`, DAN ITU SALAH. Level 4 adalah "developer",
+   * bukan OPD — persis jebakan yang sudah ditulis di `lib/akun-level.ts`.
+   * Akibatnya: Operator OPD sungguhan (level 5) dan 40 operator wilayah
+   * (level 41) mendapat navbar publik penuh, sementara akun developer justru
+   * yang disederhanakan. Tidak ada galat; navbar-nya cuma keliru untuk semua
+   * orang yang seharusnya terkena.
+   */
+  const isPengaju = isAuthenticated && isPengajuInstansi(user?.level);
 
   // Menu bawaan (lib/navigation.ts) + sub-menu tambahan yang dibuat admin
   // lewat dashboard. Bawaan tidak pernah tersimpan di DB sehingga tak bisa
@@ -923,7 +933,7 @@ export function Navbar() {
     [JSON.stringify(menuTambahan)],
   );
 
-  const menuItems = isOpd
+  const menuItems = isPengaju
     ? [{ title: "Permohonan", href: "/user/pengajuan" } satisfies (typeof navigationItems)[number]]
     : menuGabungan;
 
@@ -1114,7 +1124,7 @@ export function Navbar() {
                 <p className="px-3 pb-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">
                   Menu
                 </p>
-                {!isOpd && (
+                {!isPengaju && (
                   <Link
                     href="/"
                     className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#495E57]/8 hover:text-[#495E57]"

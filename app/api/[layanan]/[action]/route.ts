@@ -4,6 +4,9 @@ import { join, extname } from "path";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
+import { isAdmin, isWarga } from "@/lib/akun-level";
+import { layananTersembunyi } from "@/lib/visibilitas-server";
+import { LAYANAN_KODE } from "@/lib/layanan-kode";
 import { createNotifikasi, notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
 import { payloadBerkasEntries } from "@/lib/permohonan-display";
@@ -20,23 +23,6 @@ import { getLayananForm, validateLayananPayload } from "@/lib/layanan-forms";
  *
  * <layanan> dipetakan ke kode JenisPermohonan di DB.
  */
-const LAYANAN_KODE: Record<string, string> = {
-  "akta-kelahiran-nik-ada": "AKTA_KELAHIRAN_NIK_ADA",
-  "akta-kelahiran-nik-tidak-ada": "AKTA_KELAHIRAN_NIK_BLM_ADA",
-  "akta-kematian": "AKTA_KEMATIAN",
-  "akta-nikah": "AKTA_NIKAH",
-  "akta-perceraian": "AKTA_PERCERAIAN",
-  kia: "KIA",
-  ktpel: "KTP_EL",
-  "perpindahan-penduduk": "PINDAH",
-  kedatangan: "KEDATANGAN",
-  "konsolidasi-update-data": "KONSOLIDASI",
-  "kk-tambah-anak": "KK_TAMBAH_ANAK",
-  "kk-pisah": "KK_PISAH",
-  "kk-numpang": "KK_NUMPANG",
-  "kk-perubahan-biodata": "KK_UBAH_BIODATA",
-  "kk-cetak-ulang": "KK_CETAK_ULANG",
-};
 
 const SUBMIT_ACTIONS = ["create", "update", "postdata", "insertdata", "store"];
 
@@ -153,7 +139,36 @@ export async function POST(
 
   // ── Submit permohonan ──
   if (SUBMIT_ACTIONS.includes(action)) {
-    // Jam layanan berlaku untuk semua pembuat permohonan (warga & staff).
+    /*
+     * 🔴 LAYANAN YANG DITUTUP DINAS DITOLAK DI SINI, bukan cuma
+     * disembunyikan tombolnya.
+     *
+     * Sampai sekarang endpoint ini tidak pernah memeriksa visibilitas sama
+     * sekali. Layanan yang sudah dimatikan tetap menerima permohonan bagi
+     * siapa pun yang menyimpan tautannya, menekan Kembali, atau membuka
+     * bookmark lama — dan permohonan itu masuk ke antrean petugas seolah
+     * layanannya masih buka.
+     *
+     * ⚠️ Super Admin dikecualikan: ia yang menutup layanan, dan tetap perlu
+     * bisa memasukkan permohonan susulan atau menguji sebelum membuka
+     * kembali. Staf TIDAK dikecualikan — kalau ia masih bisa mengirim,
+     * layanan itu belum benar-benar tertutup.
+     */
+    const tersembunyi = await layananTersembunyi();
+    if (tersembunyi.has(layanan) && !isAdmin(session.level)) {
+      return fail([
+        "Layanan ini sedang tidak dibuka. Silakan hubungi Disdukcapil untuk informasi lebih lanjut.",
+      ], 403);
+    }
+
+    /*
+     * Jam layanan diperiksa SESUDAH visibilitas, bukan sebelumnya.
+     *
+     * Keduanya menolak dengan 403, tapi alasannya jauh berbeda: "buka
+     * pukul 08.00" menyuruh warga kembali lagi nanti, sementara layanan
+     * yang ditutup dinas tidak akan terbuka jam berapa pun. Menjawab
+     * dengan jam lebih dulu mengirim orang menunggu sia-sia.
+     */
     const jam = await cekJamLayananSekarang();
     if (!jam.open) return fail([jam.message], 403);
 
@@ -209,8 +224,10 @@ export async function POST(
       }),
     );
 
-    // Konfirmasi in-app untuk warga/OPD pengaju (petugas tidak perlu).
-    if (session.level > 2) {
+    // Konfirmasi in-app untuk pengaju yang mengurus permohonannya sendiri.
+    // Petugas & OPD tidak perlu: mereka melihat hasilnya langsung di
+    // dashboard, dan pemberitahuan ke diri sendiri hanya jadi derau.
+    if (isWarga(session.level)) {
       await safeNotify(() =>
         createNotifikasi({
           userId: session.uid,
@@ -224,8 +241,9 @@ export async function POST(
       );
     }
 
-    // Bila pembuatnya petugas (form "Pengajuan Baru" atas nama warga), catat ke
-    // log aktivitas. Warga/OPD (level > 2) diabaikan oleh helper.
+    // Bila pembuatnya memakai dashboard (petugas atau OPD, lewat form
+    // "Pengajuan Baru" atas nama warga), catat ke log aktivitas.
+    // Warga yang mengurus permohonannya sendiri diabaikan oleh helper.
     await catatAktivitas(
       session,
       "BUAT",

@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils';
 import {
   LAYANAN_PERMOHONAN,
   KATEGORI_LAYANAN,
+  ROUTE_KE_FORM_SLUG,
 } from '@/lib/permohonan-layanan';
+import { slugTersembunyi } from '@/lib/pelayanan-list';
+import { warnaKategori } from '@/lib/kategori';
 
 /**
  * Pemilih layanan permohonan untuk warga/OPD di dashboard.
@@ -34,7 +37,7 @@ export function PilihLayananClient({
         const res = await fetch('/api/static-content?keys=pelayanan.visibilitas');
         const j = await res.json();
         const hidden = j.data?.items?.['pelayanan.visibilitas']?.hidden;
-        if (!batal && Array.isArray(hidden)) setTersembunyi(new Set(hidden));
+        if (!batal) setTersembunyi(slugTersembunyi(hidden));
       } catch {
         // Gagal memuat = tampilkan semua layanan; bukan kondisi fatal.
       }
@@ -44,18 +47,46 @@ export function PilihLayananClient({
     };
   }, []);
 
-  const hasil = useMemo(() => {
+  /*
+   * Daftar yang lolos pencarian & visibilitas, TANPA saringan kategori —
+   * dari sinilah hitungan tiap tab diambil.
+   *
+   * ⚠️ Kalau dihitung dari seluruh daftar, tab bisa berbunyi "Akta 5" lalu
+   * terbuka kosong karena kata kuncinya tidak cocok satu pun.
+   */
+  const lolosCari = useMemo(() => {
     const cari = q.trim().toLowerCase();
     return LAYANAN_PERMOHONAN.filter((l) => {
-      if (tersembunyi.has(l.slug) || tersembunyi.has(l.title)) return false;
-      if (kategori !== 'all' && l.category !== kategori) return false;
+      /*
+       * 🔴 Dicocokkan lewat SLUG FORMULIR, bukan slug rute.
+       *
+       * Sebelumnya baris ini berbunyi `tersembunyi.has(l.slug) ||
+       * tersembunyi.has(l.title)`, sementara yang tersimpan adalah `modalType`.
+       * Tidak satu pun dari 15 layanan pernah cocok: layanan yang dimatikan
+       * dinas tetap tampil di sini, tanpa satu pun galat.
+       */
+      if (tersembunyi.has(ROUTE_KE_FORM_SLUG[l.slug] ?? l.slug)) return false;
       if (!cari) return true;
       return (
         l.title.toLowerCase().includes(cari) ||
         l.description.toLowerCase().includes(cari)
       );
     });
-  }, [q, kategori, tersembunyi]);
+  }, [q, tersembunyi]);
+
+  const jumlahKat = useMemo(() => {
+    const n: Record<string, number> = { all: lolosCari.length };
+    for (const l of lolosCari) n[l.category] = (n[l.category] ?? 0) + 1;
+    return n;
+  }, [lolosCari]);
+
+  const hasil = useMemo(
+    () =>
+      kategori === 'all'
+        ? lolosCari
+        : lolosCari.filter((l) => l.category === kategori),
+    [lolosCari, kategori],
+  );
 
   return (
     <>
@@ -72,9 +103,10 @@ export function PilihLayananClient({
 
       {/* Filter kategori */}
       <div className="mb-6 flex flex-wrap gap-2">
-        {KATEGORI_LAYANAN.map((k) => {
+        {KATEGORI_LAYANAN.filter((k) => (jumlahKat[k.id] ?? 0) > 0).map((k) => {
           const Ikon = getIcon(k.icon);
           const aktif = kategori === k.id;
+          const w = warnaKategori(k.id);
           return (
             <button
               key={k.id}
@@ -82,12 +114,20 @@ export function PilihLayananClient({
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors',
                 aktif
-                  ? 'border-transparent bg-primary text-primary-foreground'
+                  ? w.tab
                   : 'border-border bg-card text-muted-foreground hover:bg-accent',
               )}
             >
               {Ikon && <Ikon className="h-3.5 w-3.5" />}
               {k.name}
+              <span
+                className={cn(
+                  'inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-[0.65rem] font-semibold',
+                  aktif ? w.hitung : 'bg-muted text-muted-foreground',
+                )}
+              >
+                {jumlahKat[k.id] ?? 0}
+              </span>
             </button>
           );
         })}
@@ -107,10 +147,23 @@ export function PilihLayananClient({
                 href={`/user/pengajuan/baru/${l.slug}`}
                 className="group flex flex-col rounded-2xl border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
+                {/*
+                  🔴 Warnanya dari KATEGORI, bukan gradasi per-layanan.
+
+                  Gradasi lama tidak selaras kategori: Akta memakai empat warna
+                  berbeda (pink, warning, slate, destructive), sementara
+                  Perpindahan dan Data justru identik. Warnanya karena itu tidak
+                  memberi tahu apa pun — dua layanan sejenis terlihat berbeda,
+                  dua yang berbeda terlihat sama.
+
+                  ⚠️ Kotak di belakang ikon tetap `bg-primary/10` untuk SEMUA
+                  kategori; yang berbeda hanya warna glif ikonnya. Sama persis
+                  dengan pemilih layanan petugas — satu peta, dua halaman.
+                */}
                 <div
                   className={cn(
-                    'mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-white',
-                    l.color,
+                    'mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10',
+                    warnaKategori(l.category).ikon,
                   )}
                 >
                   {Ikon && <Ikon className="h-5 w-5" />}

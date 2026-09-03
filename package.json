@@ -11,7 +11,11 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "peran:periksa": "tsx scripts/periksa-peran.ts",
+    "tolak:uji": "tsx scripts/uji-tolak.ts",
+    "visibilitas:uji": "tsx scripts/uji-visibilitas.ts",
+    "akun:uji": "tsx scripts/buat-akun-uji.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

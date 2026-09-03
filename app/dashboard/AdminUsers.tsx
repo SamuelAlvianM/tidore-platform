@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
+import { isAdmin, isPetugas } from '@/lib/akun-level';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +36,9 @@ import {
   AlertTriangle,
   IdCard,
   ZoomIn,
+  Pencil,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageViewer, type GambarItem } from '@/components/shared/image-viewer';
@@ -192,24 +196,226 @@ function Baris({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+/**
+ * Sunting profil akun — panel yang tumbuh DI DALAM detail, bukan modal baru.
+ *
+ * Petugas menyunting sambil membaca data yang sedang diperbaikinya; modal
+ * menutupi persis kolom yang jadi acuannya.
+ *
+ * ⚠️ Kecamatan boleh dibiarkan kosong bila memang belum pernah terisi, tapi
+ * yang SUDAH terisi tidak bisa dikosongkan — server menolaknya. Wilayah
+ * permohonan dibaca dari sana, dan mengosongkannya membuat permohonan akun itu
+ * hilang dari seluruh rekap wilayah.
+ */
+function FormSunting({
+  detail,
+  kecamatanList,
+  onBatal,
+  onSelesai,
+}: {
+  detail: DetailUser;
+  kecamatanList: Kecamatan[];
+  onBatal: () => void;
+  onSelesai: () => void;
+}) {
+  const [f, setF] = useState({
+    nama: detail.userFullname ?? '',
+    userId: detail.userId,
+    nik: detail.userNik ?? '',
+    kk: detail.userNokk ?? '',
+    hp: detail.userHp ?? '',
+    email: detail.userEmail ?? '',
+    kecamatan: detail.userKecamatan ?? '',
+  });
+  const [simpan, setSimpan] = useState(false);
+  const ubah = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setF((p) => ({ ...p, [k]: e.target.value }));
+
+  const kirim = async () => {
+    setSimpan(true);
+    const res = await fetch(`/api/admin/users/${detail.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(f),
+    });
+    const j = await res.json();
+    setSimpan(false);
+    if (j.error?.length) {
+      toast.error(j.error[0]);
+      return;
+    }
+    toast.success(j.success?.[0] ?? 'Akun diperbarui');
+    onSelesai();
+  };
+
+  return (
+    <div className="mt-3 rounded-xl border border-primary/30 bg-primary/[0.03] p-4">
+      <h4 className="mb-3 text-sm font-semibold text-slate-900">Sunting Profil</h4>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label className="text-xs">Nama Lengkap</Label>
+          <Input value={f.nama} onChange={ubah('nama')} />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">
+            {detail.userlevelId === 3 ? 'NIK (login)' : 'Username (login)'}
+          </Label>
+          <Input value={f.userId} onChange={ubah('userId')} />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">
+            {detail.userlevelId === 4 ? 'NIK perwakilan' : 'NIK'}
+          </Label>
+          <Input value={f.nik} onChange={ubah('nik')} inputMode="numeric" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">No. Kartu Keluarga</Label>
+          <Input value={f.kk} onChange={ubah('kk')} inputMode="numeric" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">No. WhatsApp</Label>
+          <Input value={f.hp} onChange={ubah('hp')} inputMode="tel" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Email</Label>
+          <Input value={f.email} onChange={ubah('email')} type="email" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Kecamatan</Label>
+          <SearchSelect
+            value={f.kecamatan}
+            onValueChange={(v) => setF((p) => ({ ...p, kecamatan: v }))}
+            options={kecamatanList.map((k) => ({ value: k.nama, label: k.nama }))}
+            placeholder="Pilih kecamatan"
+            searchPlaceholder="Cari kecamatan…"
+            emptyText="Kecamatan tidak ditemukan."
+          />
+        </div>
+      </div>
+      <div className="mt-4 flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onBatal} disabled={simpan}>
+          Batal
+        </Button>
+        <Button size="sm" onClick={kirim} disabled={simpan}>
+          {simpan && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+          Simpan
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Setel ulang sandi akun.
+ *
+ * 🔴 Sandi TIDAK dikirim lewat surel/WhatsApp oleh sistem — ia ditampilkan
+ * sekali di layar untuk disampaikan petugas langsung kepada pemiliknya.
+ * Mengirimkannya lewat kanal yang justru sedang rusak (surel salah ketik,
+ * nomor sudah berganti) adalah persis keadaan yang membuat fitur ini perlu.
+ */
+function FormSandi({
+  detail,
+  onBatal,
+  onSelesai,
+}: {
+  detail: DetailUser;
+  onBatal: () => void;
+  onSelesai: () => void;
+}) {
+  const [sandi, setSandi] = useState('');
+  const [tampil, setTampil] = useState(false);
+  const [simpan, setSimpan] = useState(false);
+
+  const kirim = async () => {
+    setSimpan(true);
+    const res = await fetch(`/api/admin/users/${detail.id}/sandi`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: sandi }),
+    });
+    const j = await res.json();
+    setSimpan(false);
+    if (j.error?.length) {
+      toast.error(j.error[0]);
+      return;
+    }
+    toast.success(j.success?.[0] ?? 'Sandi disetel');
+    onSelesai();
+  };
+
+  return (
+    <div className="mt-3 rounded-xl border border-warning/40 bg-warning/[0.06] p-4">
+      <h4 className="mb-1 text-sm font-semibold text-slate-900">
+        Setel Ulang Sandi
+      </h4>
+      <p className="mb-3 text-xs text-slate-500">
+        Sandi baru untuk{' '}
+        <b className="text-slate-700">{detail.userFullname ?? detail.userId}</b>.
+        Sampaikan langsung kepada pemilik akun — sistem tidak mengirimkannya.
+      </p>
+      <div className="space-y-1.5">
+        <Label className="text-xs">Sandi Baru</Label>
+        <div className="relative">
+          <Input
+            value={sandi}
+            onChange={(e) => setSandi(e.target.value)}
+            type={tampil ? 'text' : 'password'}
+            placeholder="Minimal 6 karakter, jangan angka semua"
+            className="pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setTampil((v) => !v)}
+            aria-label={tampil ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
+          >
+            {tampil ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+      <div className="mt-4 flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onBatal} disabled={simpan}>
+          Batal
+        </Button>
+        <Button size="sm" onClick={kirim} disabled={simpan || !sandi}>
+          {simpan && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+          Setel Sandi
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /** Isi panel detail — dipakai panel samping (desktop) maupun modal (mobile). */
 function IsiDetail({
   detail,
   memuat,
   busy,
+  levelSaya,
+  kecamatanList,
   onAktifkan,
   onTolak,
   onNonaktif,
+  onPerbarui,
 }: {
   detail: DetailUser | null;
   memuat: boolean;
   busy: boolean;
+  /** Peran petugas yang sedang membuka — menentukan apa yang boleh disentuh. */
+  levelSaya: number;
+  kecamatanList: Kecamatan[];
   onAktifkan: () => void;
   onTolak: () => void;
   onNonaktif: () => void;
+  onPerbarui: () => void;
 }) {
   // Indeks foto identitas yang sedang dibuka di penampil layar penuh.
   const [lihatFoto, setLihatFoto] = useState<number | null>(null);
+  const [panel, setPanel] = useState<'sunting' | 'sandi' | null>(null);
+
+  // Berganti akun → panel yang terbuka untuk akun sebelumnya harus tertutup,
+  // kalau tidak formulirnya masih berisi data orang lain.
+  useEffect(() => setPanel(null), [detail?.id]);
 
   if (memuat || !detail) {
     return (
@@ -437,6 +643,54 @@ function IsiDetail({
             </Button>
           </div>
         )}
+
+        {/*
+          Sunting profil & setel sandi.
+
+          ⚠️ Akun PETUGAS hanya boleh disentuh Super Admin — menyunting
+          `userId`-nya atau menyetel sandinya sama saja dengan mengambil alih
+          akun itu. Servernya menegakkan aturan yang sama; tombol yang
+          disembunyikan bukan penjagaan.
+        */}
+        {(!isPetugas(detail.userlevelId) || isAdmin(levelSaya)) && (
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setPanel((v) => (v === 'sunting' ? null : 'sunting'))}
+            >
+              <Pencil className="h-3.5 w-3.5" /> Sunting Profil
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setPanel((v) => (v === 'sandi' ? null : 'sandi'))}
+            >
+              <KeyRound className="h-3.5 w-3.5" /> Setel Sandi
+            </Button>
+          </div>
+        )}
+
+        {panel === 'sunting' && (
+          <FormSunting
+            detail={detail}
+            kecamatanList={kecamatanList}
+            onBatal={() => setPanel(null)}
+            onSelesai={() => {
+              setPanel(null);
+              onPerbarui();
+            }}
+          />
+        )}
+        {panel === 'sandi' && (
+          <FormSandi
+            detail={detail}
+            onBatal={() => setPanel(null)}
+            onSelesai={() => setPanel(null)}
+          />
+        )}
       </div>
 
       {/* Penampil layar penuh — komponen yang sama dengan berkas permohonan. */}
@@ -565,30 +819,40 @@ export function AdminUsers() {
       .catch(() => setKecamatanList([]));
   }, []);
 
-  // Ambil detail saat baris dibuka.
-  useEffect(() => {
-    if (detailId == null) {
-      setDetail(null);
-      return;
-    }
-    let batal = false;
-    setDetailLoading(true);
-    fetch(`/api/admin/users/${detailId}`)
-      .then((r) => r.json())
-      .then((j) => {
-        if (batal) return;
+  /*
+   * Ambil detail satu akun. Dipisah dari efeknya supaya bisa DIPANGGIL ULANG
+   * sesudah penyuntingan — tanpa itu panel tetap memperlihatkan data lama dan
+   * petugas mengira simpannya gagal, lalu menyimpan dua kali.
+   */
+  const muatDetail = useCallback(
+    async (id: number) => {
+      setDetailLoading(true);
+      try {
+        const j = await (await fetch(`/api/admin/users/${id}`)).json();
         if (j.error?.length) {
           toast.error(j.error[0]);
           setDetailId(null);
           return;
         }
         setDetail(j.data ?? null);
-      })
-      .finally(() => !batal && setDetailLoading(false));
-    return () => {
-      batal = true;
-    };
-  }, [detailId]);
+      } finally {
+        setDetailLoading(false);
+      }
+    },
+    [],
+  );
+
+  const muatUlangDetail = useCallback(() => {
+    if (detailId != null) muatDetail(detailId);
+  }, [detailId, muatDetail]);
+
+  useEffect(() => {
+    if (detailId == null) {
+      setDetail(null);
+      return;
+    }
+    muatDetail(detailId);
+  }, [detailId, muatDetail]);
 
   const setStatus = async (
     id: number,
@@ -982,6 +1246,9 @@ export function AdminUsers() {
               detail={detail}
               memuat={detailLoading}
               busy={busyId === detail?.id}
+              levelSaya={myLevel}
+              kecamatanList={kecamatanList}
+              onPerbarui={() => { load(); muatUlangDetail(); }}
               onAktifkan={() => detail && setStatus(detail.id, STATUS_AKUN.AKTIF)}
               onTolak={() => {
                 if (!detail) return;
@@ -1018,6 +1285,9 @@ export function AdminUsers() {
             detail={detail}
             memuat={detailLoading}
             busy={busyId === detail?.id}
+            levelSaya={myLevel}
+            kecamatanList={kecamatanList}
+            onPerbarui={() => { load(); muatUlangDetail(); }}
             onAktifkan={() => detail && setStatus(detail.id, STATUS_AKUN.AKTIF)}
             onTolak={() => {
               if (!detail) return;

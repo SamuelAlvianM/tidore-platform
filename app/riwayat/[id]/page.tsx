@@ -1,3 +1,5 @@
+import { AlasanDitolak } from '@/components/shared/alasan-ditolak';
+import { uraikan } from '@/lib/tolak-permohonan';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
@@ -6,7 +8,7 @@ import { Footer } from '@/components/shared/footer';
 import { BerkasGallery, PermohonanJourney } from '@/components/shared/permohonan-detail';
 import { labelField, payloadDataEntries, payloadBerkasEntries } from '@/lib/permohonan-display';
 import {
-  ArrowLeft, Clock, CheckCircle2, XCircle, FileText, Download, AlertTriangle,
+  ArrowLeft, Clock, CheckCircle2, XCircle, FileText, Download,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -61,6 +63,19 @@ export default async function RiwayatDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="container mx-auto px-4 md:px-8 lg:px-16 py-10 max-w-3xl space-y-5">
+        {/*
+          Alasan penolakan berdiri PALING ATAS, di atas perjalanan permohonan.
+
+          🔴 Sebelumnya ia di bawah journey, dan isinya satu blok teks apa
+          adanya. Pemohon yang membuka halaman ini setelah ditolak sedang
+          mencari tepat satu hal; menaruhnya di bawah berarti ia harus
+          menggulir melewati diagram yang sudah jelas menunjukkan "ditolak"
+          untuk sampai ke satu-satunya kalimat yang berguna baginya.
+        */}
+        {item.status === 'DITOLAK' && (
+          <AlasanDitolak tolak={uraikan(item.catatan)} />
+        )}
+
         {/* Status + journey */}
         <div className="glass-card rounded-2xl p-5">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -78,23 +93,6 @@ export default async function RiwayatDetailPage({ params }: { params: Promise<{ 
           />
         </div>
 
-        {/* Alasan penolakan / catatan petugas */}
-        {item.status === 'DITOLAK' && (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5">
-            <div className="flex items-center gap-2 text-destructive mb-2">
-              <AlertTriangle className="w-4 h-4" />
-              <h2 className="text-sm font-semibold">Permohonan Ditolak</h2>
-            </div>
-            <p className="text-sm text-slate-700">
-              {item.catatan?.trim()
-                ? item.catatan
-                : 'Silakan hubungi petugas Disdukcapil untuk informasi alasan penolakan.'}
-            </p>
-            <p className="mt-3 text-xs text-slate-500">
-              Anda dapat memperbaiki data/berkas sesuai catatan di atas lalu mengajukan permohonan baru.
-            </p>
-          </div>
-        )}
         {item.status !== 'DITOLAK' && item.catatan && (
           <div className="glass-card rounded-2xl p-5">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Catatan dari Petugas</h2>

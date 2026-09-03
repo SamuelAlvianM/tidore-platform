@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   ZoomIn,
@@ -17,9 +18,28 @@ import { cn } from '@/lib/utils';
 /**
  * Penampil gambar layar penuh: zoom, putar, geser, dan pindah antar-berkas.
  *
- * Dipakai di dua tempat yang sama-sama menampilkan berkas permohonan —
- * halaman detail (petugas memeriksa) dan formulir pengajuan (warga memastikan
- * unggahannya terbaca). Keduanya memakai komponen ini agar perilakunya sama.
+ * Dipakai di tempat-tempat yang sama-sama menampilkan berkas permohonan atau
+ * foto identitas — halaman detail (petugas memeriksa), formulir pengajuan
+ * (warga memastikan unggahannya terbaca), dan Manajemen Akun (petugas
+ * mencocokkan foto KTP dengan NIK). Semuanya memakai komponen ini agar
+ * perilakunya sama.
+ *
+ * 🔴 DIRENDER LEWAT PORTAL KE <body>, dan itu bukan kerapian belaka.
+ *
+ * `position: fixed` + `z-[100]` TIDAK cukup. Panel Detail Akun membungkusnya
+ * dalam `sticky top-4`, dan `position: sticky` SELALU membuat stacking
+ * context — bahkan tanpa z-index. Begitu itu terjadi, `z-[100]` tidak lagi
+ * berlaku terhadap seluruh halaman, melainkan hanya di dalam panel itu;
+ * panelnya sendiri duduk di tingkat `auto` (0), sementara sidebar dashboard
+ * ber-`z-30`. Hasilnya penampil "layar penuh" muncul DI BELAKANG sidebar.
+ *
+ * ⚠️ Tidak ada galat dan angkanya tampak benar — 100 jauh lebih besar dari 30.
+ * Yang salah bukan angkanya, melainkan terhadap apa angka itu dibandingkan.
+ * Menaikkan z-index tidak akan pernah memperbaikinya; satu-satunya jalan
+ * keluar adalah keluar dari stacking context-nya.
+ *
+ * ⚠️ Portal baru dipasang SESUDAH mount. Di server `document` tidak ada, dan
+ * merendernya langsung membuat hidrasi berselisih dengan HTML server.
  */
 
 export interface GambarItem {
@@ -36,6 +56,11 @@ export function ImageViewer({
   indexAwal?: number;
   onClose: () => void;
 }) {
+  // Portal baru boleh dipasang sesudah mount: `document` tidak ada di server,
+  // dan merendernya lebih awal membuat hidrasi berselisih dengan HTML server.
+  const [siap, setSiap] = React.useState(false);
+  React.useEffect(() => setSiap(true), []);
+
   const [idx, setIdx] = React.useState(indexAwal);
   const [skala, setSkala] = React.useState(1);
   const [putar, setPutar] = React.useState(0);
@@ -79,12 +104,12 @@ export function ImageViewer({
     };
   }, [onClose, pindah, reset, items.length]);
 
-  if (!item) return null;
+  if (!item || !siap) return null;
 
   const tombol =
     'inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-white/25 disabled:opacity-30';
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex flex-col bg-black/92 backdrop-blur-sm"
       // Klik latar menutup; klik gambar/toolbar tidak.
@@ -193,7 +218,8 @@ export function ImageViewer({
       <p className="border-t border-white/10 px-4 py-2 text-center text-[0.7rem] text-white/40">
         Gulir untuk zoom · seret untuk menggeser · R putar · 0 kembalikan · Esc tutup
       </p>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

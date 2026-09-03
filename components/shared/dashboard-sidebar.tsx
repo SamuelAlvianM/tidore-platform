@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { isAdmin, isPengajuInstansi } from '@/lib/akun-level';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logoutUser } from '@/store/slices/authSlice';
@@ -113,8 +114,34 @@ const ADMIN_ONLY_HREFS = new Set([
   '/dashboard/log',
 ]);
 
+/**
+ * Menu Operator OPD — DUA saja.
+ *
+ * 🔴 Ia memakai kerangka yang sama seperti petugas, tapi bukan pekerjaannya
+ * yang sama: OPD mengajukan permohonan atas nama warga di wilayahnya, tidak
+ * memproses permohonan orang lain, tidak mengelola akun, tidak menerbitkan
+ * konten. Menu di luar dua ini akan berakhir 403 — dan tautan yang
+ * menjanjikan halaman lalu menolaknya lebih buruk daripada menu yang memang
+ * tidak ada.
+ *
+ * ⚠️ "Permohonan Saya", bukan "Permohonan": daftarnya memang cuma miliknya
+ * (disaring di API), dan judul yang sama dengan milik petugas membuatnya
+ * tampak seperti melihat permohonan seluruh kabupaten.
+ */
+const GRUP_OPD: MenuGroup[] = [
+  {
+    items: [
+      { href: '/dashboard/pengajuan-baru', label: 'Pengajuan Baru', icon: FilePlus2 },
+      { href: '/dashboard/permohonan', label: 'Permohonan Saya', icon: ClipboardList },
+    ],
+  },
+];
+
 function groupsForLevel(level: number): MenuGroup[] {
-  if (level === 1) return GROUPS;
+  // OPD instansi (5) DAN operator wilayah (41) — keduanya mengajukan atas
+  // nama warga, keduanya dapat menu yang sama.
+  if (isPengajuInstansi(level)) return GRUP_OPD;
+  if (isAdmin(level)) return GROUPS;
   // Selain menyembunyikan grup khusus admin, saring juga item admin yang
   // menyelinap di grup umum (mis. "Log Aktivitas" di grup Sistem).
   return GROUPS.filter((g) => !ADMIN_ONLY_GROUPS.has(g.title ?? ''))
@@ -122,10 +149,43 @@ function groupsForLevel(level: number): MenuGroup[] {
     .filter((g) => g.items.length > 0);
 }
 
+/**
+ * Pintasan bilah bawah (mobile) — DIIRIS dari menu yang benar-benar dimiliki
+ * peran ini, bukan daftar kedua yang ditulis tangan.
+ *
+ * 🔴 Sebelumnya `MOBILE_MAIN` disaring sendiri dengan aturannya sendiri. Dua
+ * sumber untuk satu daftar, dan yang satu tidak ikut berubah: begitu Operator
+ * OPD memakai kerangka ini, SELURUH bilahnya menawarkan halaman yang bukan
+ * miliknya dan menjawab 403 — tanpa satu pun galat, sebab menu sidebar-nya
+ * sendiri sudah benar dan dari layar lebar semuanya tampak beres.
+ */
 function mobileMainForLevel(level: number): MenuItem[] {
-  if (level === 1) return MOBILE_MAIN;
-  return MOBILE_MAIN.filter((m) => !ADMIN_ONLY_HREFS.has(m.href));
+  const grup = groupsForLevel(level);
+  const boleh = new Set(grup.flatMap((g) => g.items.map((m) => m.href)));
+  const pilihan = MOBILE_MAIN.filter((m) => boleh.has(m.href));
+
+  // Peran bermenu sedikit (OPD) hampir tidak beririsan dengan daftar kurasi
+  // petugas — pakai menunya sendiri apa adanya.
+  return pilihan.length >= 2 ? pilihan : grup.flatMap((g) => g.items).slice(0, 4);
 }
+
+/*
+ * Jumlah kolom bilah bawah, sebagai kelas UTUH.
+ *
+ * ⚠️ Jangan disusun jadi `grid-cols-${n}`. Tailwind memindai berkas sumber
+ * sebagai TEKS: kelas yang cuma lahir saat program berjalan tidak pernah ikut
+ * ke CSS, dan bilahnya akan menumpuk ke bawah tanpa satu pun galat.
+ *
+ * Angkanya mengikuti jumlah pintasan + 1 tombol "Menu". Sebelumnya dipaku 5,
+ * padahal staf hanya punya 3 pintasan dan Operator OPD hanya 2 — sisanya
+ * kolom kosong yang mendorong seluruh isi bilah ke kiri.
+ */
+const KOLOM_BILAH: Record<number, string> = {
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+  5: 'grid-cols-5',
+};
 
 const COLLAPSE_KEY = 'tidore-dash-collapsed';
 
@@ -438,6 +498,7 @@ function MobileBottomNav() {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { user } = useAppSelector((state) => state.auth);
   const level = user?.level ?? 3;
+  const pintasan = mobileMainForLevel(level);
 
   return (
     <nav
@@ -445,8 +506,8 @@ function MobileBottomNav() {
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Navigasi dashboard"
     >
-      <div className="grid grid-cols-5">
-        {mobileMainForLevel(level).map((m) => {
+      <div className={cn('grid', KOLOM_BILAH[pintasan.length + 1] ?? 'grid-cols-5')}>
+        {pintasan.map((m) => {
           const active = isActive(m.href, m.exact);
           return (
             <Link
