@@ -15,7 +15,12 @@
 import { useEffect, useState } from 'react';
 import { CalendarClock, Clock, CalendarOff, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { HARI_LABEL, JAM_TIMEZONE, type JamHari } from '@/lib/jam-layanan';
+import {
+  HARI_LABEL,
+  JAM_TIMEZONE,
+  JAM_TIMEZONE_LABEL,
+  type JamHari,
+} from '@/lib/jam-layanan';
 import { cn } from '@/lib/utils';
 
 export interface StatusJamLayanan {
@@ -26,7 +31,7 @@ export interface StatusJamLayanan {
   holidays: string[];
 }
 
-/** Ambil status jam pelayanan sekarang (WIB). loading→null selama fetch. */
+/** Ambil status jam pelayanan sekarang (zona JAM_TIMEZONE). loading→null selama fetch. */
 export function useStatusJamLayanan() {
   const [status, setStatus] = useState<StatusJamLayanan | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,8 +60,8 @@ export function useStatusJamLayanan() {
   return { loading, status, tertutup };
 }
 
-/** Indeks hari ini (0=Minggu…6=Sabtu) pada zona WIB. */
-function hariIniWib(): number {
+/** Indeks hari ini (0=Minggu…6=Sabtu) pada zona JAM_TIMEZONE. */
+function hariIniZona(): number {
   const wd = new Intl.DateTimeFormat('en-US', {
     timeZone: JAM_TIMEZONE,
     weekday: 'short',
@@ -68,7 +73,9 @@ function hariIniWib(): number {
 const URUTAN_HARI = [1, 2, 3, 4, 5, 6, 0];
 
 function formatTanggalId(ymd: string): string {
-  const d = new Date(`${ymd}T00:00:00+07:00`);
+  // Tengah hari UTC: aman dilabeli ulang di zona mana pun se-Indonesia (UTC+7..+9)
+  // tanpa meleset sehari.
+  const d = new Date(`${ymd}T12:00:00Z`);
   if (Number.isNaN(d.getTime())) return ymd;
   return new Intl.DateTimeFormat('id-ID', {
     timeZone: JAM_TIMEZONE,
@@ -88,7 +95,7 @@ export function PanelJamTutup({
   status: StatusJamLayanan;
   onBack?: () => void;
 }) {
-  const hariIni = hariIniWib();
+  const hariIni = hariIniZona();
   const todayYmd = new Intl.DateTimeFormat('en-CA', {
     timeZone: JAM_TIMEZONE,
   }).format(new Date());
@@ -150,7 +157,7 @@ export function PanelJamTutup({
                         ini ? 'font-semibold text-primary' : 'text-slate-700'
                       )}
                     >
-                      {d.mulai}–{d.selesai} WIB
+                      {d.mulai}–{d.selesai} {JAM_TIMEZONE_LABEL}
                     </span>
                   ) : (
                     <span className="text-xs font-medium text-slate-400">Tutup</span>

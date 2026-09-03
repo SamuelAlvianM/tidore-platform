@@ -4,11 +4,14 @@
  * - Tanggal libur khusus (YYYY-MM-DD) yang menutup layanan penuh.
  * - Master switch `enabled`; bila false, permohonan bisa dibuat kapan pun.
  * Disimpan di StaticContent kunci `pelayanan.jam`; berlaku untuk warga & staff.
- * Zona waktu acuan: WITA (Asia/Makassar).
+ * Zona waktu acuan: WIT (Asia/Jayapura) — Kota Tidore Kepulauan ada di Maluku
+ * Utara, UTC+9. Dipaku di sini supaya tidak ikut zona server.
  */
 
 export const JAM_LAYANAN_KEY = "pelayanan.jam";
-export const JAM_TIMEZONE = "Asia/Makassar";
+export const JAM_TIMEZONE = "Asia/Jayapura";
+/** Singkatan zona untuk ditampilkan ke user — selalu ikut JAM_TIMEZONE. */
+export const JAM_TIMEZONE_LABEL = "WIT";
 
 export interface JamHari {
   /** Hari buka atau tutup penuh. */
@@ -38,7 +41,7 @@ export const HARI_LABEL = [
   "Sabtu",
 ];
 
-/** Default: Senin–Jumat 08.00–16.00 WITA, pembatasan nonaktif. */
+/** Default: Senin–Jumat 08.00–16.00 WIT, pembatasan nonaktif. */
 export function defaultJamLayanan(): JamLayananConfig {
   return {
     enabled: false,
@@ -83,8 +86,8 @@ export function sanitizeJamLayanan(raw: unknown): JamLayananConfig {
   return { enabled: o.enabled === true, days, holidays };
 }
 
-/** Tanggal & menit saat ini pada zona WITA. */
-function nowInWib(now = new Date()): { ymd: string; day: number; minutes: number } {
+/** Tanggal & menit saat ini pada zona JAM_TIMEZONE (WIT). */
+function nowInZona(now = new Date()): { ymd: string; day: number; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: JAM_TIMEZONE,
     year: "numeric",
@@ -118,11 +121,11 @@ export interface StatusJam {
   message: string;
 }
 
-/** Apakah pembuatan permohonan diizinkan saat ini (WITA). */
+/** Apakah pembuatan permohonan diizinkan saat ini (WIT). */
 export function cekJamLayanan(cfg: JamLayananConfig, now = new Date()): StatusJam {
   if (!cfg.enabled) return { open: true, message: "" };
 
-  const { ymd, day, minutes } = nowInWib(now);
+  const { ymd, day, minutes } = nowInZona(now);
 
   if (cfg.holidays.includes(ymd)) {
     return {
@@ -144,12 +147,12 @@ export function cekJamLayanan(cfg: JamLayananConfig, now = new Date()): StatusJa
   if (minutes < start || minutes >= end) {
     return {
       open: false,
-      message: `Layanan permohonan online hari ${HARI_LABEL[day]} hanya buka pukul ${jam.mulai}–${jam.selesai} WITA.`,
+      message: `Layanan permohonan online hari ${HARI_LABEL[day]} hanya buka pukul ${jam.mulai}–${jam.selesai} ${JAM_TIMEZONE_LABEL}.`,
     };
   }
 
   return {
     open: true,
-    message: `Buka hari ${HARI_LABEL[day]} pukul ${jam.mulai}–${jam.selesai} WITA`,
+    message: `Buka hari ${HARI_LABEL[day]} pukul ${jam.mulai}–${jam.selesai} ${JAM_TIMEZONE_LABEL}`,
   };
 }
