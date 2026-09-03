@@ -3,6 +3,7 @@ import { ok } from "@/lib/api-response";
 import {
   KARTU_STATISTIK_KUNCI,
   normalizeKartu,
+  resolveKolom,
   warnaPreset,
 } from "@/lib/beranda-statistik";
 import { DKB_PERIODE_KUNCI } from "@/lib/static-content-registry";
@@ -112,18 +113,41 @@ export async function GET() {
     const pekon = demografiRows.filter((d) => d.kategori === kat && d.level === 5);
     return pekon.length ? pekon : demografiRows.filter((d) => d.kategori === kat);
   };
-  const sumCol = (kat: string, col: string) =>
-    rowsFor(kat).reduce((a, d) => a + (Number((d.data as Record<string, unknown>)?.[col]) || 0), 0);
+  /*
+   * 🔴 KOLOM YANG TIDAK ADA MENGEMBALIKAN `null`, BUKAN 0.
+   *
+   * Ini pembedaan yang paling penting di berkas ini. Sebelumnya kolom yang
+   * tidak dikenali dibaca `Number(undefined) || 0` → nol, dan beranda
+   * mencetaknya sebagai angka penduduk. Nol adalah PERNYATAAN: "kabupaten ini
+   * punya 0 kepala keluarga". Yang benar adalah "belum ada datanya" — dan
+   * keduanya tidak boleh terlihat sama.
+   *
+   * Terukur: di TIDORE tiga dari enam kartu beranda menampilkan 0 padahal
+   * datanya ada, cuma nama kolomnya `Total`. Tidak ada galat di mana pun.
+   */
+  const sumCol = (kat: string, col: string): number | null => {
+    const rows = rowsFor(kat);
+    if (!rows.length) return null;
+
+    const kunci = Object.keys((rows[0].data ?? {}) as Record<string, unknown>);
+    const nyata = resolveKolom(kunci, col);
+    if (!nyata) return null;
+
+    return rows.reduce(
+      (a, d) => a + (Number((d.data as Record<string, unknown>)?.[nyata]) || 0),
+      0,
+    );
+  };
 
   // Nilai tiap kartu mengikuti kolom yang dipilih admin; badge = persentase
   // terhadap total kolom acuan (badgeKolom) bila diset.
   const kartuDemografi = kartuKonfig.map((k) => {
-    const value = k.kategori && k.kolom ? sumCol(k.kategori, k.kolom) : 0;
+    const value = k.kategori && k.kolom ? sumCol(k.kategori, k.kolom) : null;
     const preset = warnaPreset(k.warna);
     let badge: string | undefined;
-    if (k.badgeKolom) {
+    if (k.badgeKolom && value !== null) {
       const base = sumCol(k.kategori, k.badgeKolom);
-      badge = base > 0 ? `${Math.round((value / base) * 100)}%` : undefined;
+      badge = base && base > 0 ? `${Math.round((value / base) * 100)}%` : undefined;
     }
     return {
       title: k.title,
@@ -133,6 +157,7 @@ export async function GET() {
       accent: preset.accent,
       accentBg: preset.accentBg,
       badge,
+      /** `null` = datanya belum ada. Beranda menampilkan "—", bukan 0. */
       value,
     };
   });

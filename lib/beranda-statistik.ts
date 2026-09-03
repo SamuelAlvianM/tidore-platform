@@ -59,6 +59,54 @@ const KOLOM_LABEL: Record<string, string> = {
 };
 export const labelKolom = (k: string) => KOLOM_LABEL[k] ?? k;
 
+/**
+ * Ejaan header yang menyebut KUANTITAS YANG SAMA di berkas agregat Dukcapil.
+ *
+ * 🔴 KENAPA PERLU. Importer mengambil nama kolom apa adanya dari header Excel,
+ * dan header itu tidak seragam antar berkas maupun antar kabupaten: berkas KK
+ * satu daerah menulis `KK_JML`, daerah lain `JML`, daerah lain lagi `Total`.
+ * Kartu beranda menuntut satu nama pasti, jadi kartu yang benar pun membaca
+ * kolom yang tidak ada — lalu menampilkan **0**.
+ *
+ * Terukur 3 Sep 2026: di TIDORE, "Kepala Keluarga", "Wajib KTP", dan "Sudah
+ * Rekam KTP-el" semuanya 0 di beranda padahal datanya ada — kolomnya bernama
+ * `Total`. Tidak ada galat di mana pun; angka nol terlihat seperti fakta.
+ *
+ * ⚠️ INI PENYETARAAN EJAAN, BUKAN TEBAKAN. Yang disetarakan hanya nama yang
+ * benar-benar menyebut hal yang sama: "jumlah seluruhnya".
+ *
+ * 🔴 `JML_WKTP` SENGAJA TIDAK IKUT. "Sudah rekam KTP-el" adalah kuantitas yang
+ * BERBEDA dari "jumlah wajib KTP". Menyetarakannya dengan `JML` akan
+ * menampilkan seolah SELURUH wajib KTP sudah merekam — angka resmi yang salah,
+ * dan jauh lebih berbahaya daripada kolom yang kosong.
+ */
+const SINONIM_JUMLAH = ['JML', 'JUMLAH', 'TOTAL', 'KK_JML', 'JML_KK'];
+
+/**
+ * Cari nama kolom yang benar-benar ada di sebuah baris data.
+ *
+ * Urutannya sengaja menyempit: persis → abaikan besar-kecil huruf → sinonim
+ * "jumlah". Mengembalikan `null` bila tidak ketemu — dan `null` itu HARUS
+ * dibedakan dari nol oleh pemanggilnya.
+ */
+export function resolveKolom(
+  kunciData: string[],
+  kolom: string,
+): string | null {
+  if (!kolom) return null;
+  if (kunciData.includes(kolom)) return kolom;
+
+  const naik = kolom.toUpperCase();
+  const samaAbai = kunciData.find((k) => k.toUpperCase() === naik);
+  if (samaAbai) return samaAbai;
+
+  if (SINONIM_JUMLAH.includes(naik)) {
+    const sinonim = kunciData.find((k) => SINONIM_JUMLAH.includes(k.toUpperCase()));
+    if (sinonim) return sinonim;
+  }
+  return null;
+}
+
 /** Susunan kartu bawaan — sama dengan tampilan lama sebelum bisa diatur. */
 export const DEFAULT_KARTU: KartuStatistik[] = [
   { title: "Jumlah Penduduk", icon: "Users", kategori: "jenis-kelamin", kolom: "JML", warna: "biru" },

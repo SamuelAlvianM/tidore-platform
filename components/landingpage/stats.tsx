@@ -101,7 +101,14 @@ interface KartuDemografi {
   accent: string; // kelas warna teks (badge)
   accentBg: string; // kelas gradient latar ikon
   badge?: string;
-  value: number;
+  /**
+   * 🔴 `null` = DATANYA BELUM ADA, dan itu berbeda dari nol.
+   *
+   * Nol adalah pernyataan — "kabupaten ini punya 0 kepala keluarga". Kartu yang
+   * kolom sumbernya tidak ditemukan tidak boleh membuat pernyataan itu; ia
+   * menampilkan "—". Lihat `sumCol()` di app/api/stats/route.ts.
+   */
+  value: number | null;
 }
 
 interface StatsData {
@@ -169,10 +176,22 @@ function StatCard({ title, value, icon, accent, accentBg, badge, onClick, editHi
       </div>
 
       <div>
-        <p className="text-[1.7rem] font-bold tracking-tight text-slate-900 leading-none mb-2">
-          <AnimatedNumber value={value} />
-        </p>
+        {value === null ? (
+          <p
+            className="text-[1.7rem] font-bold tracking-tight leading-none mb-2 text-slate-300"
+            title="Data untuk kartu ini belum tersedia — hubungi admin untuk mengatur sumber datanya"
+          >
+            &mdash;
+          </p>
+        ) : (
+          <p className="text-[1.7rem] font-bold tracking-tight text-slate-900 leading-none mb-2">
+            <AnimatedNumber value={value} />
+          </p>
+        )}
         <p className="text-[0.66rem] font-semibold uppercase tracking-widest text-slate-500">{title}</p>
+        {value === null && (
+          <p className="mt-1 text-[0.6rem] font-medium text-slate-400">Belum ada data</p>
+        )}
       </div>
     </button>
   );
