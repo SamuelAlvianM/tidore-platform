@@ -1950,9 +1950,9 @@
     "semantic_hash": "c1b4d58426ba86048bcaa7270ec30eaf"
   },
   "package.json": {
-    "mtime": 1788457593.175517,
-    "seen": 1788458532.4192116,
-    "ast_hash": "308cfb79841f9a33127406d6bba9f350",
+    "mtime": 1788459105.4784384,
+    "seen": 1788459752.9677596,
+    "ast_hash": "98ca9a90a8a0ff9cae0c0bb7574f3b2b",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -2064,9 +2064,9 @@
     "semantic_hash": ""
   },
   "JOURNAL.md": {
-    "mtime": 1788458627.6211696,
-    "seen": 1788458634.0818644,
-    "ast_hash": "cae718548c29893b0498ef05b6504c0b",
+    "mtime": 1788459723.5847192,
+    "seen": 1788459752.967793,
+    "ast_hash": "081a0ca637f40e0e368c4412d1c0e3a1",
     "semantic_hash": ""
   },
   "PROMPT-DISABILITAS.md": {
@@ -2187,6 +2187,12 @@
     "mtime": 1788457235.882223,
     "seen": 1788458532.4192245,
     "ast_hash": "a0940d11eca6ffb0dfb09cd4eb47d6cb",
+    "semantic_hash": ""
+  },
+  "scripts/isi-wilayah-akun.ts": {
+    "mtime": 1788459299.343984,
+    "seen": 1788459752.9677768,
+    "ast_hash": "ab99cbe6600a8060608a05a23e3b5ac5",
     "semantic_hash": ""
   }
 }
