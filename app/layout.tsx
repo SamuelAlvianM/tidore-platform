@@ -57,7 +57,7 @@ const DESKRIPSI_BAWAAN =
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3300",
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3103",
   ),
   title: {
     default: JUDUL_BAWAAN,

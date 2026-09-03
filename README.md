@@ -19,7 +19,7 @@ cp .env.example .env.local      # isi DATABASE_URL & AUTH_SECRET
 # Siapkan DB MySQL (buat database "tidore" lebih dulu), lalu:
 npm run db:push                 # buat tabel dari schema Prisma
 npm run db:seed                 # isi data dummy + akun demo
-npm run dev                     # http://localhost:3300
+npm run dev                     # http://localhost:3103
 ```
 
 ### Akun demo (setelah seed)

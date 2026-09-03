@@ -34,7 +34,7 @@ export function appUrl(path = ""): string {
   const base =
     process.env.APP_URL ??
     process.env.NEXT_PUBLIC_APP_URL ??
-    "http://localhost:3000";
+    "http://localhost:3103";
   return `${base.replace(/\/$/, "")}${path}`;
 }
 
