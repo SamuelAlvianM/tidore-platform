@@ -1,6 +1,6 @@
 # Journal — TIDORE / DAGA (`tidore-platform`)
 
-> **Terakhir diperbarui: 2026-08-08** · anak dari [`../journal.md`](../journal.md) §3.3
+> **Terakhir diperbarui: 2026-09-03** · anak dari [`../journal.md`](../journal.md) §3.3
 >
 > Project **paling mutakhir** dari tiga bersaudara. Riwayat lengkapnya (rebranding,
 > backup 15 GB, restore Laravel, ETL, cutover MySQL 8, uji 15 form, zona waktu, SEO)
@@ -188,3 +188,75 @@ dulu (PDF ikut bundle), baru `deploy/sql/2026-08-14_profil-kependudukan.sql`
 | [`../HISTORY.md`](../HISTORY.md) | §2.9–§2.13 + §H — riwayat lengkap TIDORE |
 | `../tidore-data-lama/` | backup master ~15 GB — 🔴 **jangan dihapus** |
 | `HANDOFF-SIDAKO-2026-07-21.md`, `PROMPT-DISABILITAS.md` | warisan dari SIDAKO, arsip |
+
+## 9. Sembilan poin rapat — SELESAI 3 Sep 2026
+
+Diangkut dari SIDAKO; sebagian besar berkas identik sehingga disalin lalu
+disesuaikan. Yang berbeda justru bagian terpenting: peta perannya.
+
+| # | Poin | Berkas utama |
+|---|---|---|
+| 1,3,5 | Sidebar & header pengaju instansi, dua menu | `lib/akun-level.ts`, `components/shared/dashboard-sidebar.tsx` |
+| 2 | Halaman detail permohonan tersendiri | `app/dashboard/permohonan/[id]/` |
+| 4 | Penolakan wajib alasan + rincian + keterangan | `lib/tolak-permohonan.ts`, `components/dashboard/pilih-rincian.tsx` |
+| 6 | Saringan jenis & wilayah | `app/api/admin/permohonan/route.ts` |
+| 7 | Zoom foto lepas dari sidebar (portal) | `components/shared/image-viewer.tsx` |
+| 8 | Sunting profil & setel sandi | `app/api/admin/users/[id]/`, `lib/validasi-akun.ts` |
+| 9 | Tutup-buka jenis layanan + kartu abu-abu | `lib/pelayanan-list.ts`, `lib/visibilitas-server.ts` |
+| — | Warna per kategori layanan | `lib/kategori.ts` |
+
+### 🔴 Level 41 ikut mendapat dashboard — keputusan yang perlu diketahui
+
+Namanya "operator", bukan "operator opd", jadi menurut nama ia bukan OPD.
+Tapi **35 dari 40 akunnya memiliki 972 permohonan — 40% dari seluruh
+permohonan portal ini**, dan pekerjaannya sama persis dengan OPD.
+
+Karena itu `isPengajuInstansi()` mencakup level 5 DAN 41. Memakai `isOpd`
+saja membuat mereka jatuh ke cabang terakhir `lingkupPermohonan()` dan
+melihat daftar KOSONG — termasuk permohonan yang mereka ajukan sendiri.
+
+Ketahuan hanya karena dilihat di peramban: sidebar level 41 semula
+menampilkan menu staf lengkap.
+
+### Dua cacat lama yang ikut ditemukan
+
+1. 🔴 **`navbar.tsx` memakai `level === 4` sebagai OPD.** Level 4 adalah
+   "developer" — persis jebakan yang sudah tertulis di §akun-level. Operator
+   OPD sungguhan (5) dan 40 operator wilayah (41) mendapat navbar publik
+   penuh; akun developer justru yang disederhanakan.
+2. 🔴 **213 dari 219 penolakan (97%) `catatan`-nya KOSONG.** Warga yang
+   ditolak tidak pernah diberi tahu apa pun. Enam sisanya teks bebas, dan
+   keenamnya tetap terbaca — `uraikan()` memperlakukan baris tak dikenal
+   sebagai keterangan.
+
+### Perintah baru
+
+```
+npm run peran:periksa        # adu lib/akun-level.ts dengan m_userlevels
+npm run tolak:uji            # 16 pemeriksaan penyandian penolakan
+npm run visibilitas:uji      # 10 pemeriksaan penerjemah kunci visibilitas
+npm run akun:uji             # akun uji LOKAL (OPD, wilayah, staf, admin)
+```
+
+### 🔴 Kerusakan data uji yang HARUS diketahui
+
+Saat menguji penjagaan akun, saya menyetel sandi akun **id 1 (`rayh4ze`,
+"DEVELOPER", level 2)** menjadi `apapun123` di **basis data LOKAL**. Label uji
+saya keliru — saya kira sedang menguji "sandi akun sendiri", padahal id 1
+bukan akun penguji. Sandi lamanya hash bcrypt dan tidak bisa dipulihkan.
+
+**Produksi TIDAK tersentuh** — tidak pernah ada koneksi ke sana. Yang perlu
+dilakukan pemilik akun: setel ulang sandinya di laptop, atau impor ulang
+dump. Penjagaan kodenya sendiri terbukti benar saat diuji dengan sasaran yang
+tepat (403 untuk akun sendiri).
+
+### Belum dikerjakan
+
+- **`userKecamatan` hanya terisi di 1 dari 564 akun.** Saringan wilayah karena
+  itu nyaris tidak menyaring apa pun. Nama akun memuat nama desa
+  (`admin-desagosale`, `lurah-ome`, `admin-kelurahanakelamo`) dan `m_wilayah`
+  punya 89 desa — pola yang sama dengan `wilayah:isi-akun` di SAIBATIN, tapi
+  perintahnya belum dibuat di sini.
+- Warna kategori & alur penolakan belum dilihat dari sisi WARGA di TIDORE
+  (diverifikasi penuh di SIDAKO dengan kode yang sama).
+- Branch belum di-merge ke `main`.
