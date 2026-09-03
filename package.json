@@ -15,7 +15,8 @@
     "peran:periksa": "tsx scripts/periksa-peran.ts",
     "tolak:uji": "tsx scripts/uji-tolak.ts",
     "visibilitas:uji": "tsx scripts/uji-visibilitas.ts",
-    "akun:uji": "tsx scripts/buat-akun-uji.ts"
+    "akun:uji": "tsx scripts/buat-akun-uji.ts",
+    "wilayah:isi-akun": "tsx scripts/isi-wilayah-akun.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

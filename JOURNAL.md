@@ -252,11 +252,53 @@ tepat (403 untuk akun sendiri).
 
 ### Belum dikerjakan
 
-- **`userKecamatan` hanya terisi di 1 dari 564 akun.** Saringan wilayah karena
-  itu nyaris tidak menyaring apa pun. Nama akun memuat nama desa
-  (`admin-desagosale`, `lurah-ome`, `admin-kelurahanakelamo`) dan `m_wilayah`
-  punya 89 desa — pola yang sama dengan `wilayah:isi-akun` di SAIBATIN, tapi
-  perintahnya belum dibuat di sini.
+- ~~`userKecamatan` hanya terisi di 1 dari 564 akun~~ — **SELESAI**, lihat
+  §10 di bawah.
 - Warna kategori & alur penolakan belum dilihat dari sisi WARGA di TIDORE
   (diverifikasi penuh di SIDAKO dengan kode yang sama).
 - Branch belum di-merge ke `main`.
+
+## 10. `wilayah:isi-akun` — SELESAI 3 Sep 2026
+
+Saringan wilayah berdiri di atas `users.user_kecamatan`, dan kolom itu terisi
+di **1 dari 564 akun**. Saringannya menyaring 2.458 permohonan jadi hampir nol
+tanpa satu pun galat — saringan yang tidak menemukan apa-apa terlihat persis
+seperti wilayah yang memang belum punya permohonan.
+
+```
+npm run wilayah:isi-akun              # laporan saja
+npm run wilayah:isi-akun -- --tulis   # baru menulis
+```
+
+**Hasil di basis data lokal:** 36 akun terisi, 1 dibakukan, 4 diserahkan ke
+dinas. Permohonan yang kini punya wilayah: 928 dari 2.458.
+
+| Kecamatan | Permohonan |
+|---|---|
+| OBA TENGAH | 404 |
+| OBA UTARA | 345 |
+| TIDORE SELATAN | 59 |
+| TIDORE | 57 |
+| TIDORE UTARA | 55 |
+| OBA | 9 |
+
+🔴 **Empat akun sengaja TIDAK diisi** — dilaporkan, bukan ditebak:
+
+| Akun | Permohonan | Sebab |
+|---|---|---|
+| `desa-maitarainduk` | 40 | `m_wilayah` punya MAITARA, MAITARA SELATAN/UTARA/TENGAH — **tidak ada "Maitara Induk"**. Mungkin MAITARA; mungkin bukan. Salah satu wilayah berarti 40 permohonan masuk rekap kecamatan yang keliru, dan itu angka laporan resmi. |
+| `admin-kurniawan` | 2 | nama orang, bukan desa |
+| `desa-galang` | 1 | "galang" bukan desa di Tidore |
+| `galang-opd` | 1 | idem |
+
+🔴 **Satu cacat lain ikut ketemu:** akun `rayh4ze` (level 2) menyimpan
+`"Kecamatan Tidore"`, sementara saringan mencocokkan PERSIS dengan nama di
+`m_wilayah` (`"TIDORE"`). Permohonannya karena itu lenyap dari setiap saringan
+wilayah. Perintah ini membakukan nilai yang cocok setelah imbuhan
+"kecamatan"/"kec" dilepas — pembakuan menjangkau SEMUA peran, sementara
+pengisian hanya akun instansi (hanya mereka yang nama akunnya memuat nama
+desa).
+
+⚠️ 1.529 permohonan tetap tanpa wilayah: pemiliknya akun WARGA, dan
+pendaftaran warga di TIDORE memang tidak meminta kecamatan (berbeda dengan
+SIDAKO). Itu keputusan produk, bukan data yang hilang.
