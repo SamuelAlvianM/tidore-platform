@@ -37,7 +37,6 @@ export const siteConfig = {
     siteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION_ID ?? "",
   },
 
-  recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "",
 
   /**
    * Alamat aplikasi ANTRIAN LOKET — aplikasi TERPISAH (repo `antrian-dukcapil`,

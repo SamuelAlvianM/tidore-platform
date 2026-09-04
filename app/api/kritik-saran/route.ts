@@ -1,18 +1,14 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { getSession } from "@/lib/auth";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
 
 /** Kirim kritik & saran (port frtHubungiKamiKritikSaran/postdata). */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const { nama, email, hp, pesan, recaptchaToken } = body as Record<string, string>;
+  const { nama, email, hp, pesan } = body as Record<string, string>;
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal"]);
-  }
   if (!nama?.trim() || !pesan?.trim()) {
     return fail(["Info: Nama dan pesan wajib diisi"]);
   }

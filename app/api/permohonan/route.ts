@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { getSession } from "@/lib/auth";
 import { uraikan } from "@/lib/tolak-permohonan";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
@@ -89,15 +88,11 @@ export async function POST(req: NextRequest) {
   if (!jam.open) return fail([jam.message], 403);
 
   const body = await req.json().catch(() => ({}));
-  const { jenisKode, payload, recaptchaToken } = body as {
+  const { jenisKode, payload } = body as {
     jenisKode?: string;
     payload?: unknown;
-    recaptchaToken?: string;
   };
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal"]);
-  }
   if (!jenisKode) return fail(["Info: Jenis permohonan wajib dipilih"]);
 
   const jenis = await prisma.jenisPermohonan.findUnique({ where: { kode: jenisKode } });

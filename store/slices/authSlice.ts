@@ -40,7 +40,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (
-    credentials: { user_id: string; password: string; recaptchaToken?: string },
+    credentials: { user_id: string; password: string },
     { rejectWithValue }
   ) => {
     try {
@@ -88,7 +88,6 @@ export const registerUser = createAsyncThunk(
       foto: string;
       /** Foto/scan KTP sebagai data URL JPEG (diunggah dari berkas). */
       ktp: string;
-      recaptchaToken?: string;
       /** Bukti verifikasi OTP WhatsApp dari /api/otp/verify. */
       otpBukti?: string;
     },
@@ -157,7 +156,7 @@ export const checkNikKk = createAsyncThunk(
 export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async (
-    data: { nik: string; recaptchaToken?: string },
+    data: { nik: string },
     { rejectWithValue }
   ) => {
     try {
@@ -189,7 +188,7 @@ export const forgotPassword = createAsyncThunk(
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async (
-    data: { pass1: string; pass2: string; key: string; recaptchaToken?: string },
+    data: { pass1: string; pass2: string; key: string },
     { rejectWithValue }
   ) => {
     try {

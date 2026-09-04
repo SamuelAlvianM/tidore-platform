@@ -32,7 +32,6 @@ import {
   IdCard,
   ScanLine,
 } from 'lucide-react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import Image from 'next/image';
 import { siteConfig } from '@/lib/site-config';
 import { labelKolom } from '@/lib/akun-tolak';
@@ -102,7 +101,6 @@ export default function RegisterPage() {
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { isLoading, error, isAuthenticated, success } = useAppSelector((state) => state.auth);
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [formData, setFormData] = useState({
     nama: '',
@@ -136,12 +134,8 @@ export default function RegisterPage() {
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
 
-  // reCAPTCHA hanya aktif jika site key diisi. Tanpa key (mis. saat dev),
-  // anggap langsung siap supaya tombol tidak "memuat" selamanya.
-  const recaptchaEnabled = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -321,12 +315,6 @@ export default function RegisterPage() {
     setMounted(true);
   }, []);
 
-  // Check if reCAPTCHA is ready
-  useEffect(() => {
-    if (executeRecaptcha) {
-      setRecaptchaReady(true);
-    }
-  }, [executeRecaptcha]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -523,21 +511,12 @@ export default function RegisterPage() {
       return;
     }
 
-    if (recaptchaEnabled && !executeRecaptcha) {
-      setValidationErrors(['reCAPTCHA belum siap. Silakan refresh halaman.']);
-      return;
-    }
 
     try {
-      const recaptchaToken = recaptchaEnabled && executeRecaptcha
-        ? await executeRecaptcha('register_action')
-        : undefined;
-
       const hasil = await dispatch(registerUser({
         ...formData,
         foto,
         ktp,
-        recaptchaToken,
         otpBukti: otpBukti || undefined,
       })).unwrap();
 
@@ -691,15 +670,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* reCAPTCHA Status */}
-            {!recaptchaReady && (
-              <Alert className="border-primary/30 bg-primary/10 dark:bg-primary/20 dark:border-primary/40 animate-in fade-in slide-in-from-top-2 duration-300">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <AlertDescription className="text-primary">
-                  Memuat reCAPTCHA...
-                </AlertDescription>
-              </Alert>
-            )}
 
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
@@ -756,7 +726,7 @@ export default function RegisterPage() {
                         onChange={handleInputChange}
                         onFocus={() => setFocusedField('nik')}
                         onBlur={() => setFocusedField(null)}
-                        disabled={isLoading || !recaptchaReady}
+                        disabled={isLoading}
                         maxLength={16}
                         className={kelasInput('nik', !!formData.nik, `${cincinPerbaiki('nik')} ${cincinOcr('nik')}`)}
                       />
@@ -783,7 +753,7 @@ export default function RegisterPage() {
                         onChange={handleInputChange}
                         onFocus={() => setFocusedField('kk')}
                         onBlur={() => setFocusedField(null)}
-                        disabled={isLoading || !recaptchaReady}
+                        disabled={isLoading}
                         maxLength={16}
                         className={kelasInput('kk', !!formData.kk, `${cincinPerbaiki('kk')} ${cincinOcr('kk')}`)}
                       />
@@ -813,7 +783,7 @@ export default function RegisterPage() {
                           onChange={handleInputChange}
                           onFocus={() => setFocusedField('nama')}
                           onBlur={() => setFocusedField(null)}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           className={kelasInput('nama', !!formData.nama, `pl-10 ${cincinPerbaiki('nama')} ${cincinOcr('nama')}`)}
                         />
                       </div>
@@ -838,7 +808,7 @@ export default function RegisterPage() {
                           placeholder="Pilih Kecamatan"
                           searchPlaceholder="Cari kecamatan…"
                           emptyText="Kecamatan tidak ditemukan."
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           icon={<MapPin className="h-4 w-4 shrink-0 text-slate-400" />}
                         />
                       </div>
@@ -868,7 +838,7 @@ export default function RegisterPage() {
                           onChange={handleInputChange}
                           onFocus={() => setFocusedField('hp')}
                           onBlur={() => setFocusedField(null)}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           className={kelasInput('hp', !!formData.hp, `pl-10 ${cincinPerbaiki('hp')}`)}
                         />
                       </div>
@@ -898,7 +868,7 @@ export default function RegisterPage() {
                           onChange={handleInputChange}
                           onFocus={() => setFocusedField('email')}
                           onBlur={() => setFocusedField(null)}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           className={kelasInput('email', !!formData.email, `pl-10 ${cincinPerbaiki('email')}`)}
                         />
                       </div>
@@ -996,7 +966,7 @@ export default function RegisterPage() {
                           onChange={handleInputChange}
                           onFocus={() => setFocusedField('pass')}
                           onBlur={() => setFocusedField(null)}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           className={kelasInput('pass', !!formData.pass, 'pr-10')}
                         />
                         <button
@@ -1031,7 +1001,7 @@ export default function RegisterPage() {
                           onChange={handleInputChange}
                           onFocus={() => setFocusedField('pass2')}
                           onBlur={() => setFocusedField(null)}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           className={kelasInput('pass2', !!formData.pass2, 'pr-10')}
                         />
                         <button
@@ -1067,7 +1037,7 @@ export default function RegisterPage() {
                         <CameraCapture
                           value={foto}
                           onChange={setFoto}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           tanpaUnggah
                         />
                       </div>
@@ -1131,7 +1101,7 @@ export default function RegisterPage() {
                             if (!v) setOcrPesan(null);
                           }}
                           onFileAsli={bacaKtpOtomatis}
-                          disabled={isLoading || !recaptchaReady}
+                          disabled={isLoading}
                           label="Pilih Foto KTP"
                         />
                       </div>
@@ -1202,17 +1172,12 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              disabled={isLoading || !recaptchaReady}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Memproses Pendaftaran...
-                </>
-              ) : !recaptchaReady ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Memuat reCAPTCHA...
                 </>
               ) : (
                 <>
@@ -1249,7 +1214,6 @@ export default function RegisterPage() {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-muted-foreground">
-        <p className="opacity-60">Protected by reCAPTCHA</p>
       </div>
     </div>
   );

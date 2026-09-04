@@ -8,10 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, AlertCircle, MessagesSquare, Loader2, Send } from 'lucide-react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function KritikSaranPage() {
-  const { executeRecaptcha } = useGoogleReCaptcha();
   const [form, setForm] = useState({ nama: '', hp: '', email: '', pesan: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -34,11 +32,10 @@ export default function KritikSaranPage() {
 
     setIsLoading(true);
     try {
-      const recaptchaToken = executeRecaptcha ? await executeRecaptcha('kritik_saran') : undefined;
       const res = await fetch('/api/kritik-saran', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, recaptchaToken }),
+        body: JSON.stringify({ ...form }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.[0] ?? 'Gagal mengirim kritik & saran');

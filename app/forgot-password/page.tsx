@@ -10,20 +10,16 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, CheckCircle2, KeyRound, ArrowLeft } from 'lucide-react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import Image from 'next/image';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLoading, error, success } = useAppSelector((state) => state.auth);
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  const recaptchaEnabled = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   const [nik, setNik] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -32,12 +28,6 @@ export default function ForgotPasswordPage() {
     setMounted(true);
   }, []);
 
-  // Check if reCAPTCHA is ready
-  useEffect(() => {
-    if (executeRecaptcha) {
-      setRecaptchaReady(true);
-    }
-  }, [executeRecaptcha]);
 
   useEffect(() => {
     return () => {
@@ -73,19 +63,10 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    if (recaptchaEnabled && !executeRecaptcha) {
-      setValidationErrors(['reCAPTCHA belum siap. Silakan refresh halaman.']);
-      return;
-    }
 
     try {
-      const recaptchaToken = recaptchaEnabled && executeRecaptcha
-        ? await executeRecaptcha('forgot_password_action')
-        : undefined;
-
       await dispatch(forgotPassword({
         nik,
-        recaptchaToken,
       })).unwrap();
       
       // Success - form will show success message
@@ -141,17 +122,8 @@ export default function ForgotPasswordPage() {
         
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-5">
-            {/* reCAPTCHA Status */}
-            {!recaptchaReady && (
-              <Alert className="border-primary/30 bg-primary/10 dark:bg-primary/20 dark:border-primary/40 animate-in fade-in slide-in-from-top-2 duration-300">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <AlertDescription className="text-primary">
-                  Memuat reCAPTCHA...
-                </AlertDescription>
-              </Alert>
-            )}
 
-            {recaptchaReady && !validationErrors.length && !error && !success && (
+            {!validationErrors.length && !error && !success && (
               <Alert className="border-success/30 bg-success/10 dark:bg-success/20 dark:border-success/40 animate-in fade-in slide-in-from-top-2 duration-300">
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <AlertDescription className="text-success">
@@ -222,7 +194,7 @@ export default function ForgotPasswordPage() {
                   onChange={handleInputChange}
                   onFocus={() => setFocusedField('nik')}
                   onBlur={() => setFocusedField(null)}
-                  disabled={isLoading || !recaptchaReady}
+                  disabled={isLoading}
                   maxLength={16}
                   className={`w-full transition-all duration-300 ${
                     focusedField === 'nik' 
@@ -263,17 +235,12 @@ export default function ForgotPasswordPage() {
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-[#3a4b45] to-[#495E57] text-white hover:opacity-90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              disabled={isLoading || !recaptchaReady}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Memproses...
-                </>
-              ) : !recaptchaReady ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Memuat reCAPTCHA...
                 </>
               ) : (
                 <>
@@ -309,7 +276,6 @@ export default function ForgotPasswordPage() {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-muted-foreground">
-        <p className="opacity-60">Protected by reCAPTCHA</p>
       </div>
     </div>
   );

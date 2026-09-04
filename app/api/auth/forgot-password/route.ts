@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { appUrl, sendMail } from "@/lib/mail";
 import { tplResetPassword } from "@/lib/mail-templates";
 
@@ -12,11 +11,8 @@ import { tplResetPassword } from "@/lib/mail-templates";
  */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const { nik, recaptchaToken } = body as { nik?: string; recaptchaToken?: string };
+  const { nik } = body as { nik?: string };
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal"]);
-  }
   if (!nik) return fail(["Info: NIK wajib diisi"]);
 
   const user = await prisma.user.findFirst({

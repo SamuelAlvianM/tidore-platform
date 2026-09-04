@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, UserPlus, KeyRound, ArrowRight, Search } from 'lucide-react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { STATUS_AKUN } from '@/lib/akun-status';
@@ -21,19 +20,13 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [formData, setFormData] = useState({
     user_id: '',
     password: '',
   });
 
-  // reCAPTCHA hanya aktif jika site key diisi. Tanpa key (mis. saat dev),
-  // anggap langsung siap supaya tombol tidak "memuat" selamanya.
-  const recaptchaEnabled = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
   // Petunjuk "Cek Status" saat login gagal karena status akun (menunggu/ditolak/
   // nonaktif). Disetel dari `data` respons login supaya warga langsung diarahkan.
   const [cekStatusHint, setCekStatusHint] = useState<{ status: number; nik: string } | null>(null);
@@ -51,13 +44,6 @@ export default function LoginPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Check if reCAPTCHA is ready
-  useEffect(() => {
-    if (executeRecaptcha) {
-      setRecaptchaReady(true);
-    }
-  }, [executeRecaptcha]);
 
   // Redirect setelah Redux state terupdate (backup jika handleSubmit race)
   useEffect(() => {
@@ -108,20 +94,10 @@ export default function LoginPage() {
     }
     setCekStatusHint(null);
 
-    if (recaptchaEnabled && !executeRecaptcha) {
-      setValidationErrors(['reCAPTCHA belum siap. Silakan refresh halaman.']);
-      return;
-    }
-
     try {
-      const recaptchaToken = recaptchaEnabled && executeRecaptcha
-        ? await executeRecaptcha('login_action')
-        : undefined;
-
       await dispatch(loginUser({
         user_id: formData.user_id.trim(),
         password: formData.password,
-        recaptchaToken,
       })).unwrap();
 
       // Biarkan useEffect di atas yang handle redirect setelah isAuthenticated = true
@@ -183,25 +159,6 @@ export default function LoginPage() {
         
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4 px-8">
-            {/* reCAPTCHA Not Ready Warning */}
-            {!recaptchaReady && (
-              <Alert className="border-primary/30 bg-primary/10 dark:bg-primary/20 dark:border-primary/40 animate-in fade-in slide-in-from-top-2 duration-300">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <AlertDescription className="text-primary">
-                  Memuat reCAPTCHA...
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* {recaptchaReady && !validationErrors.length && !error && (
-              <Alert className="border-success/30 bg-success/10 dark:bg-success/20 dark:border-success/40 animate-in fade-in slide-in-from-top-2 duration-300">
-                <CheckCircle2 className="h-4 w-4 text-success" />
-                <AlertDescription className="text-success">
-                  Siap untuk login
-                </AlertDescription>
-              </Alert>
-            )} */}
-
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
               <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -278,7 +235,7 @@ export default function LoginPage() {
                   onChange={handleInputChange}
                   onFocus={() => setFocusedField('user_id')}
                   onBlur={() => setFocusedField(null)}
-                  disabled={isLoading || !recaptchaReady}
+                  disabled={isLoading}
                   className={`w-full transition-all duration-300 ${
                     focusedField === 'user_id' 
                       ? 'ring-2 ring-primary border-primary shadow-lg shadow-primary/20' 
@@ -314,7 +271,7 @@ export default function LoginPage() {
                   onChange={handleInputChange}
                   onFocus={() => setFocusedField('password')}
                   onBlur={() => setFocusedField(null)}
-                  disabled={isLoading || !recaptchaReady}
+                  disabled={isLoading}
                   className={`w-full pr-10 transition-all duration-300 ${
                     focusedField === 'password' 
                       ? 'ring-2 ring-primary border-primary shadow-lg shadow-primary/20' 
@@ -366,17 +323,12 @@ export default function LoginPage() {
               type="submit"
               className="w-full text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               style={{ background: 'linear-gradient(90deg, #5c766d, #3a4b45)' }}
-              disabled={isLoading || !recaptchaReady}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Memproses...
-                </>
-              ) : !recaptchaReady ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Memuat reCAPTCHA...
                 </>
               ) : (
                 <>
@@ -416,20 +368,6 @@ export default function LoginPage() {
               </a>
             </div>
 
-            {/* Notes Section */}
-            <div className="rounded-xl p-4 space-y-2.5 border" style={{ background: 'rgba(202,138,4,0.04)', borderColor: 'rgba(202,138,4,0.15)' }}>
-              <h3 className="font-semibold text-primary text-xs uppercase tracking-wide">
-                Catatan
-              </h3>
-              <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-                <p>
-                  - Kode Aktivasi (Password Sementara) dan notifikasi Pengajuan Online dikirim melalui WhatsApp dan E-Mail
-                </p>
-                <p>
-                  - Gunakan nomor WhatsApp & E-Mail aktif saat pendaftaran. Jika belum, silahkan lengkapi akun profil pendaftaran anda dengan nomor WhatsApp dan E-Mail aktif.
-                </p>
-              </div>
-            </div>
 
             <div className="relative w-full hidden">
               <div className="absolute inset-0 flex items-center">

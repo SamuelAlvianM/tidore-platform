@@ -2,23 +2,18 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const MAX_AGE_MS = 60 * 60 * 1000; // 1 jam
 
 /** Reset password memakai kode (key) dari permintaan lupa password. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const { pass1, pass2, key, recaptchaToken } = body as {
+  const { pass1, pass2, key } = body as {
     pass1?: string;
     pass2?: string;
     key?: string;
-    recaptchaToken?: string;
   };
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal"]);
-  }
   if (!key) return fail(["Info: Kode reset tidak valid"]);
   if (!pass1 || !pass2) return fail(["Info: Password wajib diisi"]);
   if (pass1.length < 6) return fail(["Info: Password minimal 6 karakter"]);

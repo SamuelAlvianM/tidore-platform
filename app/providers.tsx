@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { Toaster } from "sonner";
 import StoreProvider from "@/store/StoreProvider";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useAppDispatch } from "@/store/hooks";
 import { verifySession } from "@/store/slices/authSlice";
 import { InlineEditProvider } from "@/components/konten/inline-edit";
@@ -19,8 +18,6 @@ function SessionHydrator() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-
   const inner = (
     <>
       <SessionHydrator />
@@ -36,17 +33,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </>
   );
 
-  // Tanpa site key, jangan render provider reCAPTCHA — memberi key kosong
-  // membuat skrip Google gagal dimuat dan tombol "memuat" tanpa henti.
-  if (!recaptchaKey) {
-    return <StoreProvider>{inner}</StoreProvider>;
-  }
-
-  return (
-    <StoreProvider>
-      <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
-        {inner}
-      </GoogleReCaptchaProvider>
-    </StoreProvider>
-  );
+  return <StoreProvider>{inner}</StoreProvider>;
 }

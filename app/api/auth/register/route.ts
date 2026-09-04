@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { sendMail } from "@/lib/mail";
 import { tplRegistrasiDiterima } from "@/lib/mail-templates";
 import { cekBukti, normalisasiHp, otpWajib } from "@/lib/otp";
@@ -30,13 +29,8 @@ export async function POST(req: NextRequest) {
     kecamatan,
     foto,
     ktp,
-    recaptchaToken,
     otpBukti,
   } = body as Record<string, string>;
-
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal, harap dicoba kembali (N-00)"]);
-  }
 
   // Validasi wajib
   if (!nama || !nik || !kk || !hp || !email || !pass || !pass2) {
