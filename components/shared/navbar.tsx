@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
-import { isPengajuInstansi } from "@/lib/akun-level";
+import { bolehDashboard, isPengajuInstansi } from "@/lib/akun-level";
 
 /** Menu tanpa dropdown yang href-nya situs luar (mis. portal SKM resmi)
  *  harus dibuka di tab baru, bukan lewat router Next di tab yang sama. */
@@ -776,9 +776,22 @@ function AuthArea({
 
   const displayName = user?.name || user?.user_id || "Pengguna";
   // Petugas (level 1-2) ke dashboard admin; warga/OPD langsung ke pengajuan.
-  const isPetugas = (user?.level ?? 3) <= 2;
-  const areaHref = isPetugas ? "/dashboard" : "/user/pengajuan";
-  const areaLabel = isPetugas ? "Dashboard" : "Pengajuan Saya";
+  /*
+   * 🔴 `level <= 2` MENYINGKIRKAN OPD dari dashboardnya sendiri.
+   *
+   * Sejak akun instansi punya dashboard beserta sidebar-nya (Pengajuan Baru &
+   * Permohonan Saya), tautan "area saya" di header harus mengantar ke sana.
+   * Dengan syarat lama, OPD melihat header yang menunjuk `/user/pengajuan` —
+   * halaman warga — sementara sidebar-nya ada di tempat lain. Satu akun, dua
+   * pintu masuk berbeda, dan tak ada satu pun yang memberitahu mana yang benar.
+   *
+   * `bolehDashboard` adalah syarat yang SAMA dengan yang dipakai penjaga rute
+   * `/dashboard`. Menyalin ambang levelnya di sini berarti keduanya bisa
+   * berselisih diam-diam saat peran baru ditambahkan.
+   */
+  const punyaDashboard = bolehDashboard(user?.level);
+  const areaHref = punyaDashboard ? "/dashboard" : "/user/pengajuan";
+  const areaLabel = punyaDashboard ? "Dashboard" : "Pengajuan Saya";
   // Dropdown akun sengaja dijaga tetap ringkas: petugas → Dashboard, warga/OPD
   // → Pengajuan Saya, keduanya + Pengaturan Akun. Menu "Ajukan Permohonan"
   // TIDAK ditaruh di sini karena jalurnya sudah ada di tempat yang tepat:
