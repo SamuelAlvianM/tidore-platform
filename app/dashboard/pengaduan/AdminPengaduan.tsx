@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, MessageSquare, X, CheckCircle2, Clock, Mail, Phone, User } from 'lucide-react';
+import { ImageViewer } from '@/components/shared/image-viewer';
 
 interface Item {
   id: number;
@@ -60,6 +61,16 @@ export function AdminPengaduan() {
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<Item | null>(null);
+  /*
+   * Indeks foto bukti yang sedang dibuka layar penuh; null = tertutup.
+   *
+   * 🔴 Sebelumnya foto dibuka lewat `<a target="_blank">` — petugas terlempar
+   * ke tab kosong berisi berkas mentah, tanpa zoom, tanpa putar, tanpa cara
+   * pindah ke foto berikutnya, dan harus menutup tab untuk kembali. Foto bukti
+   * dari ponsel warga hampir selalu miring dan beresolusi besar; justru di
+   * sanalah putar dan zoom paling dibutuhkan.
+   */
+  const [lihatFoto, setLihatFoto] = useState<number | null>(null);
   const [balasan, setBalasan] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -98,6 +109,7 @@ export function AdminPengaduan() {
       toast.success(json.success?.[0] ?? 'Tersimpan');
       const newStatus = status ?? detail.status;
       setItems((prev) => prev.map((p) => (p.id === detail.id ? { ...p, status: newStatus, balasan } : p)));
+      setLihatFoto(null);
       setDetail(null);
     }
   };
@@ -166,14 +178,14 @@ export function AdminPengaduan() {
 
       {/* Modal detail */}
       {detail && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4" onClick={() => setDetail(null)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4" onClick={() => { setLihatFoto(null); setDetail(null); }}>
           <div className="my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-slate-900">{detail.subjek ?? 'Pengaduan'}</h3>
                 <div className="mt-1"><StatusBadge status={detail.status} /></div>
               </div>
-              <button onClick={() => setDetail(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => { setLihatFoto(null); setDetail(null); }} className="cursor-pointer text-slate-400 hover:text-slate-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -196,18 +208,17 @@ export function AdminPengaduan() {
                           Bukti Foto ({foto.length})
                         </p>
                         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                          {foto.map((src) => (
-                            <a
+                          {foto.map((src, i) => (
+                            <button
                               key={src}
-                              href={src}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block aspect-square overflow-hidden rounded-lg border border-slate-200 bg-white transition-opacity hover:opacity-90"
-                              title="Buka foto ukuran penuh"
+                              type="button"
+                              onClick={() => setLihatFoto(i)}
+                              className="block aspect-square cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white transition-opacity hover:opacity-90"
+                              title="Lihat foto — bisa diperbesar, diputar, dan digeser"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element -- berkas privat dilayani route ber-sesi */}
-                              <img src={src} alt="Bukti foto pengaduan" className="h-full w-full object-cover" />
-                            </a>
+                              <img src={src} alt={`Bukti foto pengaduan ${i + 1}`} className="h-full w-full object-cover" />
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -235,6 +246,23 @@ export function AdminPengaduan() {
             </div>
           </div>
         </div>
+      )}
+
+      {/*
+        ⚠️ Dipasang DI LUAR panel detail. Penampilnya memakai portal ke <body>,
+        tapi panel pengaduan punya konteks penumpukannya sendiri; menaruh
+        pemicunya di dalam sementara panelnya di luar membuat urutan tutup jadi
+        rancu — Esc akan menutup keduanya sekaligus.
+      */}
+      {detail && lihatFoto !== null && (
+        <ImageViewer
+          items={pisahBukti(detail.isi).foto.map((src, i) => ({
+            src,
+            judul: `Bukti foto ${i + 1} — ${detail.nama}`,
+          }))}
+          indexAwal={lihatFoto}
+          onClose={() => setLihatFoto(null)}
+        />
       )}
     </div>
   );
