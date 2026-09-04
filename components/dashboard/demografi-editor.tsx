@@ -29,6 +29,13 @@ import {
 } from '@/lib/beranda-statistik';
 import { getIcon } from '@/lib/icon-map';
 import { IconColumnInput } from '@/components/konten/field-editor';
+import { PemilihPeriode } from '@/components/shared/pemilih-periode';
+import {
+  kueriPeriode,
+  labelPeriode,
+  type Periode,
+  type PeriodeTersedia,
+} from '@/lib/periode-demografi';
 
 interface EditRow {
   _id: string;
@@ -293,11 +300,18 @@ export function DemografiEditor({
   kategori,
   label,
   kartuKolom,
+  periode,
+  periodeTersedia = [],
+  onPeriode,
   open,
   onOpenChange,
   onSaved,
 }: {
   kategori: string;
+  /** Periode DKB yang sedang disunting. Semua muat/simpan terbatas padanya. */
+  periode?: Periode | null;
+  periodeTersedia?: PeriodeTersedia[];
+  onPeriode?: (p: Periode) => void;
   label: string;
   /** Kolom kartu beranda yang sedang diedit (saat dibuka dari klik kartu).
    *  Menentukan kartu spesifik yang di-highlight & diperbarui — kartu lain
@@ -365,7 +379,8 @@ export function DemografiEditor({
     if (!open) return;
     setDetail(null);
     setLoading(true);
-    fetch(`/api/admin/demografi?kategori=${encodeURIComponent(kategori)}`)
+    const q = kueriPeriode(periode);
+    fetch(`/api/admin/demografi?kategori=${encodeURIComponent(kategori)}${q ? `&${q}` : ''}`)
       .then((r) => r.json())
       .then((j) => {
         const k: string[] = j.data?.kolom?.length ? j.data.kolom : ['L', 'P', 'JML'];
@@ -377,7 +392,12 @@ export function DemografiEditor({
       })
       .catch(() => toast.error('Gagal memuat data'))
       .finally(() => setLoading(false));
-  }, [open, kategori]);
+    /*
+     * 🔴 Bergantung pada NILAI tahun/semester, bukan objek `periode`.
+     * Objeknya bisa beridentitas baru tiap render induk tanpa isinya berubah,
+     * dan itu akan memuat ulang tabel ratusan baris berkali-kali percuma.
+     */
+  }, [open, kategori, periode?.tahun, periode?.semester]);
 
   const isJK = useMemo(
     () => kolom.length === 3 && kolom.includes('L') && kolom.includes('P') && kolom.includes('JML'),
@@ -543,6 +563,12 @@ export function DemografiEditor({
   async function parseFiles(fileList: FileList): Promise<ParsedRow[] | null> {
     const form = new FormData();
     form.append('kategori', kategori);
+    if (periode) {
+      // Berkas diadu dengan angka periode INI, bukan periode lain — kalau
+      // tidak, tiap wilayah muncul sebagai konflik palsu.
+      form.append('tahun', String(periode.tahun));
+      form.append('semester', String(periode.semester));
+    }
     Array.from(fileList).forEach((f) => form.append('files', f));
     const res = await fetch('/api/admin/demografi/parse', { method: 'POST', body: form });
     const j = await res.json();
@@ -709,7 +735,11 @@ export function DemografiEditor({
       const res = await fetch('/api/admin/demografi', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kategori, rows: all }),
+        body: JSON.stringify({
+          kategori,
+          rows: all,
+          ...(periode ? { tahun: periode.tahun, semester: periode.semester } : {}),
+        }),
       });
       const j = await res.json();
       if (j.error?.length) {
@@ -771,14 +801,29 @@ export function DemografiEditor({
             </>
           ) : (
             <>
-              <h1 className="text-lg font-bold text-slate-900">Edit Data — {label}</h1>
+              <h1 className="flex flex-wrap items-center gap-2 text-lg font-bold text-slate-900">
+                Edit Data — {label}
+                {/*
+                  Periodenya menempel di JUDUL, bukan tersembunyi di pojok.
+                  Petugas mengedit angka penduduk resmi; pertanyaan "ini
+                  semester berapa?" harus terjawab tanpa mencari.
+                */}
+                {periode && (
+                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                    {labelPeriode(periode.tahun, periode.semester)}
+                  </span>
+                )}
+              </h1>
               <p className="text-xs text-slate-500">
                 <b>Import Excel</b> agregat (kecamatan). Klik <b>Detail</b> di kanan tiap kecamatan
                 untuk mengelola / import data desanya di halaman tersendiri.{' '}
                 {isJK && 'Kolom Jumlah dihitung otomatis. '}
                 Kode 6 digit = kecamatan, 10 digit = desa. Klik{' '}
                 <Star className="inline h-3 w-3 fill-amber-400 text-amber-400" /> pada judul
-                kolom untuk mengatur <b>kartu statistik beranda</b>-nya.
+                kolom untuk mengatur <b>kartu statistik beranda</b>-nya. Perubahan berlaku
+                untuk{' '}
+                <b>{periode ? labelPeriode(periode.tahun, periode.semester) : 'periode terpilih'}</b>{' '}
+                saja; periode lain tidak tersentuh.
               </p>
             </>
           )}
@@ -789,8 +834,17 @@ export function DemografiEditor({
             asChild
             title={`Unduh data ${label} tersimpan sebagai Excel`}
           >
+            {onPeriode && !detail && (
+              <PemilihPeriode
+                nilai={periode}
+                tersedia={periodeTersedia}
+                onPilih={onPeriode}
+                bolehBaru
+                ukuran="kecil"
+              />
+            )}
             <a
-              href={`/api/admin/demografi/export?kategori=${encodeURIComponent(kategori)}`}
+              href={`/api/admin/demografi/export?kategori=${encodeURIComponent(kategori)}&${kueriPeriode(periode)}`}
               download
             >
               <Download className="mr-1.5 h-4 w-4" /> Export Excel

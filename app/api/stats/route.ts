@@ -6,7 +6,8 @@ import {
   resolveKolom,
   warnaPreset,
 } from "@/lib/beranda-statistik";
-import { DKB_PERIODE_KUNCI } from "@/lib/static-content-registry";
+import { labelPeriodePanjang, periodeDariQuery } from "@/lib/periode-demografi";
+import { periodeTersedia, pilihPeriode } from "@/lib/demografi-periode";
 
 const BULAN_PENDEK = [
   "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
@@ -20,7 +21,7 @@ const BULAN_PENDEK = [
  * - Kependudukan: rekap demografi (sumber DKB, placeholder di
  *   lib/demografi-data.ts sampai model rekap DB tersedia).
  */
-export async function GET() {
+export async function GET(req: Request) {
   const now = new Date();
   const startBulanIni = new Date(now.getFullYear(), now.getMonth(), 1);
   const start6Bulan = new Date(now.getFullYear(), now.getMonth() - 5, 1);
@@ -38,6 +39,21 @@ export async function GET() {
     ...new Set(kartuKonfig.map((k) => k.kategori).filter(Boolean)),
   ];
 
+  /*
+   * Periode yang ditampilkan. Warga boleh memilih lewat `?tahun&semester`;
+   * tanpa itu, periode TERBARU yang punya data.
+   *
+   * 🔴 Angkanya WAJIB disaring periode. Sejak tabel ini bisa menyimpan dua
+   * semester berdampingan, kueri tanpa saringan menjumlahkan keduanya —
+   * beranda akan mengumumkan penduduk dua kali lipat.
+   */
+  const dimintaPeriode = periodeDariQuery(new URL(req.url).searchParams);
+  const daftarPeriode = await periodeTersedia();
+  const periode = pilihPeriode(
+    dimintaPeriode === false ? null : dimintaPeriode,
+    daftarPeriode,
+  );
+
   const [
     total,
     selesai,
@@ -47,7 +63,6 @@ export async function GET() {
     grouped,
     recent,
     demografiRows,
-    periodeRow,
   ] = await Promise.all([
     prisma.permohonan.count(),
     prisma.permohonan.count({ where: { status: "SELESAI" } }),
@@ -67,17 +82,17 @@ export async function GET() {
     // Rekap demografi hasil import Excel untuk kategori yang dipakai kartu.
     // Angka per kategori dihitung dari data pekon (level 5) bila ada — konsisten
     // dengan tabel publik yang menjumlahkan pekon; fallback ke baris kecamatan.
-    prisma.demografiWilayah.findMany({
-      where: {
-        level: { in: [4, 5] },
-        kategori: { in: kategoriSet.length ? kategoriSet : ["__none__"] },
-      },
-      select: { kategori: true, level: true, data: true },
-    }),
-    prisma.staticContent.findUnique({
-      where: { kunci: DKB_PERIODE_KUNCI },
-      select: { konten: true },
-    }),
+    periode
+      ? prisma.demografiWilayah.findMany({
+          where: {
+            tahun: periode.tahun,
+            semester: periode.semester,
+            level: { in: [4, 5] },
+            kategori: { in: kategoriSet.length ? kategoriSet : ["__none__"] },
+          },
+          select: { kategori: true, level: true, data: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   // Nama jenis untuk layanan terpopuler.
@@ -176,9 +191,19 @@ export async function GET() {
 
     // ── Kependudukan (demografi / DKB) — kartu dinamis sesuai konfigurasi ──
     kartuDemografi,
-    periodeKependudukan:
-      (periodeRow?.konten as { label?: string } | null)?.label ||
-      process.env.NEXT_PUBLIC_DKB_PERIODE ||
-      "DKB Semester II 2024",
+    /*
+     * 🔴 Label ini DIHITUNG dari data, bukan diketik di konten statis.
+     *
+     * Sebelumnya `beranda.dkb-periode` sekadar tulisan bebas: badge bisa
+     * berbunyi "Semester II 2024" sementara angka di bawahnya sudah berasal
+     * dari semester lain, dan tak ada satu pun tanda di layar. Untuk angka
+     * resmi kependudukan, keterangan periode yang keliru lebih berbahaya
+     * daripada tidak ada keterangan sama sekali.
+     */
+    periodeKependudukan: periode
+      ? labelPeriodePanjang(periode.tahun, periode.semester)
+      : null,
+    periode,
+    periodeTersedia: daftarPeriode,
   });
 }

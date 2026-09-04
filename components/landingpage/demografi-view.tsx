@@ -13,6 +13,13 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DEMOGRAFI_KATEGORI, getDemografiKategori } from '@/lib/demografi-kategori';
 import { DemografiEditor } from '@/components/dashboard/demografi-editor';
+import { PemilihPeriode } from '@/components/shared/pemilih-periode';
+import {
+  kueriPeriode,
+  labelPeriode,
+  type Periode,
+  type PeriodeTersedia,
+} from '@/lib/periode-demografi';
 
 interface Row {
   kode: string;
@@ -49,6 +56,13 @@ export function DemografiView({
   onDataChanged?: () => void;
 }) {
   const [kategori, setKategori] = useState(initialKategori);
+  /*
+   * Periode yang dilihat. `null` = biarkan server memilih yang terbaru —
+   * keadaan awal yang benar untuk pengunjung yang belum memilih apa pun.
+   */
+  const [dimintaPeriode, setDimintaPeriode] = useState<Periode | null>(null);
+  const [periodeDipakai, setPeriodeDipakai] = useState<Periode | null>(null);
+  const [periodeTersedia, setPeriodeTersedia] = useState<PeriodeTersedia[]>([]);
   const [kolom, setKolom] = useState<string[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,28 +76,36 @@ export function DemografiView({
 
   const loadKecamatan = useCallback(() => {
     setLoading(true);
-    return fetch(`/api/demografi?kategori=${encodeURIComponent(kategori)}`)
+    const q = kueriPeriode(dimintaPeriode);
+
+    return fetch(`/api/demografi?kategori=${encodeURIComponent(kategori)}${q ? `&${q}` : ''}`)
       .then((r) => r.json())
       .then((j) => {
         setKolom(j.data?.kolom ?? []);
         setRows(j.data?.items ?? []);
+        setPeriodeDipakai(j.data?.periode ?? null);
+        setPeriodeTersedia(j.data?.periodeTersedia ?? []);
       })
       .catch(() => {
         setKolom([]);
         setRows([]);
       })
       .finally(() => setLoading(false));
-  }, [kategori]);
+  }, [kategori, dimintaPeriode?.tahun, dimintaPeriode?.semester]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(`/api/demografi?kategori=${encodeURIComponent(kategori)}`)
+    const q = kueriPeriode(dimintaPeriode);
+
+    fetch(`/api/demografi?kategori=${encodeURIComponent(kategori)}${q ? `&${q}` : ''}`)
       .then((r) => r.json())
       .then((j) => {
         if (cancelled) return;
         setKolom(j.data?.kolom ?? []);
         setRows(j.data?.items ?? []);
+        setPeriodeDipakai(j.data?.periode ?? null);
+        setPeriodeTersedia(j.data?.periodeTersedia ?? []);
       })
       .catch(() => {
         if (!cancelled) {
@@ -95,14 +117,22 @@ export function DemografiView({
     return () => {
       cancelled = true;
     };
-  }, [kategori]);
+  }, [kategori, dimintaPeriode?.tahun, dimintaPeriode?.semester]);
 
   const openDetail = useCallback(
     (kec: { kode: string; wilayah: string }) => {
       setDetail(kec);
       setDetailLoading(true);
       setDetailRows([]);
-      fetch(`/api/demografi?kategori=${encodeURIComponent(kategori)}&parent=${encodeURIComponent(kec.kode)}`)
+      /*
+       * 🔴 Periodenya ikut. Tabel ringkasan menampilkan periode yang dipilih;
+       * kalau rinciannya diambil tanpa periode, server memberi yang TERBARU —
+       * dan totalnya tidak akan cocok dengan baris yang baru saja diklik.
+       */
+      fetch(
+        `/api/demografi?kategori=${encodeURIComponent(kategori)}&parent=${encodeURIComponent(kec.kode)}` +
+          (periodeDipakai ? `&${kueriPeriode(periodeDipakai)}` : ''),
+      )
         .then((r) => r.json())
         .then((j) => {
           setDetailKolom(j.data?.kolom ?? kolom);
@@ -111,7 +141,7 @@ export function DemografiView({
         .catch(() => setDetailRows([]))
         .finally(() => setDetailLoading(false));
     },
-    [kategori, kolom],
+    [kategori, kolom, periodeDipakai],
   );
 
   const total = sumKolom(rows, kolom);
@@ -119,6 +149,35 @@ export function DemografiView({
 
   return (
     <div className="space-y-5">
+      {/* Periode data — di ATAS pemilih kategori: periodenya berlaku untuk
+          semua kategori, jadi ia keputusan yang lebih dulu diambil. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-slate-500">
+          {periodeDipakai ? (
+            <>
+              Menampilkan data{' '}
+              <b className="text-slate-700">
+                {labelPeriode(periodeDipakai.tahun, periodeDipakai.semester)}
+              </b>
+              .
+            </>
+          ) : (
+            'Memuat periode data…'
+          )}
+          {periodeTersedia.length > 1 && ' Pilih periode lain di kanan.'}
+        </p>
+        {/* Warga hanya boleh berpindah ke periode yang ADA datanya — memilih
+            periode kosong cuma menghasilkan tabel kosong yang terlihat rusak.
+            Petugas (editable) boleh membuat periode baru. */}
+        <PemilihPeriode
+          nilai={periodeDipakai}
+          tersedia={periodeTersedia}
+          onPilih={setDimintaPeriode}
+          bolehBaru={editable}
+          ukuran="kecil"
+        />
+      </div>
+
       {/* Pemilih kategori + tombol edit (mode admin) */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-2">
@@ -148,7 +207,13 @@ export function DemografiView({
             className="gap-1.5"
             title={`Unduh data ${getDemografiKategori(kategori)?.label ?? ''} sebagai Excel`}
           >
-            <a href={`/api/demografi/export?kategori=${encodeURIComponent(kategori)}`} download>
+            <a
+              href={
+                `/api/demografi/export?kategori=${encodeURIComponent(kategori)}` +
+                (periodeDipakai ? `&${kueriPeriode(periodeDipakai)}` : '')
+              }
+              download
+            >
               <Download className="h-4 w-4" /> Export Excel
             </a>
           </Button>

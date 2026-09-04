@@ -4,6 +4,7 @@ import {
   DEMOGRAFI_KATEGORI,
   getDemografiKategori,
 } from "@/lib/demografi-kategori";
+import type { Periode } from "@/lib/periode-demografi";
 
 /**
  * Penyusun workbook Excel data demografi — dipakai endpoint export admin
@@ -49,7 +50,9 @@ function addSheet(wb: ExcelJS.Workbook, label: string, rows: DbRow[]) {
  * Susun workbook untuk satu kategori (bila diisi) atau semua kategori
  * (1 sheet per kategori). Mengembalikan null bila tidak ada data sama sekali.
  */
-export async function buildDemografiWorkbook(kategori?: string) {
+export async function buildDemografiWorkbook(kategori?: string,
+  periode?: Periode | null,
+) {
   const wb = new ExcelJS.Workbook();
   wb.creator = "DAGA Disdukcapil Tidore Kepulauan";
   wb.created = new Date();
@@ -61,7 +64,10 @@ export async function buildDemografiWorkbook(kategori?: string) {
   let total = 0;
   for (const k of targets) {
     const rows = await prisma.demografiWilayah.findMany({
-      where: { kategori: k.slug },
+      where: {
+        kategori: k.slug,
+        ...(periode ? { tahun: periode.tahun, semester: periode.semester } : {}),
+      },
       orderBy: { kode: "asc" },
       select: { kode: true, wilayah: true, level: true, data: true },
     });

@@ -6,6 +6,13 @@
  */
 import { PrismaClient } from '@prisma/client';
 import mysql from 'mysql2/promise';
+import {
+  SEMESTER_BAWAAN,
+  TAHUN_BAWAAN,
+  labelPeriode,
+  semesterSah,
+  tahunSah,
+} from '../lib/periode-demografi';
 
 const prisma = new PrismaClient();
 const SOURCE = { host: 'localhost', port: 3306, user: 'root', password: 'saibatin123', database: 'tidore_lama' };
@@ -54,8 +61,28 @@ async function main() {
     }
   }
 
-  console.log('🧹 reset DemografiWilayah...');
-  await prisma.demografiWilayah.deleteMany();
+  /*
+   * 🔴 Reset DIBATASI SATU PERIODE.
+   *
+   * `deleteMany()` tanpa penyaring dulu tidak berbahaya — tabelnya cuma bisa
+   * menampung satu keadaan. Sejak ada tahun & semester, memanggilnya polos
+   * berarti ETL sekali jalan menghapus SELURUH riwayat DKB bertahun-tahun,
+   * termasuk periode yang tidak sedang diimpor.
+   *
+   * Periodenya bisa diatur: `--tahun=2025 --semester=1`. Tanpa itu, periode
+   * bawaan — data warisan yang dibaca ETL ini memang DKB Semester II 2024.
+   */
+  const argTahun = process.argv.find((a) => a.startsWith('--tahun='))?.split('=')[1];
+  const argSemester = process.argv.find((a) => a.startsWith('--semester='))?.split('=')[1];
+  const tahun = Number(argTahun ?? TAHUN_BAWAAN);
+  const semester = Number(argSemester ?? SEMESTER_BAWAAN);
+
+  if (!tahunSah(tahun) || !semesterSah(semester)) {
+    throw new Error(`Periode tidak masuk akal: tahun=${tahun} semester=${semester}`);
+  }
+
+  console.log(`🧹 reset DemografiWilayah ${labelPeriode(tahun, semester)}...`);
+  await prisma.demografiWilayah.deleteMany({ where: { tahun, semester } });
 
   let n = 0;
   for (const [kode, a] of peta) {
@@ -63,11 +90,11 @@ async function main() {
     // jenis-kelamin (kalau ada minimal 1 dari L/P/JML)
     if (Object.keys(a.jk).length) {
       if (a.jk.JML == null && (a.jk.L != null || a.jk.P != null)) a.jk.JML = (a.jk.L ?? 0) + (a.jk.P ?? 0);
-      await prisma.demografiWilayah.create({ data: { kategori: 'jenis-kelamin', kode, wilayah, level, parentKode, data: a.jk } });
+      await prisma.demografiWilayah.create({ data: { kategori: 'jenis-kelamin', tahun, semester, kode, wilayah, level, parentKode, data: a.jk } });
       n++;
     }
     for (const [slug, data] of Object.entries(a.cats)) {
-      await prisma.demografiWilayah.create({ data: { kategori: slug, kode, wilayah, level, parentKode, data } });
+      await prisma.demografiWilayah.create({ data: { kategori: slug, tahun, semester, kode, wilayah, level, parentKode, data } });
       n++;
     }
   }

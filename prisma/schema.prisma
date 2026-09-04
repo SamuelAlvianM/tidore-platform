@@ -371,9 +371,17 @@ model LogAktivitas {
 /// `kategori` = jenis-kelamin/agama/gol-darah/pekerjaan/kk/pendidikan/status-kawin/wajib-ktp.
 /// `data` menyimpan kolom nilai (mis. { L, P, JML } untuk jenis kelamin).
 /// Hierarki via `level` (4=kecamatan, 5=desa/kelurahan) + `parentKode`.
+/// `tahun` + `semester` = periode DKB; dua semester boleh berdampingan.
 model DemografiWilayah {
   id         Int      @id @default(autoincrement())
   kategori   String
+  /// Periode DKB baris ini. Lihat lib/periode-demografi.ts.
+  ///
+  /// 🔴 SETIAP kueri wajib menyaring periode. Tanpa itu angka dua semester
+  /// ikut terjumlah dan hasilnya dua kali lipat — kesalahan yang mustahil
+  /// terjadi sebelum tabel ini punya dimensi waktu, dan kini mungkin.
+  tahun      Int      @db.SmallInt
+  semester   Int      @db.TinyInt // 1 | 2
   kode       String
   wilayah    String
   level      Int      // 4=kecamatan, 5=desa/kelurahan
@@ -381,8 +389,8 @@ model DemografiWilayah {
   data       Json
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@unique([kategori, kode])
-  @@index([kategori, level])
+  @@unique([kategori, tahun, semester, kode], map: "m_demografi_wilayah_periode_kode_key")
+  @@index([kategori, tahun, semester, level], map: "m_demografi_wilayah_periode_level_idx")
   @@map("m_demografi_wilayah")
 }
 

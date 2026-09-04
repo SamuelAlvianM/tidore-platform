@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { periodeDariQuery } from "@/lib/periode-demografi";
+import { periodeTersedia, pilihPeriode } from "@/lib/demografi-periode";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +11,11 @@ export const dynamic = "force-dynamic";
  * Data demografi publik.
  * GET /api/demografi?kategori=jenis-kelamin             → daftar kecamatan (level 4)
  * GET /api/demografi?kategori=jenis-kelamin&parent=KODE → daftar pekon di kecamatan
+ * &tahun=2025&semester=1                                 → periode tertentu
+ *
+ * 🔴 SELALU satu periode. Tanpa penyaringan, angka dua semester ikut terjumlah
+ * dan tabelnya menampilkan penduduk dua kali lipat — kesalahan yang mustahil
+ * terjadi sebelum tabel ini punya dimensi waktu, dan kini mungkin.
  *
  * Angka kecamatan = PENJUMLAHAN seluruh pekon (level 5) di bawahnya, sehingga
  * tabel utama selalu berupa ringkasan dari data rinci. Baris kecamatan dari
@@ -20,28 +27,41 @@ export async function GET(req: NextRequest) {
   const parent = (searchParams.get("parent") ?? "").trim();
   if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
 
+  const diminta = periodeDariQuery(searchParams);
+  if (diminta === false) return fail(["Periode tidak dikenal"]);
+
+  const tersedia = await periodeTersedia(kategori);
+  const periode = pilihPeriode(diminta, tersedia);
+
+  // Tabel masih kosong sama sekali — jawab kosong, jangan menebak periode.
+  if (!periode) {
+    return ok({ kolom: [], items: [], periode: null, periodeTersedia: [] });
+  }
+
+  const saringPeriode = { tahun: periode.tahun, semester: periode.semester };
+
   // Detail pekon dalam satu kecamatan — apa adanya.
   if (parent) {
     const rows = await prisma.demografiWilayah.findMany({
-      where: { kategori, level: 5, parentKode: parent },
+      where: { kategori, ...saringPeriode, level: 5, parentKode: parent },
       orderBy: { kode: "asc" },
       select: { kode: true, wilayah: true, data: true },
     });
     const kolom = rows.length
       ? Object.keys(rows[0].data as Record<string, number>)
       : [];
-    return ok({ kolom, items: rows });
+    return ok({ kolom, items: rows, periode, periodeTersedia: tersedia });
   }
 
   // Ringkasan kecamatan: jumlahkan data pekon per parentKode.
   const [kecamatan, pekon] = await Promise.all([
     prisma.demografiWilayah.findMany({
-      where: { kategori, level: 4 },
+      where: { kategori, ...saringPeriode, level: 4 },
       orderBy: { kode: "asc" },
       select: { kode: true, wilayah: true, data: true },
     }),
     prisma.demografiWilayah.findMany({
-      where: { kategori, level: 5 },
+      where: { kategori, ...saringPeriode, level: 5 },
       orderBy: { kode: "asc" },
       select: { parentKode: true, data: true },
     }),
@@ -87,5 +107,5 @@ export async function GET(req: NextRequest) {
   }
   items.sort((a, b) => a.kode.localeCompare(b.kode));
 
-  return ok({ kolom, items });
+  return ok({ kolom, items, periode, periodeTersedia: tersedia });
 }

@@ -4,6 +4,16 @@ import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
 import { catatAktivitas } from "@/lib/log-aktivitas";
+import {
+  SEMESTER_BAWAAN,
+  TAHUN_BAWAAN,
+  labelPeriode,
+  periodeDariQuery,
+  semesterSah,
+  tahunSah,
+  type Periode,
+} from "@/lib/periode-demografi";
+import { periodeTerbaru, periodeTersedia } from "@/lib/demografi-periode";
 
 export const dynamic = "force-dynamic";
 
@@ -22,19 +32,52 @@ export async function GET(req: NextRequest) {
   const { error } = await cekPetugas();
   if (error) return error;
 
-  const kategori = (new URL(req.url).searchParams.get("kategori") ?? "").trim();
+  const sp = new URL(req.url).searchParams;
+  const kategori = (sp.get("kategori") ?? "").trim();
   if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
 
-  const rows = await prisma.demografiWilayah.findMany({
-    where: { kategori },
-    orderBy: { kode: "asc" },
-    select: { kode: true, wilayah: true, level: true, parentKode: true, data: true },
-  });
+  const diminta = periodeDariQuery(sp);
+  if (diminta === false) return fail(["Periode tidak dikenal"]);
+
+  /*
+   * Tanpa periode → periode TERBARU yang ada datanya. Editor yang belum
+   * mengirim periode tetap bekerja alih-alih menabrak, dan yang ia tampilkan
+   * adalah data terbaru — bukan gabungan semua semester.
+   */
+  const periode = diminta ?? (await periodeTerbaru());
+  const tersedia = await periodeTersedia();
+
+  const rows = periode
+    ? await prisma.demografiWilayah.findMany({
+        where: { kategori, tahun: periode.tahun, semester: periode.semester },
+        orderBy: { kode: "asc" },
+        select: { kode: true, wilayah: true, level: true, parentKode: true, data: true },
+      })
+    : [];
+
   const kolom = rows.length
     ? Object.keys(rows[0].data as Record<string, number>)
     : [];
 
-  return ok({ kolom, rows });
+  return ok({ kolom, rows, periode, periodeTersedia: tersedia });
+}
+
+/**
+ * Periode dari BADAN permintaan (PUT/POST). Tanpa periode → periode terbaru
+ * yang ada datanya, dan bila tabelnya masih kosong, periode bawaan.
+ */
+async function periodeDariBadan(body: unknown): Promise<Periode | null> {
+  const b = (body ?? {}) as { tahun?: unknown; semester?: unknown };
+  const adaTahun = b.tahun !== undefined && b.tahun !== null && b.tahun !== "";
+  const adaSemester = b.semester !== undefined && b.semester !== null && b.semester !== "";
+
+  if (!adaTahun && !adaSemester) {
+    return (await periodeTerbaru()) ?? { tahun: TAHUN_BAWAAN, semester: SEMESTER_BAWAAN };
+  }
+  if (!adaTahun || !adaSemester) return null;
+  if (!tahunSah(b.tahun) || !semesterSah(b.semester)) return null;
+
+  return { tahun: Number(b.tahun), semester: Number(b.semester) };
 }
 
 interface SaveRow {
@@ -55,6 +98,9 @@ export async function PUT(req: NextRequest) {
   const raw = (body as { rows?: unknown }).rows;
   if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
   if (!Array.isArray(raw)) return fail(["Data tidak valid"]);
+
+  const periode = await periodeDariBadan(body);
+  if (!periode) return fail(["Tahun dan semester harus diisi dan masuk akal"]);
 
   // Validasi & normalisasi ringan; kode 6 digit = kecamatan, 10 digit = pekon.
   const seen = new Set<string>();
@@ -79,10 +125,26 @@ export async function PUT(req: NextRequest) {
     });
   }
 
+  /*
+   * 🔴 Penghapusannya WAJIB disaring periode. Tanpa `tahun`/`semester` di
+   * `where`, menyimpan satu semester akan menghapus semester lain — persis
+   * kerusakan yang seluruh perubahan ini ada untuk mencegahnya.
+   */
   await prisma.$transaction([
-    prisma.demografiWilayah.deleteMany({ where: { kategori } }),
+    prisma.demografiWilayah.deleteMany({
+      where: { kategori, tahun: periode.tahun, semester: periode.semester },
+    }),
     ...(rows.length
-      ? [prisma.demografiWilayah.createMany({ data: rows.map((r) => ({ kategori, ...r })) })]
+      ? [
+          prisma.demografiWilayah.createMany({
+            data: rows.map((r) => ({
+              kategori,
+              tahun: periode.tahun,
+              semester: periode.semester,
+              ...r,
+            })),
+          }),
+        ]
       : []),
   ]);
 
@@ -90,7 +152,7 @@ export async function PUT(req: NextRequest) {
     session,
     "UBAH",
     "Demografi",
-    `Menyimpan data demografi kategori ${kategori} (${rows.length} baris)`,
+    `Menyimpan data demografi kategori ${kategori} ${labelPeriode(periode.tahun, periode.semester)} (${rows.length} baris)`,
     { entitasId: kategori, req },
   );
 
@@ -105,28 +167,41 @@ export async function DELETE(req: NextRequest) {
   const { session, error } = await cekPetugas();
   if (error) return error;
 
-  const kategori = (new URL(req.url).searchParams.get("kategori") ?? "").trim();
+  const sp = new URL(req.url).searchParams;
+  const kategori = (sp.get("kategori") ?? "").trim();
   if (kategori && !DEMOGRAFI_SLUGS.has(kategori)) {
     return fail(["Kategori tidak dikenal"]);
   }
 
+  // Periode OPSIONAL di sini: tanpa periode = hapus seluruh periode, supaya
+  // "hapus semua" tetap berarti apa yang tertulis.
+  const periode = periodeDariQuery(sp);
+  if (periode === false) return fail(["Periode tidak dikenal"]);
+
   const res = await prisma.demografiWilayah.deleteMany({
-    where: kategori ? { kategori } : {},
+    where: {
+      ...(kategori ? { kategori } : {}),
+      ...(periode ? { tahun: periode.tahun, semester: periode.semester } : {}),
+    },
   });
+
+  const tandaPeriode = periode
+    ? ` ${labelPeriode(periode.tahun, periode.semester)}`
+    : "";
 
   await catatAktivitas(
     session,
     "HAPUS",
     "Demografi",
     kategori
-      ? `Menghapus data demografi kategori ${kategori} (${res.count} baris)`
-      : `Menghapus SEMUA data demografi (${res.count} baris)`,
+      ? `Menghapus data demografi kategori ${kategori}${tandaPeriode} (${res.count} baris)`
+      : `Menghapus SEMUA data demografi${tandaPeriode} (${res.count} baris)`,
     { entitasId: kategori || "semua", req },
   );
 
   return ok({ dihapus: res.count }, [
     kategori
       ? `Data kategori dihapus (${res.count} baris)`
-      : `Semua data demografi dihapus (${res.count} baris)`,
+      : `Data demografi${tandaPeriode || " semua periode"} dihapus (${res.count} baris)`,
   ]);
 }

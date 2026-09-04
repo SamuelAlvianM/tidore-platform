@@ -3,6 +3,8 @@ import { fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
 import { buildDemografiWorkbook, workbookResponse } from "@/lib/demografi-export";
+import { periodeDariQuery } from "@/lib/periode-demografi";
+import { periodeTerbaru } from "@/lib/demografi-periode";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,14 +18,36 @@ export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
 
-  const kategori = (new URL(req.url).searchParams.get("kategori") ?? "").trim();
+  const sp = new URL(req.url).searchParams;
+  const kategori = (sp.get("kategori") ?? "").trim();
   if (kategori && !DEMOGRAFI_SLUGS.has(kategori)) {
     return fail(["Kategori tidak dikenal"]);
   }
 
-  const wb = await buildDemografiWorkbook(kategori || undefined);
+  /*
+   * 🔴 Ekspor SELALU satu periode, tidak pernah "semua".
+   *
+   * Lembarnya berkolom IDEM/KODE/WILAYAH tanpa kolom periode — bentuk yang
+   * sama dengan yang dibaca importer, supaya berkasnya bisa diunggah balik.
+   * Menuang dua semester ke lembar yang sama berarti satu KODE muncul dua kali
+   * dengan angka berbeda dan tidak ada apa pun yang membedakannya.
+   */
+  const diminta = periodeDariQuery(sp);
+  if (diminta === false) return fail(["Periode tidak dikenal"]);
+  const periode = diminta ?? (await periodeTerbaru());
+
+  const wb = await buildDemografiWorkbook(kategori || undefined, periode);
   if (!wb) return fail(["Belum ada data untuk diekspor"], 404);
 
-  const namaFile = kategori ? `demografi-${kategori}.xlsx` : "demografi-semua.xlsx";
+  /*
+   * ⚠️ Periodenya masuk ke NAMA BERKAS. Berkas ekspor beredar lewat WhatsApp
+   * dan folder bersama; tanpa periode di namanya, dua semester berakhir
+   * sebagai dua "demografi-kk.xlsx" yang tak bisa dibedakan.
+   */
+  const tanda = periode ? `-${periode.tahun}-sem${periode.semester}` : "";
+  const namaFile = kategori
+    ? `demografi-${kategori}${tanda}.xlsx`
+    : `demografi-semua${tanda}.xlsx`;
+
   return workbookResponse(wb, namaFile);
 }

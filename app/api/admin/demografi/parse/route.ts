@@ -4,6 +4,28 @@ import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { parseDemografiExcel, type DemografiRow } from "@/lib/demografi-import";
 import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import {
+  SEMESTER_BAWAAN,
+  TAHUN_BAWAAN,
+  semesterSah,
+  tahunSah,
+  type Periode,
+} from "@/lib/periode-demografi";
+import { periodeTerbaru } from "@/lib/demografi-periode";
+
+/** Periode dari FormData; tanpa periode → yang terbaru. `false` = tidak sah. */
+async function periodeDariForm(form: FormData): Promise<Periode | null | false> {
+  const tahun = form.get("tahun");
+  const semester = form.get("semester");
+
+  if (!tahun && !semester) {
+    return (await periodeTerbaru()) ?? { tahun: TAHUN_BAWAAN, semester: SEMESTER_BAWAAN };
+  }
+  if (!tahun || !semester) return false;
+  if (!tahunSah(tahun) || !semesterSah(semester)) return false;
+
+  return { tahun: Number(tahun), semester: Number(semester) };
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,13 +63,18 @@ export async function POST(req: NextRequest) {
 
   let files: File[] = [];
   let kategori = "";
+  let periode: Periode | null | false = null;
   try {
     const form = await req.formData();
     kategori = String(form.get("kategori") ?? "").trim();
     files = form.getAll("files").filter((f): f is File => f instanceof File);
+    periode = await periodeDariForm(form);
   } catch {
     return fail(["Format unggahan tidak valid"]);
   }
+
+  if (periode === false) return fail(["Tahun dan semester harus diisi dan masuk akal"]);
+  if (!periode) return fail(["Periode tidak dapat ditentukan"]);
 
   if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
   if (files.length === 0) return fail(["Tidak ada file yang dikirim"]);
@@ -71,8 +98,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Data tersimpan (untuk pembanding).
+  /*
+   * 🔴 Dibandingkan dengan periode YANG SAMA. Kalau tidak, berkas semester I
+   * 2025 diadu dengan angka semester II 2024 dan SETIAP wilayah muncul sebagai
+   * konflik — padahal keduanya memang berbeda, dan memang seharusnya berbeda.
+   */
   const existing = await prisma.demografiWilayah.findMany({
-    where: { kategori },
+    where: { kategori, tahun: periode.tahun, semester: periode.semester },
     select: { kode: true, data: true },
   });
   const existingByKode = new Map(
