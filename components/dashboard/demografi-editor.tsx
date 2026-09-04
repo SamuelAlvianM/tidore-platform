@@ -25,6 +25,7 @@ import {
   normalizeKartu,
   warnaPreset,
   type KartuStatistik,
+  resolveKolom,
 } from '@/lib/beranda-statistik';
 import { getIcon } from '@/lib/icon-map';
 import { IconColumnInput } from '@/components/konten/field-editor';
@@ -61,6 +62,33 @@ const toEdit = (r: { kode: string; wilayah: string; data: Record<string, number>
   data: { ...r.data },
 });
 
+/**
+ * Kartu kategori ini SELAIN kartu yang sedang diedit → { kolom: judul }.
+ *
+ * Dipakai untuk dua hal sekaligus: menandai kolomnya di header tabel, dan
+ * mengenali klik bintang di kolom yang sudah terpakai sebagai "pindah edit ke
+ * kartu itu" — bukan "timpa kartu yang sedang diedit ke sana".
+ */
+function petaKartuLain(
+  semua: KartuStatistik[],
+  kategori: string,
+  targetKolom: string | null,
+  kolomAda: string[],
+): Map<string, string> {
+  const peta = new Map<string, string>();
+  for (const k of semua) {
+    if (k.kategori !== kategori || k.kolom === targetKolom) continue;
+    /*
+     * 🔴 Dipetakan lewat resolveKolom, sama seperti beranda menghitungnya.
+     * Konfigurasi menyimpan ejaan lama (`JML`) sementara berkas Excel terbaru
+     * menulis `Total`; tanpa penyetaraan ini editor menandai kolom yang salah
+     * — atau tidak menandai apa pun — padahal berandanya menampilkan angka.
+     */
+    peta.set(resolveKolom(kolomAda, k.kolom) ?? k.kolom, k.title);
+  }
+  return peta;
+}
+
 // ── Grid tabel editable (dipakai untuk kecamatan & pekon) ──────────────────
 function EditGrid({
   rows,
@@ -73,6 +101,7 @@ function EditGrid({
   onRenameCol,
   onRemoveCol,
   highlight,
+  kartuLain,
   onToggleHighlight,
   detailCounts,
   onDetail,
@@ -90,8 +119,19 @@ function EditGrid({
   onRenameCol: (oldKey: string, nextKey: string) => void;
   /** Hapus kolom. */
   onRemoveCol: (key: string) => void;
-  /** Kolom yang di-highlight — SATU per kategori (kartu statistik beranda). */
+  /** Kolom kartu yang SEDANG DIEDIT (pratinjau & pengaturan ikon miliknya). */
   highlight: string | null;
+  /*
+   * Kolom lain di kategori ini yang SUDAH punya kartu beranda → judul kartunya.
+   *
+   * 🔴 Tanpa ini satu kategori bisa melahirkan kartu kembar. `jenis-kelamin`
+   * memasok TIGA kartu bawaan (Jumlah Penduduk, Laki-laki, Perempuan), tapi
+   * editor hanya menandai satu — kolom yang dua lainnya pakai terlihat kosong,
+   * jadi membintanginya menimpa kartu yang sedang diedit ke kolom yang sudah
+   * terpakai: beranda berakhir dengan dua kartu "Laki-laki" dan kehilangan
+   * "Jumlah Penduduk", tanpa satu pun peringatan.
+   */
+  kartuLain: Map<string, string>;
   onToggleHighlight: (key: string) => void;
   /** Peta kode kecamatan → jumlah pekon (hanya untuk tabel kecamatan). */
   detailCounts?: Record<string, number>;
@@ -124,7 +164,9 @@ function EditGrid({
                         'h-8 w-full min-w-[5.5rem] rounded border bg-white pr-3 text-right text-xs font-bold uppercase tracking-wide text-slate-700 outline-none focus:border-primary',
                         highlight === k
                           ? 'border-amber-400 bg-amber-50 hover:border-amber-500'
-                          : 'border-slate-300 hover:border-slate-400',
+                          : kartuLain.has(k)
+                            ? 'border-amber-200 bg-amber-50/40 hover:border-amber-300'
+                            : 'border-slate-300 hover:border-slate-400',
                         kolom.length > 1 ? 'pl-7' : 'pl-3',
                       )}
                     />
@@ -138,18 +180,31 @@ function EditGrid({
                       </button>
                     )}
                   </div>
+                  {/*
+                    Tiga keadaan, dan ketiganya harus bisa dibedakan sekilas:
+                      bintang penuh  — kartu yang SEDANG diedit di panel atas
+                      bintang garis  — kolom ini sudah punya kartu sendiri;
+                                       mengkliknya BERPINDAH mengedit kartu itu
+                      bintang abu    — kolom bebas
+                    Keadaan tengah itu yang dulu tidak ada, dan ketiadaannya
+                    yang membuat kartu kembar bisa terbentuk diam-diam.
+                  */}
                   <button
                     onClick={() => onToggleHighlight(k)}
                     title={
                       highlight === k
-                        ? `Kolom ${k} tampil sebagai kartu statistik beranda — klik untuk melepas`
-                        : `Highlight kolom ${k} sebagai kartu statistik beranda (hanya satu kolom)`
+                        ? `Kolom ${k} tampil sebagai kartu beranda — klik untuk melepas`
+                        : kartuLain.has(k)
+                          ? `Kolom ${k} sudah tampil sebagai kartu “${kartuLain.get(k)}” — klik untuk mengedit kartu itu`
+                          : `Jadikan kolom ${k} kartu statistik beranda`
                     }
                     className={cn(
                       'flex h-8 w-8 shrink-0 items-center justify-center rounded border transition-colors',
                       highlight === k
                         ? 'border-amber-400 bg-amber-100 text-amber-500 hover:bg-amber-200'
-                        : 'border-slate-300 bg-white text-slate-300 hover:border-amber-300 hover:text-amber-400',
+                        : kartuLain.has(k)
+                          ? 'border-amber-300 bg-white text-amber-400 hover:bg-amber-50'
+                          : 'border-slate-300 bg-white text-slate-300 hover:border-amber-300 hover:text-amber-400',
                     )}
                   >
                     <Star className={cn('h-4 w-4', highlight === k && 'fill-amber-400')} />
@@ -263,15 +318,19 @@ export function DemografiEditor({
   const [detail, setDetail] = useState<{ kode: string; wilayah: string } | null>(null);
 
   // SATU kolom highlight per kategori → jadi kartu statistik beranda
-  // (judul = nama kolom, angka = total kolom). kartuRef menyimpan seluruh
+  // (judul = nama kolom, angka = total kolom). kartuSemua menyimpan seluruh
   // konfigurasi kartu agar kartu kategori lain tidak tersentuh saat disimpan.
   const [highlight, setHighlight] = useState<string | null>(null);
   const [kartuIkon, setKartuIkon] = useState('Users');
   const [kartuWarna, setKartuWarna] = useState('biru');
-  const kartuRef = useRef<KartuStatistik[]>([]);
+  /** Seluruh kartu beranda apa adanya — kartu kategori lain ikut dikirim saat
+   *  simpan, kalau tidak ia terhapus. */
+  const [kartuSemua, setKartuSemua] = useState<KartuStatistik[]>([]);
+  /** Judul kartu yang sedang diedit — supaya jelas kartu mana yang berubah. */
+  const [kartuJudul, setKartuJudul] = useState<string | null>(null);
   // Kolom kartu yang sedang diedit (identitas kartu di config beranda) —
   // dipakai saat simpan agar hanya kartu ini yang diperbarui/diganti.
-  const targetKolomRef = useRef<string | null>(null);
+  const [targetKolom, setTargetKolom] = useState<string | null>(null);
 
   const mainFileRef = useRef<HTMLInputElement | null>(null);
   const detailFileRef = useRef<HTMLInputElement | null>(null);
@@ -284,16 +343,18 @@ export function DemografiEditor({
         const kartu = normalizeKartu(
           (j.data?.items?.[KARTU_STATISTIK_KUNCI] as { kartu?: unknown } | undefined)?.kartu,
         );
-        kartuRef.current = kartu;
+        setKartuSemua(kartu);
         // Kartu yang diedit: yang cocok kolomnya bila dibuka dari klik kartu,
         // jika tidak (dashboard) ambil kartu pertama kategori ini.
         const milik = kartuKolom
           ? kartu.find((c) => c.kategori === kategori && c.kolom === kartuKolom)
           : kartu.find((c) => c.kategori === kategori);
-        targetKolomRef.current = milik?.kolom ?? kartuKolom ?? null;
-        setHighlight(milik?.kolom ?? kartuKolom ?? null);
+        const target = milik?.kolom ?? kartuKolom ?? null;
+        setTargetKolom(target);
+        setHighlight(target);
         setKartuIkon(milik?.icon ?? 'Users');
         setKartuWarna(milik?.warna ?? 'biru');
+        setKartuJudul(milik?.title ?? null);
       })
       .catch(() => {
         /* gagal memuat konfigurasi kartu → highlight kosong, kartu lama aman */
@@ -403,11 +464,55 @@ export function DemografiEditor({
     setPekonRows(renameKeyInRows(oldKey, nextKey));
     // Highlight ikut nama kolom baru.
     setHighlight((h) => (h === oldKey ? nextKey : h));
+    setTargetKolom((t) => (t === oldKey ? nextKey : t));
+
+    /*
+     * 🔴 Kartu LAIN di kategori ini juga menunjuk nama kolom. Kalau namanya
+     * diganti tanpa ikut diperbarui, kartu itu menunjuk kolom yang tak ada
+     * lagi — dan beranda menampilkannya "—" seolah datanya hilang.
+     */
+    setKartuSemua((cs) =>
+      cs.map((c) =>
+        c.kategori === kategori && c.kolom === oldKey ? { ...c, kolom: nextKey } : c,
+      ),
+    );
   };
 
-  // Hanya SATU kolom yang bisa di-highlight — klik kolom lain memindahkannya.
-  const toggleHighlight = (key: string) =>
-    setHighlight((h) => (h === key ? null : key));
+  /**
+   * Klik bintang. Tiga arti, bergantung keadaan kolomnya:
+   *
+   * 1. kolom kartu yang sedang diedit  → lepas kartunya dari beranda
+   * 2. kolom yang sudah punya kartu lain → PINDAH mengedit kartu itu
+   * 3. kolom bebas                     → pindahkan kartu yang diedit ke sana
+   *
+   * 🔴 Cabang (2) yang dulu tidak ada. Tanpanya kartu yang sedang diedit
+   * ditimpakan ke kolom yang sudah terpakai, dan beranda mendapat dua kartu
+   * identik sementara kartu lama lenyap — sunyi, tanpa galat.
+   */
+  const toggleHighlight = (key: string) => {
+    // Perbandingan dilakukan di ruang NAMA KOLOM NYATA — konfigurasi bisa
+    // menyimpan ejaan lain untuk kolom yang sama.
+    if (highlightNyata === key) {
+      setHighlight(null);
+      return;
+    }
+
+    const judulLain = kartuLain.get(key);
+    if (judulLain !== undefined) {
+      const lain = kartuSemua.find(
+        (c) => c.kategori === kategori && (resolveKolom(kolom, c.kolom) ?? c.kolom) === key,
+      );
+      setTargetKolom(lain?.kolom ?? key);
+      setHighlight(key);
+      setKartuIkon(lain?.icon ?? 'Users');
+      setKartuWarna(lain?.warna ?? 'biru');
+      setKartuJudul(lain?.title ?? judulLain);
+      toast.info(`Sekarang mengedit kartu “${judulLain}”`);
+      return;
+    }
+
+    setHighlight(key);
+  };
 
   const addCol = () => {
     let n = kolom.length + 1;
@@ -505,25 +610,49 @@ export function DemografiEditor({
     }
   };
 
+  /*
+   * Nama kolom SEBENARNYA yang dipakai kartu yang sedang diedit.
+   *
+   * 🔴 Yang tersimpan di konfigurasi belum tentu ada di data. Kartu "Wajib
+   * KTP" menyimpan kolom `JML`, sementara berkas Dukcapil Tidore menulis
+   * `Total`; beranda menyetarakan keduanya lewat resolveKolom dan menampilkan
+   * 89.405, tapi editor membaca `JML` mentah — pratinjaunya 0 dan bintangnya
+   * tidak muncul di kolom mana pun. Dua layar, satu kartu, dua jawaban.
+   */
+  const highlightNyata = useMemo(
+    () => (highlight ? resolveKolom(kolom, highlight) : null),
+    [highlight, kolom],
+  );
+
+  /*
+   * Kartu lain di kategori ini. Diturunkan, bukan disimpan: daftar kolom
+   * datang dari permintaan yang BERBEDA dengan konfigurasi kartu, dan mana
+   * yang tiba lebih dulu tidak dijamin. Menyimpannya sebagai state berarti
+   * peta terbentuk dari daftar kolom yang mungkin masih kosong.
+   */
+  const kartuLain = useMemo(
+    () => petaKartuLain(kartuSemua, kategori, targetKolom, kolom),
+    [kartuSemua, kategori, targetKolom, kolom],
+  );
+
   // Total kolom highlight untuk PREVIEW kartu — sama dengan hitungan beranda:
   // jumlahkan baris pekon bila ada, kalau belum pakai baris kecamatan.
   const previewTotal = useMemo(() => {
-    if (!highlight) return 0;
+    if (!highlightNyata) return 0;
     const sumber = pekonRows.length ? pekonRows : kecRows;
-    return sumber.reduce((a, r) => a + (Number(r.data[highlight]) || 0), 0);
-  }, [highlight, pekonRows, kecRows]);
+    return sumber.reduce((a, r) => a + (Number(r.data[highlightNyata]) || 0), 0);
+  }, [highlightNyata, pekonRows, kecRows]);
 
   /**
    * Perbarui HANYA kartu beranda yang sedang diedit (identitas =
-   * kategori + targetKolomRef). Kartu lain — termasuk kartu lain di kategori
+   * kategori + targetKolom). Kartu lain — termasuk kartu lain di kategori
    * yang sama, mis. Laki-laki vs Perempuan — dibiarkan utuh.
    * - highlight ada: kartu target diganti kolom/ikon/warna terbaru (bila
    *   kolomnya sama, badge & judul lama dipertahankan);
    * - highlight kosong: kartu target dihapus.
    */
   const simpanHighlight = async () => {
-    const prev = kartuRef.current;
-    const targetKolom = targetKolomRef.current;
+    const prev = kartuSemua;
     const posisi = prev.findIndex(
       (c) => c.kategori === kategori && c.kolom === targetKolom,
     );
@@ -535,16 +664,31 @@ export function DemografiEditor({
       const kolomSama = lama?.kolom === highlight;
       const entri: KartuStatistik = {
         ...(kolomSama ? lama : {}),
-        title: kolomSama && lama ? lama.title : labelKolom(highlight),
+        title: kolomSama && lama ? lama.title : (kartuJudul ?? labelKolom(highlight)),
         icon: kartuIkon,
         kategori,
-        kolom: highlight,
+        // Nama kolom NYATA yang ditulis, bukan ejaan lama dari konfigurasi:
+        // sekali disimpan, editor dan beranda membaca kolom yang sama persis.
+        kolom: highlightNyata ?? highlight,
         warna: kartuWarna,
       };
+      /*
+       * 🔴 Jaring pengaman terakhir: buang kartu lain yang kebetulan sudah
+       * memakai kolom ini. `toggleHighlight` seharusnya sudah mencegahnya,
+       * tapi konfigurasi lama di basis data bisa saja sudah kembar sejak
+       * sebelum perbaikan ini — dan menyimpan ulang tidak boleh melanggengkan.
+       */
+      const bentrok = kartu.findIndex(
+        (c) =>
+          c.kategori === kategori &&
+          (resolveKolom(kolom, c.kolom) ?? c.kolom) === (highlightNyata ?? highlight),
+      );
+      if (bentrok >= 0) kartu.splice(bentrok, 1);
+
       kartu.splice(posisi >= 0 ? Math.min(posisi, kartu.length) : kartu.length, 0, entri);
     }
     // Setelah simpan, kartu target kini beridentitas kolom highlight terbaru.
-    targetKolomRef.current = highlight;
+    const targetBaru = highlight ? (highlightNyata ?? highlight) : null;
     const res = await fetch('/api/admin/static-content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -552,7 +696,8 @@ export function DemografiEditor({
     });
     const j = await res.json();
     if (j.error?.length) throw new Error(j.error[0]);
-    kartuRef.current = kartu;
+    setKartuSemua(kartu);
+    setTargetKolom(targetBaru);
   };
 
   const save = async () => {
@@ -633,7 +778,7 @@ export function DemografiEditor({
                 {isJK && 'Kolom Jumlah dihitung otomatis. '}
                 Kode 6 digit = kecamatan, 10 digit = desa. Klik{' '}
                 <Star className="inline h-3 w-3 fill-amber-400 text-amber-400" /> pada judul
-                kolom untuk menampilkannya sebagai <b>kartu statistik beranda</b>.
+                kolom untuk mengatur <b>kartu statistik beranda</b>-nya.
               </p>
             </>
           )}
@@ -727,7 +872,8 @@ export function DemografiEditor({
               onRemove={remover(setPekonRows)}
               onRenameCol={renameCol}
               onRemoveCol={removeCol}
-              highlight={highlight}
+              highlight={highlightNyata}
+              kartuLain={kartuLain}
               onToggleHighlight={toggleHighlight}
               kodePlaceholder="10 digit"
               emptyText="Belum ada desa. Import Excel detail atau klik “Tambah Desa”."
@@ -768,7 +914,7 @@ export function DemografiEditor({
                           {previewTotal.toLocaleString('id-ID')}
                         </p>
                         <p className="mt-0.5 text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500">
-                          {labelKolom(highlight)}
+                          {kartuJudul ?? labelKolom(highlightNyata ?? highlight)}
                         </p>
                       </div>
                     );
@@ -780,14 +926,39 @@ export function DemografiEditor({
                       <Star className="h-3 w-3 fill-amber-300 text-amber-300" />
                       Kartu Statistik Beranda
                     </p>
+                    {/*
+                      🔴 Nama kartunya disebut, bukan cuma nama kolomnya.
+                      Satu kategori bisa memasok beberapa kartu; tanpa disebut,
+                      petugas tidak punya cara tahu kartu MANA yang sedang ia
+                      ubah — dan baru sadar setelah beranda berubah.
+                    */}
                     <p className="mt-1 text-sm font-semibold">
-                      Kolom “{labelKolom(highlight)}” tampil sebagai kartu di beranda
+                      Mengedit kartu “{kartuJudul ?? labelKolom(highlightNyata ?? highlight)}” —
+                      sumbernya kolom{' '}
+                      <span className="font-mono">{highlightNyata ?? highlight}</span>
+                      {highlightNyata === null && (
+                        <span className="ml-1 font-normal text-amber-200">
+                          (kolom ini tidak ada di data — kartunya tampil “—” di beranda)
+                        </span>
+                      )}
                     </p>
                     <p className="mt-0.5 max-w-xl text-xs leading-relaxed text-white/70">
                       Angka kartu mengikuti total kolom di seluruh wilayah dan ikut
                       berubah saat data diedit. Perubahan diterapkan saat klik{' '}
                       <b>Simpan</b>.
                     </p>
+                    {kartuLain.size > 0 && (
+                      <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-white/70">
+                        Kategori ini juga memasok{' '}
+                        {[...kartuLain].map(([kol, judul], i) => (
+                          <span key={kol}>
+                            {i > 0 && ', '}
+                            <b>{judul}</b> (kolom <span className="font-mono">{kol}</span>)
+                          </span>
+                        ))}
+                        . Klik bintang kolomnya untuk mengedit kartu tersebut.
+                      </p>
+                    )}
                     <div className="mt-3 flex items-center gap-2">
                       <span className="text-xs font-medium text-white/80">Ikon kartu:</span>
                       {/* text-slate-700: tanpa ini teks tombol mewarisi putih dari
@@ -802,7 +973,7 @@ export function DemografiEditor({
                 <p className="relative z-10 text-sm leading-relaxed text-white/90">
                   Klik ikon{' '}
                   <Star className="inline h-3.5 w-3.5 fill-amber-300 text-amber-300" /> pada
-                  judul kolom di tabel untuk memilih <b>satu</b> kolom yang tampil sebagai{' '}
+                  judul kolom di tabel untuk menjadikannya{' '}
                   <b>kartu statistik beranda</b> — pratinjau kartunya akan muncul di sini.
                 </p>
               )}
@@ -858,7 +1029,8 @@ export function DemografiEditor({
               onRemove={remover(setKecRows)}
               onRenameCol={renameCol}
               onRemoveCol={removeCol}
-              highlight={highlight}
+              highlight={highlightNyata}
+              kartuLain={kartuLain}
               onToggleHighlight={toggleHighlight}
               detailCounts={detailCounts}
               onDetail={(r) => setDetail({ kode: digits(r.kode), wilayah: r.wilayah || 'Kecamatan' })}
