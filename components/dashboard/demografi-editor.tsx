@@ -829,20 +829,26 @@ export function DemografiEditor({
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {/*
+            🔴 Pemilih periode berdiri DI LUAR <Button asChild>.
+            `asChild` meneruskan propsnya ke SATU anak; memberi dua anak
+            membuat Radix Slot melempar "Slot failed to slot onto its
+            children" dan seluruh halaman gagal dirender.
+          */}
+          {onPeriode && !detail && (
+            <PemilihPeriode
+              nilai={periode}
+              tersedia={periodeTersedia}
+              onPilih={onPeriode}
+              bolehBaru
+              ukuran="kecil"
+            />
+          )}
           <Button
             variant="outline"
             asChild
             title={`Unduh data ${label} tersimpan sebagai Excel`}
           >
-            {onPeriode && !detail && (
-              <PemilihPeriode
-                nilai={periode}
-                tersedia={periodeTersedia}
-                onPilih={onPeriode}
-                bolehBaru
-                ukuran="kecil"
-              />
-            )}
             <a
               href={`/api/admin/demografi/export?kategori=${encodeURIComponent(kategori)}&${kueriPeriode(periode)}`}
               download
