@@ -16,10 +16,11 @@
  *     wilayah.uji.lokal  / wil12345     (operator wilayah, level 41)
  *     staf.uji.lokal     / staf12345    (operator capil, level 2)
  *     admin.uji.lokal    / adm12345     (Super Admin, level 1)
+ *     9999000000000001   / warga12345   (Warga, level 3 — masuk pakai NIK)
  */
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { LEVEL_ADMIN, LEVEL_OPD, LEVEL_OPERATOR, LEVEL_STAFF } from '../lib/akun-level';
+import { LEVEL_ADMIN, LEVEL_OPD, LEVEL_OPERATOR, LEVEL_STAFF, LEVEL_WARGA } from '../lib/akun-level';
 
 const prisma = new PrismaClient();
 
@@ -42,6 +43,12 @@ async function main() {
      * mengunci orang yang memakainya keluar dari portalnya sendiri.
      */
     { id: 999004, userId: 'admin.uji.lokal', sandi: 'adm12345', level: LEVEL_ADMIN, nama: 'Super Admin (uji lokal)', kec: null },
+    /*
+     * ⚠️ Warga masuk memakai NIK, bukan username — itulah sebabnya `userId`-nya
+     * 16 digit. NIK ini sengaja diawali angka yang mustahil dipakai wilayah
+     * mana pun, supaya tidak bertabrakan dengan warga sungguhan.
+     */
+    { id: 999005, userId: '9999000000000001', sandi: 'warga12345', level: LEVEL_WARGA, nama: 'Warga Uji (uji lokal)', kec: kec?.nama ?? null },
   ];
 
   for (const a of akun) {
