@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FileText,
   Baby,
@@ -76,6 +76,9 @@ export function PengajuanBaruClient() {
    * `bolehTerobos` di bawah dan penjagaan di API.
    */
   const bolehAtur = isPetugas(level);
+  // Jam kerja = kebijakan dinas, dijaga level 1 di servernya. Lihat catatan
+  // di drawer: kontrol yang pasti ditolak server tidak boleh ditampilkan.
+  const bolehJam = isAdmin(level);
   const bolehTerobos = isAdmin(level);
 
   // Layanan yang dimatikan dinas. Petugas tetap melihat kartunya — berwarna
@@ -83,21 +86,28 @@ export function PengajuanBaruClient() {
   // mengira daftarnya berubah tanpa sebab.
   const [mati, setMati] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    let batal = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/static-content?keys=pelayanan.visibilitas');
-        const j = await res.json();
-        if (!batal) setMati(slugTersembunyi(j.data?.items?.['pelayanan.visibilitas']?.hidden));
-      } catch {
-        // Gagal memuat = tampilkan semua; bukan keadaan fatal.
-      }
-    })();
-    return () => {
-      batal = true;
-    };
+  /*
+   * 🔴 Dijadikan fungsi supaya bisa DIPANGGIL ULANG saat drawer ditutup.
+   *
+   * Sebelumnya ini efek sekali-jalan. Petugas mematikan sebuah layanan lewat
+   * drawer, menutupnya, lalu melihat layanan itu masih menyala di belakangnya
+   * — dan menyimpulkan pengaturannya gagal tersimpan, padahal sudah. Satu-
+   * satunya cara melihat keadaan sebenarnya adalah memuat ulang halaman.
+   */
+  const muatVisibilitas = useCallback(async () => {
+    try {
+      const res = await fetch('/api/static-content?keys=pelayanan.visibilitas', {
+        // Jawaban lama dari cache peramban akan mengalahkan tujuan penyegaran.
+        cache: 'no-store',
+      });
+      const j = await res.json();
+      setMati(slugTersembunyi(j.data?.items?.['pelayanan.visibilitas']?.hidden));
+    } catch {
+      // Gagal memuat = tampilkan semua; bukan keadaan fatal.
+    }
   }, []);
+
+  useEffect(() => { muatVisibilitas(); }, [muatVisibilitas]);
 
   const cocokCari = (l: LayananForm) => {
     const cari = q.trim().toLowerCase();
@@ -177,7 +187,14 @@ export function PengajuanBaruClient() {
 
       {/* Drawer pengaturan: meluncur dari kanan dengan overlay gelap */}
       {bolehAtur && (
-        <Sheet open={showSettings} onOpenChange={setShowSettings}>
+        <Sheet
+          open={showSettings}
+          onOpenChange={(buka) => {
+            setShowSettings(buka);
+            // Menutup drawer = keadaan di layar mungkin sudah basi.
+            if (!buka) muatVisibilitas();
+          }}
+        >
           <SheetContent
             side="right"
             className="w-full overflow-y-auto sm:max-w-xl"
@@ -188,17 +205,31 @@ export function PengajuanBaruClient() {
                 Layanan
               </SheetTitle>
               <SheetDescription>
-                Atur ketersediaan jenis layanan &amp; jam kerja permohonan.
+                {bolehJam
+                  ? 'Atur ketersediaan jenis layanan & jam kerja permohonan.'
+                  : 'Atur ketersediaan jenis layanan. Jam kerja hanya bisa diubah admin.'}
               </SheetDescription>
             </SheetHeader>
-            <Tabs defaultValue="jam" className="px-4 ">
+            {/*
+              🔴 Tab "Jam Kerja" HANYA untuk admin (level 1).
+              
+              Endpoint `/api/admin/jam-layanan` menolak level lain dengan 403.
+              Sebelumnya tabnya tetap ditampilkan ke staf: ia membuka drawer,
+              melihat jam kerja gagal termuat tanpa pesan apa pun, dan
+              simpan-otomatisnya bahkan menembakkan PUT yang juga ditolak.
+              Menawarkan kontrol yang pasti ditolak servernya bukan cuma
+              percuma — ia membuat petugas mengira portalnya rusak.
+            */}
+            <Tabs defaultValue={bolehJam ? 'jam' : 'layanan'} className="px-4 ">
               <TabsList className="flex flex-row w-full gap-1 rounded-xl bg-slate-100 p-1">
+                {bolehJam && (
                 <TabsTrigger
                   value="jam"
                   className="cursor-pointer gap-1.5 rounded-lg py-2 font-medium text-slate-500 transition-colors data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
                 >
                   <Clock className="h-4 w-4" /> Jam Kerja
                 </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="layanan"
                   className="cursor-pointer gap-1.5 rounded-lg py-2 font-medium text-slate-500 transition-colors data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
@@ -206,11 +237,21 @@ export function PengajuanBaruClient() {
                   <ListChecks className="h-4 w-4" /> Ketersediaan Layanan
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="jam" className="pt-5">
-                <JamLayananEditor />
-              </TabsContent>
+              {bolehJam && (
+                <TabsContent value="jam" className="pt-5">
+                  <JamLayananEditor />
+                </TabsContent>
+              )}
               <TabsContent value="layanan" className="pt-5">
-                <PengaturanPelayanan />
+                <PengaturanPelayanan
+                  /*
+                   * 🔴 Kartu di belakang drawer ikut meredup SEKETIKA, tidak
+                   * menunggu drawer ditutup. Petugas mencoret satu layanan dan
+                   * langsung melihat akibatnya di halaman — itulah satu-satunya
+                   * cara ia yakin mencoret yang benar.
+                   */
+                  onUbah={(tersembunyi) => setMati(slugTersembunyi([...tersembunyi]))}
+                />
               </TabsContent>
             </Tabs>
           </SheetContent>

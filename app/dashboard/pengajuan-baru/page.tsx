@@ -15,7 +15,7 @@ export default async function DashboardPengajuanBaruPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-10">
+      <div className="mx-auto w-full max-w-[1600px] px-4 py-8 md:px-6 lg:px-8">
         <PengajuanBaruClient />
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,7 +15,24 @@ import {
  * Pengaturan layanan mana yang boleh tampil di halaman Permohonan Online publik.
  * Menyimpan daftar modalType yang DISEMBUNYIKAN ke StaticContent via API admin.
  */
-export function PengaturanPelayanan() {
+export function PengaturanPelayanan({
+  onUbah,
+}: {
+  /*
+   * 🔴 Dipanggil pada SETIAP centang, bukan setelah tersimpan.
+   *
+   * Penyimpanannya ditunda 700 ms supaya mencentang beberapa layanan
+   * berturut-turut tidak melahirkan satu permintaan per klik. Tapi petugas
+   * menunggu jawabannya SEKARANG: ia mencoret satu layanan dan ingin kartunya
+   * di belakang drawer langsung meredup. Menunggu simpan selesai membuat
+   * layar tertinggal sedetik penuh dari tangannya — cukup lama untuk membuat
+   * orang mengklik dua kali.
+   *
+   * ⚠️ Karena itu laporannya OPTIMISTIS. Bila penyimpanan gagal, keadaan yang
+   * benar dilaporkan ulang lewat callback yang sama — layar kembali jujur.
+   */
+  onUbah?: (tersembunyi: Set<string>) => void;
+} = {}) {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [statusSimpan, setStatusSimpan] = useState<'idle' | 'menyimpan' | 'tersimpan'>('idle');
@@ -35,6 +52,17 @@ export function PengaturanPelayanan() {
       .finally(() => setLoading(false));
   }, []);
 
+  /** Kembalikan tampilan ke keadaan terakhir yang benar-benar tersimpan. */
+  const pulihkanKeTersimpan = useCallback(() => {
+    try {
+      const aman = new Set<string>(JSON.parse(terakhirDisimpan.current || '[]'));
+      setHidden(aman);
+      onUbah?.(aman);
+    } catch {
+      /* konfigurasi terakhir tak terbaca — biarkan apa adanya */
+    }
+  }, [onUbah]);
+
   // Autosave: simpan otomatis 700ms setelah perubahan berhenti.
   useEffect(() => {
     if (loading) return;
@@ -52,6 +80,10 @@ export function PengaturanPelayanan() {
         if (j.error?.length) {
           toast.error(j.error[0]);
           setStatusSimpan('idle');
+          // ⚠️ Layar sudah terlanjur memperlihatkan keadaan baru. Kembalikan
+          // ke keadaan terakhir yang BENAR-BENAR tersimpan, kalau tidak
+          // petugas mengira layanan sudah dimatikan padahal masih menyala.
+          pulihkanKeTersimpan();
           return;
         }
         terakhirDisimpan.current = kini;
@@ -59,10 +91,11 @@ export function PengaturanPelayanan() {
       } catch {
         toast.error('Gagal menyimpan pengaturan');
         setStatusSimpan('idle');
+        pulihkanKeTersimpan();
       }
     }, 700);
     return () => clearTimeout(t);
-  }, [hidden, loading]);
+  }, [hidden, loading, pulihkanKeTersimpan]);
 
   const grouped = useMemo(() => {
     const g: Record<string, typeof PELAYANAN_LIST> = {};
@@ -75,16 +108,26 @@ export function PengaturanPelayanan() {
   const visibleCount = PELAYANAN_LIST.length - hidden.size;
 
   const toggle = (modalType: string) => {
-    setHidden((prev) => {
-      const next = new Set(prev);
-      if (next.has(modalType)) next.delete(modalType);
-      else next.add(modalType);
-      return next;
-    });
+    /*
+     * 🔴 `onUbah` DI LUAR pembaru state, bukan di dalamnya.
+     *
+     * Fungsi pembaru `setHidden(prev => …)` dijalankan React SAAT RENDER.
+     * Memanggil setState milik induk dari dalamnya melanggar aturan React —
+     * "Cannot update a component while rendering a different component" — dan
+     * pada mode ketat bisa berujung render berulang tanpa henti.
+     */
+    const next = new Set(hidden);
+    if (next.has(modalType)) next.delete(modalType);
+    else next.add(modalType);
+
+    setHidden(next);
+    onUbah?.(next);
   };
 
   const setAll = (show: boolean) => {
-    setHidden(show ? new Set() : new Set(PELAYANAN_LIST.map((p) => p.modalType)));
+    const next = show ? new Set<string>() : new Set(PELAYANAN_LIST.map((p) => p.modalType));
+    setHidden(next);
+    onUbah?.(next);
   };
 
   if (loading) {
