@@ -28,6 +28,7 @@ import {
   X,
   UserRound,
   KeyRound,
+  RotateCcw,
   Camera,
   MapPin,
   ChevronRight,
@@ -187,6 +188,51 @@ function PilihKolomTolak({
 }
 
 /** Satu baris "label — nilai" di panel detail. */
+/**
+ * Judul bagian dengan aksinya di kanan — pola yang sama untuk Data Diri dan
+ * Kata Sandi, supaya keduanya tidak pelan-pelan berbeda bentuk.
+ */
+function JudulBagian({ judul, aksi }: { judul: string; aksi?: React.ReactNode }) {
+  return (
+    <div className="mb-1 flex items-center justify-between gap-2">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">{judul}</h4>
+      {aksi}
+    </div>
+  );
+}
+
+/**
+ * Aksi kecil di samping judul bagian.
+ *
+ * ⚠️ Sengaja bergaya TAUTAN, bukan tombol penuh. Aksi utama panel ini tetap
+ * "Nonaktifkan Akun"; menyunting profil dan menyetel sandi adalah pekerjaan
+ * sehari-hari yang tidak boleh berteriak lebih keras daripada tindakan yang
+ * mengunci orang keluar dari akunnya.
+ */
+function TombolAksiBagian({
+  aktif, onClick, ikon, label,
+}: {
+  aktif: boolean;
+  onClick: () => void;
+  ikon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium transition-colors ${
+        aktif
+          ? 'bg-primary/10 text-primary'
+          : 'text-primary/80 hover:bg-primary/10 hover:text-primary'
+      }`}
+    >
+      {ikon}
+      {aktif ? 'Tutup' : label}
+    </button>
+  );
+}
+
 function Baris({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[7.5rem_1fr] gap-2 py-1.5">
@@ -413,6 +459,13 @@ function IsiDetail({
   const [lihatFoto, setLihatFoto] = useState<number | null>(null);
   const [panel, setPanel] = useState<'sunting' | 'sandi' | null>(null);
 
+  /*
+   * ⚠️ Akun PETUGAS hanya boleh disentuh Super Admin — menyunting `userId`-nya
+   * atau menyetel sandinya sama saja dengan mengambil alih akun itu. Servernya
+   * menegakkan aturan yang sama; kontrol yang disembunyikan bukan penjagaan.
+   */
+  const bolehUbah = !!detail && (!isPetugas(detail.userlevelId) || isAdmin(levelSaya));
+
   // Berganti akun → panel yang terbuka untuk akun sebelumnya harus tertutup,
   // kalau tidak formulirnya masih berisi data orang lain.
   useEffect(() => setPanel(null), [detail?.id]);
@@ -540,11 +593,28 @@ function IsiDetail({
         </div>
       )}
 
-      {/* Data diri */}
+      {/*
+        Data diri — aksi "Sunting" DUDUK DI SAMPING JUDULNYA.
+
+        🔴 Sebelumnya tombolnya berjejer di dasar panel, jauh di bawah
+        riwayat akun dan daftar permohonan. Petugas yang ingin membetulkan
+        satu nomor WhatsApp harus menggulir melewati seluruh isi panel untuk
+        menemukan tombolnya, lalu menggulir balik ke atas untuk melihat medan
+        yang ia ubah. Menempelkan aksi pada bagian yang diubahnya
+        menghilangkan perjalanan itu sama sekali.
+      */}
       <div>
-        <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Data Diri
-        </h4>
+        <JudulBagian
+          judul="Data Diri"
+          aksi={bolehUbah ? (
+            <TombolAksiBagian
+              aktif={panel === 'sunting'}
+              onClick={() => setPanel((v) => (v === 'sunting' ? null : 'sunting'))}
+              ikon={<Pencil className="h-3.5 w-3.5" />}
+              label="Sunting"
+            />
+          ) : null}
+        />
         <dl className="divide-y divide-slate-100">
           <Baris label="NIK">{detail.userNik ?? '-'}</Baris>
           <Baris label="No. KK">{detail.userNokk ?? '-'}</Baris>
@@ -552,7 +622,55 @@ function IsiDetail({
           <Baris label="WhatsApp">{detail.userHp ?? '-'}</Baris>
           <Baris label="Email">{detail.userEmail ?? '-'}</Baris>
         </dl>
+
+        {panel === 'sunting' && (
+          <FormSunting
+            detail={detail}
+            kecamatanList={kecamatanList}
+            onBatal={() => setPanel(null)}
+            onSelesai={() => {
+              setPanel(null);
+              onPerbarui();
+            }}
+          />
+        )}
       </div>
+
+      {/*
+        Kata sandi — bagiannya sendiri, dengan keterangan KAPAN dipakai.
+
+        ⚠️ Menyetel sandi orang lain adalah tindakan besar: sesudahnya pemilik
+        akun tidak bisa masuk sampai diberi tahu sandi barunya. Karena itu
+        bagian ini menjelaskan kapan ia benar-benar diperlukan, bukan sekadar
+        menyodorkan tombol.
+      */}
+      {bolehUbah && (
+        <div>
+          <JudulBagian
+            judul="Kata Sandi"
+            aksi={
+              <TombolAksiBagian
+                aktif={panel === 'sandi'}
+                onClick={() => setPanel((v) => (v === 'sandi' ? null : 'sandi'))}
+                ikon={<RotateCcw className="h-3.5 w-3.5" />}
+                label="Setel Ulang"
+              />
+            }
+          />
+          <p className="text-[0.7rem] leading-relaxed text-slate-500">
+            Dipakai bila pemilik akun lupa sandinya dan tidak bisa memakai tautan
+            lupa password (mis. emailnya kosong).
+          </p>
+
+          {panel === 'sandi' && (
+            <FormSandi
+              detail={detail}
+              onBatal={() => setPanel(null)}
+              onSelesai={() => setPanel(null)}
+            />
+          )}
+        </div>
+      )}
 
       {/* Riwayat akun */}
       <div>
@@ -642,54 +760,6 @@ function IsiDetail({
               <XCircle className="h-4 w-4" /> Tolak
             </Button>
           </div>
-        )}
-
-        {/*
-          Sunting profil & setel sandi.
-
-          ⚠️ Akun PETUGAS hanya boleh disentuh Super Admin — menyunting
-          `userId`-nya atau menyetel sandinya sama saja dengan mengambil alih
-          akun itu. Servernya menegakkan aturan yang sama; tombol yang
-          disembunyikan bukan penjagaan.
-        */}
-        {(!isPetugas(detail.userlevelId) || isAdmin(levelSaya)) && (
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              onClick={() => setPanel((v) => (v === 'sunting' ? null : 'sunting'))}
-            >
-              <Pencil className="h-3.5 w-3.5" /> Sunting Profil
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              onClick={() => setPanel((v) => (v === 'sandi' ? null : 'sandi'))}
-            >
-              <KeyRound className="h-3.5 w-3.5" /> Setel Sandi
-            </Button>
-          </div>
-        )}
-
-        {panel === 'sunting' && (
-          <FormSunting
-            detail={detail}
-            kecamatanList={kecamatanList}
-            onBatal={() => setPanel(null)}
-            onSelesai={() => {
-              setPanel(null);
-              onPerbarui();
-            }}
-          />
-        )}
-        {panel === 'sandi' && (
-          <FormSandi
-            detail={detail}
-            onBatal={() => setPanel(null)}
-            onSelesai={() => setPanel(null)}
-          />
         )}
       </div>
 

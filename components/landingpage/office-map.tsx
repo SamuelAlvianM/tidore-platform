@@ -54,9 +54,20 @@ export default function OfficeMap() {
       className="h-full w-full [&_.leaflet-container]:bg-slate-100"
       style={{ height: "100%", width: "100%" }}
     >
+      {/*
+        🔴 OpenStreetMap, BUKAN CARTO Voyager.
+        
+        CARTO kini menuntut kunci API: ubinnya tetap termuat, tapi setiap petak
+        dicap "API KEY REQUIRED — carto.com/basemaps/apikey" melintang di atas
+        peta. Yang dilihat warga adalah peta kantor dinas bertuliskan peringatan
+        teknis — dan tidak ada satu pun galat di konsol yang memberi tahu.
+
+        ⚠️ Ubin OSM punya batas pemakaian wajar. Kalau portal ini kelak ramai,
+        pindah ke penyedia ubin sendiri — jangan diam-diam dibiarkan.
+      */}
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        // CARTO Voyager: gaya bersih & modern, gratis untuk penggunaan wajar.
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap"
       />
       <Marker position={[OFFICE_LAT, OFFICE_LNG]} icon={pulseIcon} />
       <FlyIn />

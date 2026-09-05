@@ -53,8 +53,27 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = "item-aligned",
-  align = "center",
+  /*
+   * 🔴 `popper`, BUKAN `item-aligned` (bawaan shadcn).
+   *
+   * `item-aligned` meniru <select> asli: panel digeser supaya item TERPILIH
+   * jatuh persis di atas pemicunya. Pada daftar panjang dengan pilihan di
+   * bagian bawah — mis. "Surat Pindah Datang" di antara 20-an jenis layanan —
+   * panel itu terlempar jauh ke ATAS dan menutupi judul halaman beserta
+   * saringan lain. Yang terlihat petugas adalah kotak melayang di tengah
+   * layar tanpa hubungan jelas dengan tombol yang baru saja ia klik.
+   *
+   * `popper` berlabuh di bawah pemicu (naik sendiri hanya bila ruang bawah
+   * habis), persis seperti dropdown pada umumnya.
+   */
+  position = "popper",
+  align = "start",
+  sideOffset = 4,
+  /*
+   * Jarak aman dari tepi layar. Tanpa ini panel bisa menempel mepet ke tepi
+   * bawah viewport dan item terakhirnya sulit dijangkau di layar sentuh.
+   */
+  collisionPadding = 12,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (
@@ -62,13 +81,15 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-[min(20rem,var(--radix-select-content-available-height))] min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
         )}
         position={position}
         align={align}
+        sideOffset={sideOffset}
+        collisionPadding={collisionPadding}
         {...props}
       >
         <SelectScrollUpButton />
@@ -76,7 +97,7 @@ function SelectContent({
           className={cn(
             "p-1",
             position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
+              "w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
           )}
         >
           {children}
