@@ -2,8 +2,19 @@ import { notFound } from 'next/navigation';
 import { Footer } from '@/components/shared/footer';
 import { BackButton } from '@/components/shared/back-button';
 import { DemografiView } from '@/components/landingpage/demografi-view';
-import { getDemografiKategori, DEMOGRAFI_KATEGORI } from '@/lib/demografi-kategori';
+import { DEMOGRAFI_KATEGORI } from '@/lib/demografi-kategori';
+import { kategoriTampil } from '@/lib/demografi-registri';
 import { Users } from 'lucide-react';
+
+/*
+ * Halaman ini dirender saat diminta, bukan dibekukan saat build.
+ *
+ * 🔴 Kategori buatan dinas lahir SETELAH portal dibangun. Halaman statis hanya
+ * mengenal delapan slug bawaan, jadi kategori baru akan menjawab 404 kepada
+ * warga meski datanya sudah tampil di tab beranda — dan tidak ada cara
+ * memperbaikinya selain membangun ulang portalnya.
+ */
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   return DEMOGRAFI_KATEGORI.map((k) => ({ slug: k.slug }));
@@ -15,7 +26,9 @@ export default async function DemografiKategoriPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const info = getDemografiKategori(slug);
+  /* Hanya kategori yang MEMANG ditampilkan di halaman utama. Kategori yang
+     sengaja disembunyikan tidak boleh tetap terbuka lewat tautan langsung. */
+  const info = (await kategoriTampil()).find((k) => k.slug === slug);
   if (!info) notFound();
 
   return (

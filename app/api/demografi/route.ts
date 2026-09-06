@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { slugDikenal } from "@/lib/demografi-registri";
 import { periodeDariQuery } from "@/lib/periode-demografi";
 import { periodeTersedia, pilihPeriode } from "@/lib/demografi-periode";
 
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const kategori = (searchParams.get("kategori") ?? "").trim();
   const parent = (searchParams.get("parent") ?? "").trim();
-  if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
+  if (!(await slugDikenal(kategori))) return fail(["Kategori tidak dikenal"]);
 
   const diminta = periodeDariQuery(searchParams);
   if (diminta === false) return fail(["Periode tidak dikenal"]);

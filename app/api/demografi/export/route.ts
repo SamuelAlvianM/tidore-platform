@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { fail } from "@/lib/api-response";
-import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { slugDikenal } from "@/lib/demografi-registri";
 import { buildDemografiWorkbook, workbookResponse } from "@/lib/demografi-export";
 import { periodeDariQuery } from "@/lib/periode-demografi";
 import { periodeTerbaru } from "@/lib/demografi-periode";
@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const sp = new URL(req.url).searchParams;
   const kategori = (sp.get("kategori") ?? "").trim();
-  if (kategori && !DEMOGRAFI_SLUGS.has(kategori)) {
+  if (kategori && !(await slugDikenal(kategori))) {
     return fail(["Kategori tidak dikenal"]);
   }
 

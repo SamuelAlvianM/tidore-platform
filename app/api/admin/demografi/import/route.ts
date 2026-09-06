@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { parseDemografiExcel } from "@/lib/demografi-import";
-import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { slugDikenal } from "@/lib/demografi-registri";
 import { catatAktivitas } from "@/lib/log-aktivitas";
 import { labelPeriode, semesterSah, tahunSah, type Periode } from "@/lib/periode-demografi";
 import { periodeTerbaru } from "@/lib/demografi-periode";
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     return fail(["Format unggahan tidak valid"]);
   }
 
-  if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
+  if (!(await slugDikenal(kategori))) return fail(["Kategori tidak dikenal"]);
   // Ditolak SEBELUM berkasnya diurai: menolak lebih awal lebih murah daripada
   // membaca 10 MB Excel lalu baru menyadari periodenya salah.
   if (periode === false) return fail(["Tahun dan semester harus diisi dan masuk akal"]);

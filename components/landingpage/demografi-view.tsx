@@ -11,7 +11,10 @@ import {
 import { Loader2, BarChart3, ChevronRight, Pencil, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { DEMOGRAFI_KATEGORI, getDemografiKategori } from '@/lib/demografi-kategori';
+import {
+  DEMOGRAFI_KATEGORI,
+  type DemografiKategori,
+} from '@/lib/demografi-kategori';
 import { DemografiEditor } from '@/components/dashboard/demografi-editor';
 import { PemilihPeriode } from '@/components/shared/pemilih-periode';
 import {
@@ -57,6 +60,18 @@ export function DemografiView({
 }) {
   const [kategori, setKategori] = useState(initialKategori);
   /*
+   * 🔴 DAFTAR TAB DIAMBIL DARI PELADEN, bukan konstanta di kode.
+   *
+   * Dua hal rusak kalau tidak. Kategori buatan dinas tidak akan pernah muncul
+   * di sini meski datanya sudah diimpor — dan kategori yang sengaja dimatikan
+   * lewat "Tampilkan di Halaman utama" tetap terlihat warga, sehingga sakelar
+   * itu cuma hiasan.
+   *
+   * Nilai awalnya konstanta bawaan supaya tab tidak berkedip kosong sebelum
+   * jawaban peladen tiba; begitu tiba, ia yang berlaku.
+   */
+  const [daftarKategori, setDaftarKategori] = useState<DemografiKategori[]>(DEMOGRAFI_KATEGORI);
+  /*
    * Periode yang dilihat. `null` = biarkan server memilih yang terbaru —
    * keadaan awal yang benar untuk pengunjung yang belum memilih apa pun.
    */
@@ -73,6 +88,23 @@ export function DemografiView({
   const [detailKolom, setDetailKolom] = useState<string[]>([]);
   const [detailRows, setDetailRows] = useState<Row[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
+
+  useEffect(() => {
+    let batal = false;
+
+    fetch('/api/demografi/kategori')
+      .then((r) => r.json())
+      .then((j) => {
+        if (batal || !Array.isArray(j.data?.kategori)) return;
+        setDaftarKategori(j.data.kategori);
+      })
+      .catch(() => {
+        /* daftar bawaan tetap dipakai — tab kosong lebih buruk daripada
+           daftar yang mungkin ketinggalan satu kategori */
+      });
+
+    return () => { batal = true; };
+  }, []);
 
   const loadKecamatan = useCallback(() => {
     setLoading(true);
@@ -181,7 +213,7 @@ export function DemografiView({
       {/* Pemilih kategori + tombol edit (mode admin) */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-2">
-          {DEMOGRAFI_KATEGORI.map((k) => {
+          {daftarKategori.map((k) => {
             const active = k.slug === kategori;
             return (
               <button
@@ -205,7 +237,7 @@ export function DemografiView({
             variant="outline"
             asChild
             className="gap-1.5"
-            title={`Unduh data ${getDemografiKategori(kategori)?.label ?? ''} sebagai Excel`}
+            title={`Unduh data ${daftarKategori.find((k) => k.slug === kategori)?.label ?? ''} sebagai Excel`}
           >
             <a
               href={
@@ -224,7 +256,7 @@ export function DemografiView({
               className="gap-1.5"
               title="Ubah data langsung dari sini"
             >
-              <Pencil className="h-4 w-4" /> Edit data {getDemografiKategori(kategori)?.label}
+              <Pencil className="h-4 w-4" /> Edit data {daftarKategori.find((k) => k.slug === kategori)?.label}
             </Button>
           )}
         </div>
@@ -298,7 +330,7 @@ export function DemografiView({
               Detail per Desa — {detail?.wilayah}
             </DialogTitle>
             <DialogDescription>
-              Rincian data {DEMOGRAFI_KATEGORI.find((k) => k.slug === kategori)?.label} per desa/kelurahan.
+              Rincian data {daftarKategori.find((k) => k.slug === kategori)?.label} per desa/kelurahan.
             </DialogDescription>
           </DialogHeader>
 
@@ -351,7 +383,7 @@ export function DemografiView({
       {editable && (
         <DemografiEditor
           kategori={kategori}
-          label={getDemografiKategori(kategori)?.label ?? kategori}
+          label={daftarKategori.find((k) => k.slug === kategori)?.label ?? kategori}
           open={editorOpen}
           onOpenChange={setEditorOpen}
           onSaved={() => {

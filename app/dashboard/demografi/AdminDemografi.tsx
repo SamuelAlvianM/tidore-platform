@@ -25,9 +25,16 @@ import {
   ChevronRight,
   Plus,
   CalendarDays,
+  Tag,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DEMOGRAFI_KATEGORI, deteksiKategori } from '@/lib/demografi-kategori';
+import {
+  DEMOGRAFI_KATEGORI,
+  deteksiKategori,
+  type DemografiKategori,
+} from '@/lib/demografi-kategori';
 import { DEFAULT_KARTU, KARTU_STATISTIK_KUNCI } from '@/lib/beranda-statistik';
 import { DemografiEditor } from '@/components/dashboard/demografi-editor';
 import {
@@ -51,8 +58,54 @@ function downloadFile(url: string) {
   a.remove();
 }
 
+/**
+ * Judul kategori yang DIUSULKAN dari nama berkas.
+ *
+ * 🔴 Ini yang dimaksud "sistem membaca judulnya sendiri". Berkas agregat
+ * buatan dinas tidak punya pola SIAK yang bisa dikenali, dan namanya adalah
+ * satu-satunya keterangan yang ikut bersama berkasnya. Mengusulkan judul dari
+ * situ menghemat pengetikan — tapi usulan tetap DAPAT DISUNTING sebelum
+ * disimpan, karena nama berkas sering mengandung sisa penamaan internal yang
+ * tidak layak jadi judul publik.
+ *
+ * Yang dibuang hanya derau yang pasti: penanda AGR/DUSUN dari SIAK, tahun, dan
+ * penanda semester. Kata seperti "Data" DIPERTAHANKAN — "Data Kemiskinan"
+ * adalah judul yang sah, dan memangkasnya berarti menebak maksud dinas.
+ */
+function usulJudul(namaBerkas: string): string {
+  const bersih = namaBerkas
+    .replace(/\.xlsx$/i, '')
+    .replace(/[_\-.]+/g, ' ')
+    .replace(/\b(agr|dusun|kec|kel)\b/gi, ' ')
+    .replace(/\bsem(ester)?\s*(i{1,3}|[12])\b/gi, ' ')
+    .replace(/\b(19|20)\d{2}\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const judul = (bersih.length >= 3 ? bersih : namaBerkas.replace(/\.xlsx$/i, ''))
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+
+  return judul.slice(0, 60);
+}
+
 /** Hitungan kategori satu periode: slug → jumlah kecamatan tersimpan. */
 type HitunganPeriode = Record<string, number | null>;
+
+/** Berkas yang kategorinya tidak terbaca, menunggu keputusan petugas. */
+interface BerkasAsing {
+  kunci: string;
+  periode: Periode;
+  item: { file: File; usul: string }[];
+}
+
+/** Kategori beserta dua penanda yang hanya ada di sisi admin. */
+interface KategoriAdmin extends DemografiKategori {
+  /** Bawaan DKB — tidak dapat dihapus. */
+  bawaan: boolean;
+  /** Tampil di halaman utama publik. */
+  beranda: boolean;
+}
 
 export function AdminDemografi() {
   /*
@@ -70,6 +123,15 @@ export function AdminDemografi() {
    * Menambah tahun berarti membuat sepasang wadah kosong, lalu berkasnya
    * dimasukkan ke dalamnya.
    */
+  /*
+   * 🔴 DAFTAR KATEGORI DIAMBIL DARI PELADEN, bukan dari konstanta di kode.
+   *
+   * Delapan kategori bawaan adalah berkas DKB baku dari SIAK, tapi dinas juga
+   * menyusun agregatnya sendiri dan isinya berganti tiap tahun. Selama halaman
+   * ini membaca konstanta, kategori buatan dinas tidak akan pernah muncul di
+   * sini — datanya bisa masuk lewat API tapi tak ada barisnya di layar.
+   */
+  const [kategori, setKategori] = useState<KategoriAdmin[]>([]);
   const [hitungan, setHitungan] = useState<Record<string, HitunganPeriode>>({});
   const [periodeTersedia, setPeriodeTersedia] = useState<PeriodeTersedia[]>([]);
   /*
@@ -103,6 +165,13 @@ export function AdminDemografi() {
   const [tahunBaru, setTahunBaru] = useState<number>(new Date().getFullYear());
   const kotakTambah = useRef<HTMLDivElement>(null);
 
+  const [panelKategori, setPanelKategori] = useState(false);
+  const [judulKategoriBaru, setJudulKategoriBaru] = useState('');
+  const [sibukKategori, setSibukKategori] = useState(false);
+  const [konfirmasiHapusKategori, setKonfirmasiHapusKategori] =
+    useState<KategoriAdmin | null>(null);
+  const [berkasAsing, setBerkasAsing] = useState<BerkasAsing | null>(null);
+
   const berkas = useRef<Record<string, HTMLInputElement | null>>({});
   const sudahBukaAwal = useRef(false);
 
@@ -134,9 +203,29 @@ export function AdminDemografi() {
     }
   }, []);
 
+  const muatKategori = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/demografi/kategori', { cache: 'no-store' });
+      const j = await res.json();
+      if (Array.isArray(j.data?.kategori)) setKategori(j.data.kategori);
+    } catch {
+      toast.error('Gagal memuat daftar kategori');
+    }
+  }, []);
+
+  /*
+   * ⚠️ Keduanya ditunggu SEBELUM daftar wadah dirender.
+   *
+   * Hitungan per kategori dibangun dari daftar kategori. Kalau wadah pertama
+   * sempat terbuka sendiri sementara daftarnya masih kosong, hitungannya
+   * tersimpan sebagai objek kosong — dan tiap barisnya tertahan di "memeriksa…"
+   * selamanya, karena tidak ada permintaan susulan yang akan menjawabnya.
+   */
   useEffect(() => {
-    muatDaftarPeriode().finally(() => setMemuatDaftar(false));
-  }, [muatDaftarPeriode]);
+    Promise.all([muatDaftarPeriode(), muatKategori()]).finally(() =>
+      setMemuatDaftar(false),
+    );
+  }, [muatDaftarPeriode, muatKategori]);
 
   /*
    * Hitungan kategori dimuat SAAT WADAHNYA DIBUKA, bukan di awal.
@@ -152,7 +241,7 @@ export function AdminDemografi() {
     const hasil: HitunganPeriode = {};
 
     await Promise.all(
-      DEMOGRAFI_KATEGORI.map(async (kat) => {
+      kategori.map(async (kat) => {
         try {
           const r = await fetch(
             `/api/demografi?kategori=${encodeURIComponent(kat.slug)}&${q}`,
@@ -166,7 +255,7 @@ export function AdminDemografi() {
     );
 
     setHitungan((h) => ({ ...h, [k]: hasil }));
-  }, []);
+  }, [kategori]);
 
   /** Tahun yang punya wadah, terbaru di atas. Tiap tahun selalu dua semester. */
   const tahunUrut = useMemo(() => {
@@ -188,12 +277,15 @@ export function AdminDemografi() {
      seluruhnya terlipat tidak memberi tahu apa pun tentang isinya. */
   useEffect(() => {
     if (sudahBukaAwal.current || periodeTersedia.length === 0) return;
+    // Menunggu daftar kategori: tanpanya hitungannya lahir kosong dan barisnya
+    // tertahan di "memeriksa…" tanpa ada yang akan menjawabnya.
+    if (kategori.length === 0) return;
     sudahBukaAwal.current = true;
 
     const p = periodeTersedia[0];
     setTerbuka(new Set([kunciPeriode(p)]));
     muatHitungan(p);
-  }, [periodeTersedia, muatHitungan]);
+  }, [periodeTersedia, kategori, muatHitungan]);
 
   // Tutup panel "Tambah Tahun" saat klik di luar / Esc.
   useEffect(() => {
@@ -281,7 +373,7 @@ export function AdminDemografi() {
      * kosongnya bukan dugaan: sudah pasti.
      */
     const kosong = Object.fromEntries(
-      DEMOGRAFI_KATEGORI.map((kat) => [kat.slug, 0]),
+      kategori.map((kat) => [kat.slug, 0]),
     ) as HitunganPeriode;
     setHitungan((h) => ({
       ...h,
@@ -290,6 +382,84 @@ export function AdminDemografi() {
     }));
 
     toast.success(`Wadah tahun ${tahunBaru} dibuat — Semester I & II siap diisi`);
+  };
+
+  /** Tambah kategori buatan dinas. `judul` bebas; slug-nya disusun peladen. */
+  const tambahKategori = async (judul: string) => {
+    setSibukKategori(true);
+    try {
+      const res = await fetch('/api/admin/demografi/kategori', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ judul }),
+      });
+      const j = await res.json();
+      if (j.error?.length) {
+        toast.error(j.error[0]);
+        return null;
+      }
+      toast.success(j.success?.[0] ?? 'Kategori dibuat');
+      await muatKategori();
+
+      return (j.data?.kategori ?? null) as DemografiKategori | null;
+    } catch {
+      toast.error('Gagal membuat kategori');
+      return null;
+    } finally {
+      setSibukKategori(false);
+    }
+  };
+
+  /*
+   * Tampil di halaman utama.
+   *
+   * ⚠️ Dikirim sebagai DAFTAR LENGKAP, bukan satu slug yang di-toggle. Dua
+   * petugas yang menyalakan kategori berbeda pada saat yang hampir sama akan
+   * saling menimpa kalau tiap permintaan hanya membawa perubahannya sendiri
+   * — dan yang kalah tidak pernah tahu pilihannya hilang. Daftar penuh
+   * membuat keadaan akhir persis seperti yang terlihat di layar pengirimnya.
+   */
+  const ubahBeranda = async (slug: string, tampil: boolean) => {
+    const sebelum = kategori;
+    const sesudah = kategori.map((k) => (k.slug === slug ? { ...k, beranda: tampil } : k));
+    setKategori(sesudah); // optimistis — jawabannya harus terasa seketika
+
+    try {
+      const res = await fetch('/api/admin/demografi/kategori', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ beranda: sesudah.filter((k) => k.beranda).map((k) => k.slug) }),
+      });
+      const j = await res.json();
+      if (j.error?.length) {
+        toast.error(j.error[0]);
+        setKategori(sebelum); // layar kembali jujur
+      }
+    } catch {
+      toast.error('Gagal menyimpan tampilan halaman utama');
+      setKategori(sebelum);
+    }
+  };
+
+  const hapusKategori = async (slug: string, label: string) => {
+    setSibukKategori(true);
+    try {
+      const res = await fetch(
+        `/api/admin/demografi/kategori?slug=${encodeURIComponent(slug)}`,
+        { method: 'DELETE' },
+      );
+      const j = await res.json();
+      if (j.error?.length) {
+        toast.error(j.error[0]);
+        return;
+      }
+      toast.success(j.success?.[0] ?? `Kategori "${label}" dihapus`);
+      await muatKategori();
+    } catch {
+      toast.error('Gagal menghapus kategori');
+    } finally {
+      setSibukKategori(false);
+    }
   };
 
   /**
@@ -334,20 +504,23 @@ export function AdminDemografi() {
     const k = kunciPeriode(p);
     const semua = [...daftar];
     const dikenal: { file: File; slug: string; label: string }[] = [];
-    const asing: string[] = [];
+    const asing: { file: File; usul: string }[] = [];
 
     for (const f of semua) {
-      const kat = deteksiKategori(f.name);
+      const kat = deteksiKategori(f.name, kategori);
       if (kat) dikenal.push({ file: f, slug: kat.slug, label: kat.label });
-      else asing.push(f.name);
+      else asing.push({ file: f, usul: usulJudul(f.name) });
     }
 
-    if (dikenal.length === 0) {
-      toast.error(
-        `Nama berkas tidak dikenali: ${asing.join(', ')}. Buka Edit pada kategori yang dimaksud, lalu impor dari sana.`,
-      );
-      return;
-    }
+    /*
+     * Berkas yang tak terbaca TIDAK dibuang dan tidak ditebak — ia ditahan
+     * bersama File-nya, dan petugas ditawari membuat kategorinya di tempat.
+     * Menahan File-nya penting: tanpa itu petugas harus memilih berkas yang
+     * sama untuk kedua kalinya setelah kategorinya jadi.
+     */
+    setBerkasAsing(asing.length > 0 ? { kunci: k, periode: p, item: asing } : null);
+
+    if (dikenal.length === 0) return;
 
     const gagal: string[] = [];
     for (let i = 0; i < dikenal.length; i += 1) {
@@ -365,11 +538,6 @@ export function AdminDemografi() {
       );
     }
     if (gagal.length > 0) toast.error(gagal.join(' · '));
-    if (asing.length > 0) {
-      toast.error(
-        `Tidak dikenali dan dilewati: ${asing.join(', ')}. Impor lewat Edit pada kategorinya.`,
-      );
-    }
 
     muatHitungan(p);
     // Impor ke periode yang belum pernah ada menambah satu entri di daftar.
@@ -445,7 +613,7 @@ export function AdminDemografi() {
     const buka = terbuka.has(k);
     const isi = hitungan[k];
     const terisi = isi
-      ? DEMOGRAFI_KATEGORI.filter((kat) => (isi[kat.slug] ?? 0) > 0).length
+      ? kategori.filter((kat) => (isi[kat.slug] ?? 0) > 0).length
       : 0;
     const baris = barisPeriode(p.tahun, p.semester);
     const adaData = isi ? terisi > 0 : baris > 0;
@@ -487,7 +655,7 @@ export function AdminDemografi() {
           <span className="block truncate text-xs text-slate-400">
             {isi
               ? terisi > 0
-                ? `${terisi} dari ${DEMOGRAFI_KATEGORI.length} kategori terisi`
+                ? `${terisi} dari ${kategori.length} kategori terisi`
                 : 'Belum ada data'
               : baris > 0
                 ? `${baris.toLocaleString('id-ID')} baris tersimpan`
@@ -504,7 +672,7 @@ export function AdminDemografi() {
     const isi = hitungan[k];
     const sedangImpor = impor?.kunci === k;
     const adaData = isi
-      ? DEMOGRAFI_KATEGORI.some((kat) => (isi[kat.slug] ?? 0) > 0)
+      ? kategori.some((kat) => (isi[kat.slug] ?? 0) > 0)
       : barisPeriode(p.tahun, p.semester) > 0;
 
     return (
@@ -572,13 +740,90 @@ export function AdminDemografi() {
           berkas (mis. <b>AGR_JK_DUSUN</b> → Jenis Kelamin).
         </p>
 
+        {/*
+          Berkas yang kategorinya tidak terbaca.
+
+          🔴 Ditawarkan menjadi KATEGORI BARU, bukan sekadar ditolak. Inilah
+          jalan masuk agregat buatan dinas: judulnya dibaca dari nama berkasnya
+          dan boleh disunting, lalu kategori dibuat dan berkasnya langsung
+          diimpor ke periode ini. Menolak saja memaksa petugas menebak sendiri
+          bahwa ia perlu membuat kategori lebih dulu — dan tak ada apa pun di
+          layar yang mengatakan itu.
+        */}
+        {berkasAsing?.kunci === k && berkasAsing.item.length > 0 && (
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-3">
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-amber-800">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              {berkasAsing.item.length} berkas belum punya kategori
+            </p>
+
+            <div className="space-y-2">
+              {berkasAsing.item.map((it, i) => (
+                <div key={it.file.name} className="flex flex-wrap items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-xs text-amber-900">
+                    {it.file.name}
+                  </span>
+                  <input
+                    value={it.usul}
+                    onChange={(e) =>
+                      setBerkasAsing((b) =>
+                        b
+                          ? {
+                              ...b,
+                              item: b.item.map((x, j) =>
+                                j === i ? { ...x, usul: e.target.value } : x,
+                              ),
+                            }
+                          : b,
+                      )
+                    }
+                    maxLength={60}
+                    aria-label={`Nama kategori untuk ${it.file.name}`}
+                    className="h-8 w-56 rounded-lg border border-amber-300 bg-white px-2 text-sm"
+                  />
+                  <Button
+                    size="sm"
+                    disabled={sibukKategori || it.usul.trim().length < 3}
+                    onClick={async () => {
+                      const dibuat = await tambahKategori(it.usul.trim());
+                      if (!dibuat) return;
+
+                      const galat = await imporSatu(dibuat.slug, it.file, berkasAsing.periode);
+                      if (galat) {
+                        toast.error(`${dibuat.label}: ${galat}`);
+                        return;
+                      }
+                      toast.success(`${dibuat.label} terimpor ke ${labelPeriode(p.tahun, p.semester)}`);
+                      setBerkasAsing((b) =>
+                        b ? { ...b, item: b.item.filter((_, j) => j !== i) } : b,
+                      );
+                      muatHitungan(berkasAsing.periode);
+                      muatDaftarPeriode();
+                    }}
+                  >
+                    Buat kategori &amp; impor
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setBerkasAsing(null)}
+              className="mt-2 text-[0.7rem] font-medium text-amber-700 underline underline-offset-2"
+            >
+              Lewati berkas ini
+            </button>
+          </div>
+        )}
+
         {!isi ? (
           <div className="flex justify-center py-10">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {DEMOGRAFI_KATEGORI.map((kat) => {
+            {kategori.map((kat) => {
               const jumlah = isi[kat.slug];
 
               return (
@@ -707,6 +952,143 @@ export function AdminDemografi() {
             <RotateCcw className="mr-1.5 h-4 w-4" /> Reset Kartu Beranda
           </Button>
         )}
+      </div>
+
+      {/*
+        KATEGORI berdiri SENDIRI, di luar wadah periode.
+
+        🔴 Menambah kategori dan menampilkannya di halaman utama berlaku untuk
+        SELURUH portal, bukan untuk satu semester. Menaruh sakelarnya di dalam
+        wadah Semester I 2027 akan mengajarkan hal yang salah — seolah sebuah
+        kategori bisa tampil di beranda untuk satu semester dan tidak untuk
+        semester lain. Yang berbeda per periode hanyalah DATANYA.
+      */}
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <button
+          type="button"
+          onClick={() => setPanelKategori((b) => !b)}
+          aria-expanded={panelKategori}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left"
+        >
+          <ChevronRight
+            className={cn(
+              'h-4 w-4 flex-shrink-0 text-slate-400 transition-transform',
+              panelKategori && 'rotate-90',
+            )}
+          />
+          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Tag className="h-4 w-4" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-slate-900">Kategori Data</span>
+            <span className="block truncate text-xs text-slate-400">
+              {kategori.length} kategori · {kategori.filter((k) => k.beranda).length} tampil
+              di halaman utama
+            </span>
+          </span>
+        </button>
+
+        <div
+          inert={!panelKategori}
+          className={cn(
+            'grid transition-[grid-template-rows] duration-300 ease-out',
+            panelKategori ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="divide-y divide-slate-100 border-t border-slate-100">
+              {kategori.map((kat) => (
+                <div key={kat.slug} className="flex flex-wrap items-center gap-2 px-4 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-800">
+                      {kat.label}
+                      {!kat.bawaan && (
+                        <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[0.65rem] font-semibold text-slate-500">
+                          dibuat dinas
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-xs text-slate-400">{kat.slug}</p>
+                  </div>
+
+                  {/*
+                    Sakelar tampil-di-beranda ditulis sebagai KALIMAT KEADAAN,
+                    bukan ikon mata sendirian. Ikon mata punya dua bacaan yang
+                    berlawanan — "sedang terlihat" dan "klik untuk melihat" —
+                    dan petugas tidak boleh menebak yang mana pada pengaturan
+                    yang mengubah apa yang dilihat warga.
+                  */}
+                  <button
+                    type="button"
+                    onClick={() => ubahBeranda(kat.slug, !kat.beranda)}
+                    className={cn(
+                      'inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 transition-colors',
+                      kat.beranda
+                        ? 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/15'
+                        : 'bg-slate-100 text-slate-500 ring-slate-200 hover:bg-slate-200',
+                    )}
+                    title={
+                      kat.beranda
+                        ? 'Sedang tampil di halaman utama — klik untuk menyembunyikan'
+                        : 'Tersembunyi dari halaman utama — klik untuk menampilkan'
+                    }
+                  >
+                    {kat.beranda ? (
+                      <Eye className="h-3.5 w-3.5" />
+                    ) : (
+                      <EyeOff className="h-3.5 w-3.5" />
+                    )}
+                    {kat.beranda ? 'Tampil di Halaman utama' : 'Tidak tampil'}
+                  </button>
+
+                  {!kat.bawaan && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={sibukKategori}
+                      onClick={() => setKonfirmasiHapusKategori(kat)}
+                      className="flex-shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      title={`Hapus kategori ${kat.label}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {isMaster && (
+              <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 bg-slate-50/60 px-4 py-3">
+                <input
+                  value={judulKategoriBaru}
+                  onChange={(e) => setJudulKategoriBaru(e.target.value)}
+                  placeholder="Nama kategori baru, mis. Penyandang Disabilitas"
+                  maxLength={60}
+                  className="h-9 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                />
+                <Button
+                  size="sm"
+                  disabled={sibukKategori || judulKategoriBaru.trim().length < 3}
+                  onClick={async () => {
+                    const dibuat = await tambahKategori(judulKategoriBaru.trim());
+                    if (dibuat) setJudulKategoriBaru('');
+                  }}
+                >
+                  {sibukKategori ? (
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="mr-1.5 h-4 w-4" />
+                  )}
+                  Tambah Kategori
+                </Button>
+                <p className="w-full text-[0.7rem] leading-relaxed text-slate-500">
+                  Kategori baru langsung bisa diisi berkas di tiap periode. Berkas
+                  dikenali bila namanya memuat nama kategori ini.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {memuatDaftar ? (
@@ -843,6 +1225,56 @@ export function AdminDemografi() {
                 <Trash2 className="mr-1.5 h-4 w-4" />
               )}
               Ya, hapus periode ini
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Konfirmasi hapus kategori buatan dinas */}
+      <Dialog
+        open={!!konfirmasiHapusKategori}
+        onOpenChange={(o) => !sibukKategori && !o && setKonfirmasiHapusKategori(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" /> Hapus kategori{' '}
+              {konfirmasiHapusKategori?.label}?
+            </DialogTitle>
+            <DialogDescription>
+              Kategori ini hilang dari dasbor dan dari halaman utama, di{' '}
+              <b>semua periode</b>. Penghapusan <b>ditolak</b> selama masih ada
+              datanya — hapus dulu isinya lewat tombol <b>Hapus</b> pada periode
+              yang bersangkutan, supaya tidak ada baris yang tertinggal tanpa
+              pemilik.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setKonfirmasiHapusKategori(null)}
+              disabled={sibukKategori}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!konfirmasiHapusKategori) return;
+                await hapusKategori(
+                  konfirmasiHapusKategori.slug,
+                  konfirmasiHapusKategori.label,
+                );
+                setKonfirmasiHapusKategori(null);
+              }}
+              disabled={sibukKategori}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              {sibukKategori ? (
+                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-1.5 h-4 w-4" />
+              )}
+              Ya, hapus kategori
             </Button>
           </DialogFooter>
         </DialogContent>

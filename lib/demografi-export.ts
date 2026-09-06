@@ -1,9 +1,6 @@
 import ExcelJS from "exceljs";
 import { prisma } from "@/lib/prisma";
-import {
-  DEMOGRAFI_KATEGORI,
-  getDemografiKategori,
-} from "@/lib/demografi-kategori";
+import { daftarKategori } from "@/lib/demografi-registri";
 import type { Periode } from "@/lib/periode-demografi";
 
 /**
@@ -57,9 +54,19 @@ export async function buildDemografiWorkbook(kategori?: string,
   wb.creator = "DAGA Disdukcapil Tidore Kepulauan";
   wb.created = new Date();
 
-  const targets = kategori
-    ? [getDemografiKategori(kategori)!]
-    : DEMOGRAFI_KATEGORI;
+  /*
+   * 🔴 Daftar kategori diambil dari REGISTRI, bukan dari konstanta.
+   *
+   * Dua hal rusak kalau tidak: "Export Semua" diam-diam melewatkan seluruh
+   * kategori buatan dinas — berkasnya terlihat lengkap padahal tidak — dan
+   * ekspor satu kategori kustom menabrak `getDemografiKategori(...)!`, tanda
+   * seru yang berbohong: nilainya `undefined`, dan `k.label` melempar.
+   */
+  const semua = await daftarKategori();
+  const satu = kategori ? semua.find((k) => k.slug === kategori) : undefined;
+  if (kategori && !satu) return null;
+
+  const targets = satu ? [satu] : semua;
 
   let total = 0;
   for (const k of targets) {

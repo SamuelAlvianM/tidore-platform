@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
-import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { slugDikenal } from "@/lib/demografi-registri";
 import { catatAktivitas } from "@/lib/log-aktivitas";
 import {
   SEMESTER_BAWAAN,
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 
   const sp = new URL(req.url).searchParams;
   const kategori = (sp.get("kategori") ?? "").trim();
-  if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
+  if (!(await slugDikenal(kategori))) return fail(["Kategori tidak dikenal"]);
 
   const diminta = periodeDariQuery(sp);
   if (diminta === false) return fail(["Periode tidak dikenal"]);
@@ -96,7 +96,7 @@ export async function PUT(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const kategori = String((body as { kategori?: string }).kategori ?? "").trim();
   const raw = (body as { rows?: unknown }).rows;
-  if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
+  if (!(await slugDikenal(kategori))) return fail(["Kategori tidak dikenal"]);
   if (!Array.isArray(raw)) return fail(["Data tidak valid"]);
 
   const periode = await periodeDariBadan(body);
@@ -169,7 +169,7 @@ export async function DELETE(req: NextRequest) {
 
   const sp = new URL(req.url).searchParams;
   const kategori = (sp.get("kategori") ?? "").trim();
-  if (kategori && !DEMOGRAFI_SLUGS.has(kategori)) {
+  if (kategori && !(await slugDikenal(kategori))) {
     return fail(["Kategori tidak dikenal"]);
   }
 

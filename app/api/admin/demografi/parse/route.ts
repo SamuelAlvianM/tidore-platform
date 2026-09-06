@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { parseDemografiExcel, type DemografiRow } from "@/lib/demografi-import";
-import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { slugDikenal } from "@/lib/demografi-registri";
 import {
   SEMESTER_BAWAAN,
   TAHUN_BAWAAN,
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   if (periode === false) return fail(["Tahun dan semester harus diisi dan masuk akal"]);
   if (!periode) return fail(["Periode tidak dapat ditentukan"]);
 
-  if (!DEMOGRAFI_SLUGS.has(kategori)) return fail(["Kategori tidak dikenal"]);
+  if (!(await slugDikenal(kategori))) return fail(["Kategori tidak dikenal"]);
   if (files.length === 0) return fail(["Tidak ada file yang dikirim"]);
   for (const f of files) {
     if (!/\.xlsx$/i.test(f.name)) return fail([`"${f.name}" bukan file .xlsx`]);
