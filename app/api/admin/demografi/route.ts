@@ -14,6 +14,7 @@ import {
   type Periode,
 } from "@/lib/periode-demografi";
 import { periodeTerbaru, periodeTersedia } from "@/lib/demografi-periode";
+import { klasifikasiKode } from "@/lib/demografi-import";
 
 export const dynamic = "force-dynamic";
 
@@ -102,15 +103,27 @@ export async function PUT(req: NextRequest) {
   const periode = await periodeDariBadan(body);
   if (!periode) return fail(["Tahun dan semester harus diisi dan masuk akal"]);
 
-  // Validasi & normalisasi ringan; kode 6 digit = kecamatan, 10 digit = pekon.
+  /*
+   * 🔴 LEVEL DITENTUKAN OLEH ATURAN YANG SAMA DENGAN IMPORTIR.
+   *
+   * Dulu di sini berbunyi `kode.length === 10 ? 5 : 4` — apa pun yang bukan
+   * 10 digit dianggap kecamatan. Baris kabupaten/kota berkode 4 digit yang
+   * ikut tampil di editor karena itu NAIK PANGKAT jadi kecamatan setiap kali
+   * petugas menekan Simpan, dan sejak itu tiap penjumlahan tingkat kecamatan
+   * menghitung seluruh kota dua kali. Komentar di baris ini bahkan sudah
+   * menuliskan aturan yang benar; kodenya yang tidak mengikutinya.
+   */
   const seen = new Set<string>();
   const rows: SaveRow[] = [];
   for (const r of raw as SaveRow[]) {
-    const kode = String(r?.kode ?? "").replace(/\D/g, "");
     const wilayah = String(r?.wilayah ?? "").trim();
     if (!wilayah) continue;
-    const level = kode.length === 10 ? 5 : 4;
-    if (!kode || seen.has(kode)) continue;
+
+    const kelas = klasifikasiKode(String(r?.kode ?? ""));
+    if (!kelas) continue; // bentuk kode tak dikenali → dilewati, bukan ditebak
+
+    const { kode, level } = kelas;
+    if (seen.has(kode)) continue;
     seen.add(kode);
     const data: Record<string, number> = {};
     for (const [k, v] of Object.entries(r?.data ?? {})) {

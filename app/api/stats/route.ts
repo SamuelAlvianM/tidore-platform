@@ -105,7 +105,10 @@ export async function GET(req: Request) {
           where: {
             tahun: periode.tahun,
             semester: periode.semester,
-            level: { in: [4, 5] },
+            // Tingkat 3 ikut diambil supaya kategori yang HANYA punya baris
+            // kabupaten tetap terhitung — `rowsFor` yang memastikan hanya satu
+            // tingkat yang dijumlahkan.
+            level: { in: [3, 4, 5] },
             kategori: { in: kategoriSet.length ? kategoriSet : ["__none__"] },
           },
           select: { kategori: true, level: true, data: true },
@@ -139,12 +142,26 @@ export async function GET(req: Request) {
     if (idx !== undefined) trend6[idx].count += 1;
   }
 
-  // Agregasi demografi (import Excel). Angka per kategori dari baris pekon
-  // (level 5) bila ada agar sama dengan tabel ringkasan; kalau belum, baris
-  // kecamatan (level 4).
+  /*
+   * 🔴 SATU TINGKAT SAJA, TIDAK PERNAH DICAMPUR.
+   *
+   * Cadangannya dulu berbunyi "kalau tidak ada desa, pakai SEMUA baris
+   * kategori ini". Itu menjumlahkan tingkat yang berbeda ke dalam satu angka:
+   * satu baris kabupaten yang nilainya sudah merupakan jumlah kecamatan,
+   * ditambah kecamatan-kecamatannya sendiri, menghasilkan penduduk DUA KALI
+   * LIPAT. Tidak ada galat, tidak ada tanda — cuma angka resmi yang salah di
+   * halaman depan portal pemerintah.
+   *
+   * Desa dulu (paling rinci), lalu kecamatan, lalu kabupaten. Berhenti pada
+   * tingkat pertama yang punya isi.
+   */
   const rowsFor = (kat: string) => {
-    const pekon = demografiRows.filter((d) => d.kategori === kat && d.level === 5);
-    return pekon.length ? pekon : demografiRows.filter((d) => d.kategori === kat);
+    for (const level of [5, 4, 3]) {
+      const baris = demografiRows.filter((d) => d.kategori === kat && d.level === level);
+      if (baris.length) return baris;
+    }
+
+    return [];
   };
   /*
    * 🔴 KOLOM YANG TIDAK ADA MENGEMBALIKAN `null`, BUKAN 0.

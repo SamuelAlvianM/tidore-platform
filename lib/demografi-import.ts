@@ -36,15 +36,45 @@ const cellNum = (v: unknown): number => {
 
 /**
  * Dari KODE mentah → { kode ternormalisasi (digit saja), level }.
- * 6 digit = kecamatan (level 4), 10 digit = desa/pekon (level 5).
- * Mengembalikan null untuk kab/kota, dusun (ada huruf), atau panjang lain.
+ *
+ * Standar kode wilayah Kemendagri: 2 digit = provinsi, 4 = kabupaten/kota,
+ * 6 = kecamatan, 10 = desa/kelurahan.
+ *
+ * 🔴 SATU ATURAN UNTUK SEMUA JALUR MASUK. Sebelum ini penyimpanan manual dari
+ * editor punya aturannya sendiri — `kode.length === 10 ? 5 : 4` — sehingga
+ * SEMUA yang bukan 10 digit jadi kecamatan, termasuk baris kabupaten/kota
+ * berkode 4 digit. Akibatnya sekali saja petugas membuka editor lalu menekan
+ * Simpan, baris "KOTA TIDORE KEPULAUAN" naik pangkat jadi kecamatan ke-9, dan
+ * setiap penjumlahan tingkat kecamatan menghitung seluruh kota DUA KALI.
+ *
+ * Terukur di TIDORE (7 Sep 2026): tujuh kategori punya 8 kecamatan, tapi
+ * `jenis-kelamin` — kategori yang paling sering disunting karena memasok tiga
+ * kartu beranda — punya 9, dan yang ke-9 adalah kode 8272 sepanjang 4 digit.
+ *
+ * `null` = bentuk yang tidak dikenali (mis. baris DUSUN yang mengandung huruf);
+ * pemanggil melewatinya, tidak menebaknya.
+ */
+export function klasifikasiKode(raw: string): { kode: string; level: number } | null {
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  if (!digits) return null;
+  if (digits.length === 10) return { kode: digits, level: 5 };
+  if (digits.length === 6) return { kode: digits, level: 4 };
+  if (digits.length === 4) return { kode: digits, level: 3 };
+
+  return null;
+}
+
+/**
+ * Versi untuk IMPOR Excel: kabupaten/kota sengaja dilewati.
+ *
+ * Berkas SIAK memuat baris kabupaten sebagai ringkasan, dan angkanya sudah
+ * terkandung di baris kecamatan di bawahnya. Menyimpannya berarti menaruh
+ * jebakan penjumlahan ganda di tabel yang sama.
  */
 function classifyKode(raw: string): { kode: string; level: number } | null {
-  const digits = raw.replace(/\./g, "");
-  if (!/^\d+$/.test(digits)) return null; // ada huruf (mis. DUSUN) → lewati
-  if (digits.length === 6) return { kode: digits, level: 4 };
-  if (digits.length === 10) return { kode: digits, level: 5 };
-  return null;
+  const hasil = klasifikasiKode(raw);
+
+  return hasil && hasil.level >= 4 ? hasil : null;
 }
 
 export async function parseDemografiExcel(buffer: Buffer): Promise<ParseResult> {
