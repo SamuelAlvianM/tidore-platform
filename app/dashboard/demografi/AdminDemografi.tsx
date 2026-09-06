@@ -237,22 +237,32 @@ export function AdminDemografi() {
    */
   const muatHitungan = useCallback(async (p: Periode) => {
     const k = kunciPeriode(p);
-    const q = kueriPeriode(p);
-    const hasil: HitunganPeriode = {};
 
-    await Promise.all(
-      kategori.map(async (kat) => {
-        try {
-          const r = await fetch(
-            `/api/demografi?kategori=${encodeURIComponent(kat.slug)}&${q}`,
-          );
-          const j = await r.json();
-          hasil[kat.slug] = j.data?.items?.length ?? 0;
-        } catch {
-          hasil[kat.slug] = 0;
-        }
-      }),
-    );
+    /*
+     * 🔴 ENDPOINT ADMIN, bukan `/api/demografi` publik.
+     *
+     * Yang publik sengaja JATUH KE PERIODE TERBARU bila periode yang diminta
+     * kosong — benar untuk warga yang membuka tautan lama, bencana di sini.
+     * Dasbor bertanya "berapa isi Semester I 2026?", dijawab isi Semester II
+     * 2024, lalu memasang "8 dari 8 kategori terisi" pada wadah yang
+     * sebenarnya kosong. Tombol Export dan Hapus-nya ikut menyala untuk
+     * periode yang tidak pernah ada isinya.
+     *
+     * Endpoint ini menjawab PERSIS periode yang diminta, dan sekaligus
+     * menggantikan delapan permintaan dengan satu.
+     */
+    const hasil: HitunganPeriode = {};
+    try {
+      const r = await fetch(
+        `/api/admin/demografi/hitungan?${kueriPeriode(p)}`,
+        { cache: 'no-store' },
+      );
+      const j = await r.json();
+      const dari = (j.data?.hitungan ?? {}) as Record<string, number>;
+      for (const kat of kategori) hasil[kat.slug] = dari[kat.slug] ?? 0;
+    } catch {
+      for (const kat of kategori) hasil[kat.slug] = 0;
+    }
 
     setHitungan((h) => ({ ...h, [k]: hasil }));
   }, [kategori]);

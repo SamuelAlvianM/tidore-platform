@@ -8,6 +8,7 @@ import {
 } from "@/lib/beranda-statistik";
 import { labelPeriodePanjang, periodeDariQuery } from "@/lib/periode-demografi";
 import { periodeTersedia, pilihPeriode } from "@/lib/demografi-periode";
+import { kategoriTampil } from "@/lib/demografi-registri";
 
 const BULAN_PENDEK = [
   "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
@@ -32,9 +33,26 @@ export async function GET(req: Request) {
     where: { kunci: KARTU_STATISTIK_KUNCI },
     select: { konten: true },
   });
-  const kartuKonfig = normalizeKartu(
+  const kartuSemua = normalizeKartu(
     (kartuRow?.konten as { kartu?: unknown } | null)?.kartu,
   );
+
+  /*
+   * 🔴 KARTU IKUT SAKELAR "TAMPIL DI HALAMAN UTAMA".
+   *
+   * Kartu statistik adalah benda PALING TERLIHAT di halaman utama, dan
+   * masing-masing menarik angkanya dari satu kategori demografi. Tanpa
+   * penyaringan ini, petugas mematikan kategori Jenis Kelamin, tab-nya lenyap
+   * dari tabel di bawah — tapi "Jumlah Penduduk 121.952" tetap terpampang
+   * besar di puncak halaman, karena kartu itu diam-diam menarik angkanya dari
+   * kategori yang sama. Sakelarnya jadi berbohong tentang namanya sendiri.
+   *
+   * Kartu yang belum ditentukan sumbernya (tanpa `kategori`) dibiarkan: ia
+   * tidak menampilkan angka siapa pun, jadi tidak ada yang perlu disembunyikan.
+   */
+  const bolehTampil = new Set((await kategoriTampil()).map((k) => k.slug));
+  const kartuKonfig = kartuSemua.filter((k) => !k.kategori || bolehTampil.has(k.kategori));
+
   const kategoriSet = [
     ...new Set(kartuKonfig.map((k) => k.kategori).filter(Boolean)),
   ];

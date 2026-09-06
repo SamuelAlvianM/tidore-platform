@@ -378,9 +378,9 @@
     "semantic_hash": "4a34d428c20f174069afca6bd2bbe1a1"
   },
   "app/api/stats/route.ts": {
-    "mtime": 1788512636.6149592,
-    "seen": 1788513647.9951966,
-    "ast_hash": "839f555253c5abf3684d157c41b7f18a",
+    "mtime": 1788713769.3859222,
+    "seen": 1788715204.8549159,
+    "ast_hash": "a1da8d3c8e34cf407661173375349e05",
     "semantic_hash": ""
   },
   "app/api/tiket/[id]/route.ts": {
@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "app/dashboard/demografi/AdminDemografi.tsx": {
-    "mtime": 1788711082.9309113,
-    "seen": 1788712448.4219456,
-    "ast_hash": "344692331f38e1cd09e0a32e2b3ade12",
+    "mtime": 1788714579.3071313,
+    "seen": 1788715204.8549466,
+    "ast_hash": "d4b049d23d1b894d33e6c103029edd8e",
     "semantic_hash": ""
   },
   "app/dashboard/demografi/page.tsx": {
@@ -2235,6 +2235,12 @@
     "mtime": 1788711082.3545742,
     "seen": 1788712448.4225574,
     "ast_hash": "04de409f1a4ede4467f5aba5dc14f39e",
+    "semantic_hash": ""
+  },
+  "app/api/admin/demografi/hitungan/route.ts": {
+    "mtime": 1788714579.6894968,
+    "seen": 1788715204.8546543,
+    "ast_hash": "cb8614f2de90ad48879524f5c7ece93b",
     "semantic_hash": ""
   }
 }
