@@ -102,7 +102,21 @@ export function PengaturanPelayanan({
     for (const item of PELAYANAN_LIST) {
       (g[item.category] ??= []).push(item);
     }
-    return g;
+
+    /*
+     * Kelompok TERBANYAK lebih dulu.
+     *
+     * Urutan bawaannya mengikuti urutan deklarasi di PELAYANAN_LIST, yang
+     * kebetulan menaruh kelompok berisi dua layanan di atas kelompok berisi
+     * tujuh. Akibatnya layar teratas hampir kosong sementara bagian yang
+     * paling sering disetel petugas terdorong ke bawah lipatan. Mengurutkan
+     * dari yang terbanyak menaruh pekerjaan terbesar di tempat pertama yang
+     * dilihat.
+     *
+     * `sort` di JavaScript modern bersifat stabil, jadi kelompok dengan
+     * jumlah sama tetap memakai urutan aslinya.
+     */
+    return Object.entries(g).sort((a, b) => b[1].length - a[1].length);
   }, []);
 
   const visibleCount = PELAYANAN_LIST.length - hidden.size;
@@ -158,7 +172,10 @@ export function PengaturanPelayanan({
 
       {/* Daftar per kategori */}
       <div className="space-y-5">
-        {Object.entries(grouped).map(([cat, items]) => (
+        {grouped.map(([cat, items]) => {
+          const adaMati = items.some((i) => hidden.has(i.modalType));
+
+          return (
           <div key={cat} className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
               {PELAYANAN_KATEGORI[cat] ?? cat}
@@ -173,12 +190,29 @@ export function PengaturanPelayanan({
                       'flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors',
                       shown
                         ? 'border-slate-200 hover:border-primary/40'
-                        : 'border-dashed border-slate-200 bg-slate-50 opacity-70',
+                        /*
+                         * 🔴 TANPA `opacity-70` untuk keadaan mati.
+                         *
+                         * Opasitas memudarkan seluruh isi kotak — termasuk
+                         * kotak centangnya, satu-satunya benda di sini yang
+                         * masih HARUS terbaca sebagai bisa diklik. Yang
+                         * dimaksud "layanan ini mati" cukup disampaikan teks
+                         * coret, latar kelabu, dan garis putus-putus; tidak
+                         * perlu ikut mengaburkan sakelarnya sendiri.
+                         */
+                        : 'border-dashed border-slate-300 bg-slate-50 hover:border-primary/40',
                     )}
                   >
                     <Checkbox
                       checked={shown}
                       onCheckedChange={() => toggle(item.modalType)}
+                      /*
+                       * Saat mati, bingkainya ditebalkan dan digelapkan.
+                       * Kotak kosong bergaris tipis di sebelah teks coret
+                       * terbaca sebagai hiasan keadaan "nonaktif", bukan
+                       * sebagai sakelar yang menunggu diklik.
+                       */
+                      className={cn(!shown && 'border-2 border-slate-400')}
                     />
                     <span
                       className={cn(
@@ -192,8 +226,26 @@ export function PengaturanPelayanan({
                 );
               })}
             </div>
+
+            {/*
+              ⚠️ Petunjuknya menempel pada KELOMPOK yang punya layanan mati,
+              bukan sekali di kepala halaman.
+
+              Petugas yang bingung sedang menatap kotak-kotak coret di tengah
+              daftar; kalimat penolongnya ada di puncak halaman, jauh di luar
+              layar. Ditaruh di sini ia muncul persis di sebelah kebingungan
+              itu, dan hilang sendiri begitu semua layanan kelompok ini
+              menyala — jadi tidak menjadi kebisingan tetap.
+            */}
+            {adaMati && (
+              <p className="mt-3 flex items-center gap-1.5 text-[0.72rem] font-medium text-amber-700">
+                <EyeOff className="h-3.5 w-3.5 shrink-0" />
+                Centang kembali agar form pengisian kembali aktif.
+              </p>
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400">

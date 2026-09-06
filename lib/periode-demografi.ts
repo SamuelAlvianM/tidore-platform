@@ -64,6 +64,15 @@ export const labelPeriodePanjang = (tahun: number, semester: number) =>
 export const periodeSama = (a?: Periode | null, b?: Periode | null) =>
   !!a && !!b && a.tahun === b.tahun && a.semester === b.semester;
 
+/**
+ * Kunci ringkas satu periode: "2024-2".
+ *
+ * Dipakai sebagai kunci objek/Set di sisi peramban — mis. wadah periode mana
+ * yang sedang terbuka, dan hitungan kategori milik periode mana. Satu fungsi
+ * supaya "2024-2" tidak pernah dieja berbeda di dua tempat.
+ */
+export const kunciPeriode = (p: Periode) => `${p.tahun}-${p.semester}`;
+
 /** `tahun=…&semester=…`, atau string kosong bila periodenya belum ada. */
 export const kueriPeriode = (p?: Periode | null) =>
   p ? `tahun=${p.tahun}&semester=${p.semester}` : "";
@@ -124,7 +133,7 @@ export function gabungPeriode(...daftar: (PeriodeTersedia[] | undefined)[]): Per
 
   for (const d of daftar) {
     for (const p of d ?? []) {
-      const k = `${p.tahun}-${p.semester}`;
+      const k = kunciPeriode(p);
       const ada = peta.get(k);
       peta.set(k, {
         tahun: p.tahun,
