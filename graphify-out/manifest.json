@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "app/dashboard/demografi/AdminDemografi.tsx": {
-    "mtime": 1788751823.5472722,
-    "seen": 1788753112.8992853,
-    "ast_hash": "72ae150fbb6523bdc5618a68dc52c2eb",
+    "mtime": 1788753667.2469985,
+    "seen": 1788754103.1601086,
+    "ast_hash": "6b4266305b50d0787b92ae3daeb26e8f",
     "semantic_hash": ""
   },
   "app/dashboard/demografi/page.tsx": {
