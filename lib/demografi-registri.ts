@@ -22,7 +22,7 @@ import {
  * petugas melihat "Kategori tidak dikenal" untuk kategori yang ia buat sendiri.
  */
 
-const REGISTRI_KOSONG: RegistriKategori = { kustom: [], beranda: null };
+const REGISTRI_KOSONG: RegistriKategori = { kustom: [], beranda: null, label: {} };
 
 function bacaKustom(nilai: unknown): DemografiKategori[] {
   if (!Array.isArray(nilai)) return [];
@@ -46,6 +46,34 @@ function bacaKustom(nilai: unknown): DemografiKategori[] {
   return hasil;
 }
 
+
+/** Peta slug — nama pengganti. Nilai bukan teks diabaikan, bukan dipaksa. */
+function bacaLabel(nilai: unknown): Record<string, string> {
+  if (!nilai || typeof nilai !== "object" || Array.isArray(nilai)) return {};
+
+  const hasil: Record<string, string> = {};
+  for (const [slug, label] of Object.entries(nilai as Record<string, unknown>)) {
+    if (typeof label === "string" && label.trim()) hasil[slug] = label.trim();
+  }
+
+  return hasil;
+}
+
+/**
+ * Pasang nama pengganti pada daftar kategori.
+ *
+ * 🔴 Dipakai SEMUA jalur baca. Kalau satu jalur saja melewatkannya — tab
+ * halaman utama, judul sheet ekspor, nama di editor kartu — portal yang sama
+ * menyebut satu kategori dengan dua nama berbeda, dan yang melihatnya tidak
+ * punya cara menebak mana yang benar.
+ */
+function pasangLabel(
+  daftar: DemografiKategori[],
+  label: Record<string, string>,
+): DemografiKategori[] {
+  return daftar.map((k) => (label[k.slug] ? { ...k, label: label[k.slug] } : k));
+}
+
 /** Isi registri apa adanya. Tidak pernah melempar — registri rusak = kosong. */
 export async function bacaRegistri(): Promise<RegistriKategori> {
   try {
@@ -61,17 +89,18 @@ export async function bacaRegistri(): Promise<RegistriKategori> {
       beranda: Array.isArray(konten.beranda)
         ? konten.beranda.filter((b): b is string => typeof b === "string")
         : null,
+      label: bacaLabel(konten.label),
     };
   } catch {
     return REGISTRI_KOSONG;
   }
 }
 
-/** Seluruh kategori: bawaan dulu, lalu buatan dinas. */
+/** Seluruh kategori: bawaan dulu, lalu buatan dinas — dengan nama terkini. */
 export async function daftarKategori(): Promise<DemografiKategori[]> {
-  const { kustom } = await bacaRegistri();
+  const { kustom, label } = await bacaRegistri();
 
-  return [...DEMOGRAFI_KATEGORI, ...kustom];
+  return pasangLabel([...DEMOGRAFI_KATEGORI, ...kustom], label ?? {});
 }
 
 /** Kategori ini dikenal? Dipakai SEMUA endpoint sebagai gantinya DEMOGRAFI_SLUGS. */
@@ -91,8 +120,8 @@ export async function slugDikenal(slug: string): Promise<boolean> {
  * demografinya hanya karena pengaturan barunya belum pernah disentuh.
  */
 export async function kategoriTampil(): Promise<DemografiKategori[]> {
-  const { kustom, beranda } = await bacaRegistri();
-  const semua = [...DEMOGRAFI_KATEGORI, ...kustom];
+  const { kustom, beranda, label } = await bacaRegistri();
+  const semua = pasangLabel([...DEMOGRAFI_KATEGORI, ...kustom], label ?? {});
 
   if (beranda === null) return semua;
 
@@ -119,6 +148,7 @@ export async function tulisRegistri(
       fileHint: k.fileHint,
     })),
     beranda: registri.beranda,
+    label: { ...(registri.label ?? {}) },
   };
 
   await prisma.staticContent.upsert({

@@ -8,9 +8,11 @@ import {
   DEMOGRAFI_KATEGORI,
   DEMOGRAFI_KATEGORI_KUNCI,
   DEMOGRAFI_SLUGS,
+  KATEGORI_TERKUNCI,
   slugKategori,
 } from "@/lib/demografi-kategori";
-import { bacaRegistri, tulisRegistri } from "@/lib/demografi-registri";
+import { bacaRegistri, daftarKategori, tulisRegistri } from "@/lib/demografi-registri";
+import { KARTU_STATISTIK_KUNCI, normalizeKartu } from "@/lib/beranda-statistik";
 
 export const dynamic = "force-dynamic";
 
@@ -18,33 +20,131 @@ export const dynamic = "force-dynamic";
 const MAKS_KUSTOM = 24;
 
 /**
- * Kategori data demografi: daftar, tambah, atur tampil di halaman utama, hapus.
+ * Kategori data demografi: daftar, ganti nama, atur tampil di halaman utama.
  *
- * GET    → seluruh kategori + penanda bawaan/kustom + tampil-di-beranda
- * POST   → { judul } tambah kategori buatan dinas
+ * GET    → seluruh kategori + di mana ia benar-benar tampil + jumlah barisnya
+ * PATCH  → { slug, judul } ganti NAMA TAMPILAN saja; slug tidak tersentuh
  * PUT    → { beranda: string[] } atur mana yang tampil di halaman utama
- * DELETE → ?slug= hapus kategori kustom (ditolak bila masih berisi data)
+ * POST   → tambah kategori   } keduanya ditolak selama `KATEGORI_TERKUNCI`,
+ * DELETE → hapus kategori    } lihat alasannya di lib/demografi-kategori.ts
  */
+
+/** Balasan seragam saat daftar kategori sedang dikunci. */
+function terkunci() {
+  return fail(
+    [
+      "Daftar kategori dikunci. Kategori tidak dapat ditambah atau dihapus; "
+      + "nama tampilannya masih bisa diubah lewat tombol Ganti Nama.",
+    ],
+    409,
+  );
+}
 export async function GET() {
   const session = await getSession();
   if (!session || !isPetugas(session.level)) return fail(["Tidak diizinkan"], 403);
 
-  const { kustom, beranda } = await bacaRegistri();
-  const semua = [...DEMOGRAFI_KATEGORI, ...kustom];
+  const { beranda } = await bacaRegistri();
+  const semua = await daftarKategori();
   const tampil = beranda === null ? null : new Set(beranda);
 
+  /*
+   * 🔴 Tiap kategori menyebut DI MANA ia benar-benar tampil, dan berapa
+   * barisnya.
+   *
+   * Sebelumnya panel ini cuma berbunyi "8 tampil di halaman utama" — kalimat
+   * yang tidak menyebut tampil di mana. Petugas membandingkannya dengan enam
+   * kartu angka di beranda, menyimpulkan ada dua kategori yang hilang, lalu
+   * hendak menghapus dua kategori yang sebetulnya berisi ribuan baris DKB.
+   * Padahal keduanya hal yang berbeda: kategori mengisi TAB tabel demografi,
+   * sedangkan kartu beranda konfigurasi tersendiri yang boleh menarik beberapa
+   * angka dari kategori yang sama.
+   *
+   * Angka yang dikirim ke layar: `kartu` (berapa kartu beranda menarik dari
+   * kategori ini) dan `baris` (seluruh periode). Keduanya yang membuat
+   * pertanyaan "yang mana sebenarnya kosong" bisa dijawab dengan melihat,
+   * bukan menebak.
+   */
+  const [hitungBaris, kartuRow] = await Promise.all([
+    prisma.demografiWilayah.groupBy({ by: ["kategori"], _count: { _all: true } }),
+    prisma.staticContent.findUnique({
+      where: { kunci: KARTU_STATISTIK_KUNCI },
+      select: { konten: true },
+    }),
+  ]);
+
+  const barisPer = new Map(hitungBaris.map((r) => [r.kategori, r._count._all]));
+  const kartuPer = new Map<string, number>();
+  for (const kartu of normalizeKartu((kartuRow?.konten as { kartu?: unknown } | null)?.kartu)) {
+    if (kartu.kategori) kartuPer.set(kartu.kategori, (kartuPer.get(kartu.kategori) ?? 0) + 1);
+  }
+
   return ok({
+    terkunci: KATEGORI_TERKUNCI,
     kategori: semua.map((k) => ({
       ...k,
       bawaan: DEMOGRAFI_SLUGS.has(k.slug),
       beranda: tampil === null ? true : tampil.has(k.slug),
+      kartu: kartuPer.get(k.slug) ?? 0,
+      baris: barisPer.get(k.slug) ?? 0,
     })),
   });
+}
+
+/**
+ * Ganti NAMA TAMPILAN satu kategori. Slug-nya tidak pernah ikut berubah.
+ *
+ * 🔴 Inilah satu-satunya cara mengubah daftar kategori sekarang, dan
+ * sengaja dibuat begitu. Slug adalah nilai kolom `kategori` pada setiap baris
+ * DKB yang sudah diimpor dan potongan URL publik `/media/demografi/<slug>`;
+ * mengubahnya berarti seluruh data lama lepas dari kategorinya dalam satu klik.
+ * Nama boleh salah ketik dan diperbaiki kapan saja — slug tidak.
+ */
+export async function PATCH(req: NextRequest) {
+  const session = await getSession();
+  if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
+
+  const body = await req.json().catch(() => ({}));
+  const slug = String((body as { slug?: unknown }).slug ?? "").trim();
+  const judul = String((body as { judul?: unknown }).judul ?? "").trim();
+
+  if (!slug) return fail(["Kategori tidak disebut"]);
+  if (judul.length < 3) return fail(["Nama kategori minimal 3 huruf"]);
+  if (judul.length > 60) return fail(["Nama kategori maksimal 60 huruf"]);
+
+  const registri = await bacaRegistri();
+  const dikenal = DEMOGRAFI_SLUGS.has(slug) || registri.kustom.some((k) => k.slug === slug);
+  if (!dikenal) return fail(["Kategori tidak dikenal"]);
+
+  const sekarang = (await daftarKategori()).find((k) => k.slug === slug);
+  const label = { ...(registri.label ?? {}) };
+
+  /*
+   * Nama yang dikembalikan ke aslinya menghapus entrinya, bukan menyimpan
+   * salinan yang kebetulan sama. Kalau tidak, label bawaan yang kelak
+   * diperbaiki di kode akan kalah oleh salinan basi di basis data.
+   */
+  const asli = DEMOGRAFI_KATEGORI.find((k) => k.slug === slug)?.label
+    ?? registri.kustom.find((k) => k.slug === slug)?.label;
+  if (judul === asli) delete label[slug];
+  else label[slug] = judul;
+
+  registri.label = label;
+  await tulisRegistri(registri, session.uid);
+  await catatAktivitas(
+    session,
+    "UBAH",
+    "Demografi",
+    `Mengganti nama kategori "${sekarang?.label ?? slug}" menjadi "${judul}" (${slug})`,
+    { entitasId: slug, req },
+  );
+
+  return ok({ slug, label: judul }, [`Nama kategori disimpan: "${judul}"`]);
 }
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
+  if (KATEGORI_TERKUNCI) return terkunci();
 
   const body = await req.json().catch(() => ({}));
   const judul = String((body as { judul?: unknown }).judul ?? "").trim();
@@ -121,6 +221,7 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const session = await getSession();
   if (!session || session.level !== 1) return fail(["Tidak diizinkan"], 403);
+  if (KATEGORI_TERKUNCI) return terkunci();
 
   const slug = (new URL(req.url).searchParams.get("slug") ?? "").trim();
   if (!slug) return fail(["Kategori tidak disebut"]);

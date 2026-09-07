@@ -35,9 +35,39 @@ export const DEMOGRAFI_SLUGS = new Set(DEMOGRAFI_KATEGORI.map((k) => k.slug));
  */
 export const DEMOGRAFI_KATEGORI_KUNCI = "demografi.kategori";
 
+/**
+ * Daftar kategori DIKUNCI: tidak bisa ditambah atau dihapus dari dasbor.
+ *
+ * 🔴 Kenapa dikunci. Kolom `kategori` di basis data cuma teks, dan setiap
+ * baris DKB yang sudah diimpor menempel pada slug-nya. Menghapus satu kategori
+ * meninggalkan ribuan baris yang tidak dikenal siapa pun — tidak muncul di
+ * layar, tidak bisa diekspor, tidak bisa dihapus lewat antarmuka. Menambah
+ * kategori yang lalu tidak jadi dipakai menghasilkan hal yang sama dari arah
+ * sebaliknya.
+ *
+ * Yang tersisa untuk dinas adalah MENGGANTI NAMANYA, dan itu aman: yang
+ * berubah cuma label di layar, slug-nya tidak tersentuh sedikit pun.
+ *
+ * ⚠️ Satu tetapan ini mengunci ANTARMUKA SEKALIGUS ENDPOINT-nya. Mengunci
+ * tombolnya saja meninggalkan POST/DELETE yang masih menerima permintaan —
+ * terkunci di layar, terbuka bagi siapa pun yang tahu alamatnya. Ubah ke
+ * `false` untuk membuka keduanya kembali; kodenya utuh, tidak dibuang.
+ */
+export const KATEGORI_TERKUNCI = true;
+
 export interface RegistriKategori {
   /** Kategori tambahan buatan dinas. */
   kustom: DemografiKategori[];
+  /**
+   * Nama tampilan pengganti, per slug.
+   *
+   * 🔴 HANYA LABEL. Slug tidak pernah ikut berubah, dan itu bukan
+   * kelalaian: slug adalah nilai kolom `kategori` pada tiap baris DKB dan
+   * potongan URL publik `/media/demografi/<slug>`. Mengganti slug saat dinas
+   * mengganti nama berarti seluruh data lamanya lepas dari kategorinya dalam
+   * satu klik, tanpa peringatan — persis "data menggantung" yang dihindari.
+   */
+  label?: Record<string, string>;
   /**
    * Slug yang ditampilkan di halaman utama.
    *
