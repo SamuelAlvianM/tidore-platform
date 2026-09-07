@@ -11,8 +11,18 @@ import {
   KATEGORI_TERKUNCI,
   slugKategori,
 } from "@/lib/demografi-kategori";
-import { bacaRegistri, daftarKategori, tulisRegistri } from "@/lib/demografi-registri";
-import { KARTU_STATISTIK_KUNCI, normalizeKartu } from "@/lib/beranda-statistik";
+import {
+  bacaRegistri,
+  daftarKategori,
+  kategoriTampil,
+  tulisRegistri,
+} from "@/lib/demografi-registri";
+import {
+  KARTU_STATISTIK_KUNCI,
+  MAKS_KARTU_BERANDA,
+  normalizeKartu,
+  selaraskanKartu,
+} from "@/lib/beranda-statistik";
 
 export const dynamic = "force-dynamic";
 
@@ -202,11 +212,50 @@ export async function PUT(req: NextRequest) {
     ...registri.kustom.map((k) => k.slug),
   ]);
   // Hanya simpan slug yang dikenal → cegah data sampah menumpuk di registri.
-  registri.beranda = [
+  const diminta = [
     ...new Set(raw.filter((s): s is string => typeof s === "string" && dikenal.has(s))),
   ];
 
+  /*
+   * 🔴 BATAS ENAM DITEGAKKAN DI SINI, bukan cuma di tombolnya.
+   *
+   * Beranda punya enam petak kartu dan tiap kategori berhak atas satu. Layar
+   * yang menolak klik ketujuh sudah cukup untuk petugas, tapi tidak untuk
+   * permintaan yang datang langsung ke alamat ini — dan kalau lolos, kartu
+   * ketujuh muncul di beranda tanpa petak, merusak tata letaknya di ponsel.
+   */
+  /*
+   * 🔴 MENYUSUT SELALU BOLEH, walau masih di atas batas.
+   *
+   * Portal yang sudah berjalan bisa punya delapan kategori menyala dari sebelum
+   * aturan ini ada. Menolak setiap daftar yang panjangnya di atas enam akan
+   * menolak juga usaha MEMATIKAN salah satunya — daftar 8 jadi 7 tetap di atas
+   * enam — dan petugas terkunci pada keadaan yang justru diminta ia perbaiki,
+   * tanpa satu pun jalan keluar di layar. Yang ditolak hanya yang MENAMBAH.
+   */
+  const sebelumnya = registri.beranda?.length ?? Number.MAX_SAFE_INTEGER;
+  if (diminta.length > MAKS_KARTU_BERANDA && diminta.length >= sebelumnya) {
+    return fail([
+      `Paling banyak ${MAKS_KARTU_BERANDA} kategori yang boleh tampil di halaman utama. `
+      + `Matikan salah satu dulu sebelum menyalakan yang lain.`,
+    ]);
+  }
+  registri.beranda = diminta;
+
   await tulisRegistri(registri, session.uid);
+
+  /*
+   * 🔴 Kartu beranda IKUT DISELARASKAN, bukan dibiarkan sendiri.
+   *
+   * Sakelar ini menentukan kategori mana yang tampil; kalau kartunya tidak
+   * ikut, mematikan sebuah kategori menyisakan kartunya menggantung di puncak
+   * beranda (disaring /api/stats, tapi tetap tersimpan dan muncul lagi begitu
+   * kategorinya dinyalakan kembali — dengan setelan lama yang membingungkan),
+   * dan menyalakan kategori baru tidak memberinya kartu sama sekali.
+   *
+   * Sesudah ini jumlah kartu SELALU sama dengan jumlah kategori yang tampil.
+   */
+  await selaraskanKartuBeranda();
   await catatAktivitas(
     session,
     "UBAH",
@@ -264,4 +313,42 @@ export async function DELETE(req: NextRequest) {
   );
 
   return ok({ slug }, [`Kategori "${ada.label}" dihapus`]);
+}
+
+/**
+ * Tulis ulang `beranda.statistik` supaya persis satu kartu per kategori yang
+ * tampil. Dipanggil setiap kali daftar tampil berubah.
+ */
+async function selaraskanKartuBeranda(): Promise<void> {
+  const tampil = await kategoriTampil();
+  const row = await prisma.staticContent.findUnique({
+    where: { kunci: KARTU_STATISTIK_KUNCI },
+    select: { konten: true },
+  });
+  /*
+   * Kolom `konten` bertipe Json Prisma, yang menolak antarmuka bernama —
+   * `KartuStatistik[]` tidak punya index signature. Disalin jadi objek biasa
+   * supaya bentuk tersimpannya persis seperti yang dibaca `normalizeKartu`.
+   */
+  const kartu = selaraskanKartu(
+    normalizeKartu((row?.konten as { kartu?: unknown } | null)?.kartu),
+    tampil,
+  ).map((k) => ({
+    title: k.title,
+    icon: k.icon,
+    kategori: k.kategori,
+    kolom: k.kolom,
+    warna: k.warna,
+    ...(k.badgeKolom ? { badgeKolom: k.badgeKolom } : {}),
+  }));
+
+  await prisma.staticContent.upsert({
+    where: { kunci: KARTU_STATISTIK_KUNCI },
+    create: {
+      kunci: KARTU_STATISTIK_KUNCI,
+      judul: "Kartu Statistik Beranda",
+      konten: { kartu },
+    },
+    update: { konten: { kartu } },
+  });
 }

@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Check, X, Search, Shapes, Pencil, TableProperties } from 'lucide-react';
 import { ICON_MAP, ICON_NAMES, getIcon } from '@/lib/icon-map';
-import { DEMOGRAFI_KATEGORI, getDemografiKategori } from '@/lib/demografi-kategori';
+import { getDemografiKategori } from '@/lib/demografi-kategori';
 import {
   KARTU_STATISTIK_KUNCI,
   DEFAULT_KARTU,
@@ -319,14 +319,30 @@ function CardEditor({
 
         {/* Sumber data: kategori + kolom */}
         <div className="grid grid-cols-2 gap-3">
+          {/*
+            🔴 KATEGORI TIDAK BISA DIGANTI DI SINI — sengaja.
+            
+            Satu kategori berhak atas satu kartu, dan kartu ini adalah wajah
+            kategori tersebut. Selama medan ini bisa diubah, dua kartu bisa
+            menunjuk kategori yang sama: beranda menampilkan satu kategori dua
+            kali sementara kategori lain yang datanya sudah diimpor tidak
+            muncul sama sekali, dan tidak ada apa pun di layar yang
+            menjelaskannya. Persis keadaan yang dulu terjadi — tiga dari enam
+            kartu semuanya menarik dari `jenis-kelamin`.
+            
+            Kartu ditambah dan dikurangi lewat sakelar "Tampil di Halaman
+            utama" pada panel Kategori Data di dasbor demografi.
+          */}
           <div className="space-y-1.5">
             <Label>Kategori data</Label>
-            <SelectBox
-              value={card.kategori}
-              onChange={(v) => onChange({ kategori: v, kolom: '', badgeKolom: undefined })}
-              placeholder="— Pilih kategori —"
-              options={DEMOGRAFI_KATEGORI.map((k) => ({ value: k.slug, label: k.label }))}
-            />
+            <div
+              className="flex h-9 items-center rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-600"
+              title="Kartu ini mewakili kategori tersebut. Ganti lewat sakelar tampil di dasbor demografi."
+            >
+              <span className="truncate">
+                {getDemografiKategori(card.kategori)?.label ?? card.kategori ?? '—'}
+              </span>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Kolom (angka)</Label>

@@ -4,6 +4,7 @@ import {
   KARTU_STATISTIK_KUNCI,
   normalizeKartu,
   resolveKolom,
+  selaraskanKartu,
   warnaPreset,
 } from "@/lib/beranda-statistik";
 import { labelPeriodePanjang, periodeDariQuery } from "@/lib/periode-demografi";
@@ -50,8 +51,18 @@ export async function GET(req: Request) {
    * Kartu yang belum ditentukan sumbernya (tanpa `kategori`) dibiarkan: ia
    * tidak menampilkan angka siapa pun, jadi tidak ada yang perlu disembunyikan.
    */
-  const bolehTampil = new Set((await kategoriTampil()).map((k) => k.slug));
-  const kartuKonfig = kartuSemua.filter((k) => !k.kategori || bolehTampil.has(k.kategori));
+  /*
+   * 🔴 Diselaraskan lagi SAAT DIBACA, bukan cuma saat disimpan.
+   *
+   * Baris `beranda.statistik` bisa berubah dari jalur lain — editor kartu,
+   * tombol "Reset Kartu Beranda", atau tangan yang menyunting basis data
+   * langsung. Menyaring saja tidak cukup: dua kartu berkategori sama akan
+   * lolos saringan dan beranda kembali menampilkan satu kategori dua kali.
+   * Di sini bentuk akhirnya dipastikan — satu kartu per kategori yang tampil,
+   * seurut daftarnya, paling banyak enam.
+   */
+  const tampil = await kategoriTampil();
+  const kartuKonfig = selaraskanKartu(kartuSemua, tampil);
 
   const kategoriSet = [
     ...new Set(kartuKonfig.map((k) => k.kategori).filter(Boolean)),

@@ -29,6 +29,106 @@ export interface KartuStatistik {
   badgeKolom?: string;
 }
 
+
+/**
+ * Jatah kartu beranda: SATU per kategori, dan paling banyak enam kategori.
+ *
+ * 🔴 ATURANNYA 1:1, BUKAN SEKADAR BATAS ATAS. Sebelum ini kartu bebas
+ * menunjuk kategori mana pun, dan enam kartu bawaan ternyata cuma menarik dari
+ * TIGA kategori: `jenis-kelamin` memasok tiga kartu sekaligus (Jumlah Penduduk,
+ * Laki-laki, Perempuan) dan `wajib-ktp` dua. Akibatnya beranda terlihat penuh
+ * padahal yang diwakili sedikit, lima kategori lain yang datanya sudah diimpor
+ * tidak pernah muncul sebagai angka, dan tidak ada satu tempat pun di layar
+ * yang mengatakan mana yang terpakai.
+ *
+ * Sekarang kartu adalah WAJAH satu kategori: menyalakan kategori memberinya
+ * kartu, mematikannya mencabut kartunya. Yang diatur dinas tinggal judul,
+ * ikon, warna, dan kolom mana yang jadi angkanya.
+ *
+ * ⚠️ Konsekuensi yang disengaja: kartu "Laki-laki" dan "Perempuan" tidak
+ * bisa berdiri sendiri lagi — keduanya kolom `L` dan `P` di dalam berkas
+ * `jenis-kelamin`, bukan kategori. Perbandingannya masih bisa ditampilkan lewat
+ * badge persentase pada kartu jenis kelamin.
+ */
+export const MAKS_KARTU_BERANDA = 6;
+
+/** Kolom yang paling masuk akal jadi angka kartu, diambil yang pertama cocok. */
+const KOLOM_DUGAAN = ["JML", "JUMLAH", "TOTAL", "KK_JML", "JML_WKTP"];
+
+/** Warna dipilih bergiliran supaya kartu baru tidak lahir kembar warnanya. */
+const URUTAN_WARNA = ["biru", "teal", "amber", "sky", "emerald", "violet"];
+
+/**
+ * Susun kartu supaya persis satu per kategori yang tampil, seurut daftarnya.
+ *
+ * Setelan kartu yang sudah ada DIPERTAHANKAN (judul, ikon, warna, kolom);
+ * yang kembar dibuang — yang pertama menang — dan kategori yang belum punya
+ * kartu diberi satu dengan setelan awal. Kategori yang tidak tampil tidak
+ * pernah punya kartu.
+ */
+export function selaraskanKartu(
+  kartu: KartuStatistik[],
+  tampil: { slug: string; label: string }[],
+): KartuStatistik[] {
+  const dipakai = new Set<string>();
+  const perKategori = new Map<string, KartuStatistik>();
+  for (const k of kartu) {
+    if (!k.kategori || perKategori.has(k.kategori)) continue;
+    perKategori.set(k.kategori, k);
+  }
+
+  /*
+   * 🔴 Saat yang menyala LEBIH dari jatahnya, yang sudah tersetel menang.
+   *
+   * Portal lama bisa punya delapan kategori menyala sementara petaknya cuma
+   * enam. Memotong begitu saja menurut urutan daftar akan membuang justru
+   * kartu yang sudah punya kolom angka — terukur di TIDORE: "Kepala Keluarga"
+   * dan "Wajib KTP" terlempar, digantikan lima kartu tanpa kolom yang semuanya
+   * berbunyi "belum ada data". Beranda jadi terlihat rusak karena urutan
+   * penyimpanan, bukan karena keputusan siapa pun.
+   *
+   * Jadi: kategori yang kartunya sudah punya kolom didahulukan, sisanya
+   * menyusul menurut urutan daftar. Yang terpakai tetap enam.
+   */
+  const urut = tampil.length <= MAKS_KARTU_BERANDA
+    ? tampil
+    : [
+      ...tampil.filter((k) => perKategori.get(k.slug)?.kolom),
+      ...tampil.filter((k) => !perKategori.get(k.slug)?.kolom),
+    ];
+
+  return urut.slice(0, MAKS_KARTU_BERANDA).map((kat, i) => {
+    const ada = perKategori.get(kat.slug);
+    if (ada) {
+      dipakai.add(kat.slug);
+
+      return { ...ada, kategori: kat.slug };
+    }
+
+    return {
+      title: kat.label,
+      icon: "Users",
+      kategori: kat.slug,
+      /* Kolomnya sengaja KOSONG bila tidak jelas: kartu tanpa kolom tampil
+         sebagai "belum ada data", dan itu jujur. Menebak kolom sembarangan
+         membuat beranda mengumumkan angka yang tidak dimaksudkan siapa pun. */
+      kolom: "",
+      warna: URUTAN_WARNA[i % URUTAN_WARNA.length],
+    };
+  });
+}
+
+/** Kolom awal untuk kartu baru, dipilih dari kunci data yang benar-benar ada. */
+export function kolomDugaan(kunci: string[]): string {
+  const naik = kunci.map((k) => k.toUpperCase());
+  for (const d of KOLOM_DUGAAN) {
+    const i = naik.indexOf(d);
+    if (i >= 0) return kunci[i];
+  }
+
+  return kunci[0] ?? "";
+}
+
 /** Preset warna kartu → kelas Tailwind lengkap (harus literal agar ter-scan). */
 export const WARNA_PRESET: Record<string, { accentBg: string; accent: string; label: string }> = {
   biru: { accentBg: "bg-gradient-to-br from-[#2e6da4] to-[#1b4b72]", accent: "text-[#1b4b72]", label: "Biru" },

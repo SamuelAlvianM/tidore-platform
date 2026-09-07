@@ -62,6 +62,104 @@ interface Conflict {
 let seq = 0;
 const nid = () => `r${Date.now().toString(36)}_${seq++}`;
 const digits = (s: string) => s.replace(/\D/g, '');
+
+/**
+ * Sel baris TOTAL: menempel di kaki tabel, dan LATARNYA PEKAT.
+ *
+ * 🔴 Dua hal yang gampang salah di sini, dan dua-duanya pernah salah.
+ *
+ * 1. `position: sticky` TIDAK BERLAKU pada `<tfoot>` atau `<tr>` di hampir
+ *    semua browser — ia hanya bekerja pada SEL. Dipasang di `<tfoot>`,
+ *    barisnya ikut tergulir dan menimpa baris data di belakangnya.
+ *
+ * 2. Latar setengah tembus (`bg-primary/5`) membuat baris data terlihat
+ *    MENEMBUS angka total. Pada layar yang dipakai memeriksa angka penduduk,
+ *    dua angka yang saling tumpang tindih bukan cuma jelek — ia terbaca keliru.
+ *    Latarnya wajib pekat.
+ */
+const SEL_TOTAL =
+  'sticky bottom-0 z-20 border-t-2 border-primary bg-slate-100 px-2.5 py-2 '
+  + 'shadow-[0_-3px_8px_rgba(15,23,42,0.08)]';
+
+/**
+ * Medan teks yang MEMBUNGKUS, bukan memotong.
+ *
+ * 🔴 Nama wilayah dan judul kolom SIAK kerap lebih panjang daripada
+ * kotaknya: "KOTA TIDORE KEPULAUAN" terpotong jadi "KOTA TIDORE KEPULAI",
+ * "TENAGA KERJA" jadi "TENAGA", dan dua kolom berbeda bisa terlihat serupa
+ * ("TENAGA..." dan "TENAGA...") — petugas lalu menyunting kolom yang keliru
+ * tanpa pernah tahu. Pada layar yang dipakai mengoreksi angka resmi, terpotong
+ * lebih berbahaya daripada baris yang sedikit lebih tinggi.
+ *
+ * `<input>` tidak bisa membungkus, jadi ini `<textarea>` yang tingginya
+ * mengikuti isinya. Enter tidak menyisipkan baris baru — ia menyelesaikan
+ * suntingan, persis seperti kotak isian biasa.
+ */
+function TeksTumbuh({
+  value,
+  defaultValue,
+  onChange,
+  onBlur,
+  className,
+  placeholder,
+  title,
+}: {
+  value?: string;
+  defaultValue?: string;
+  onChange?: (v: string) => void;
+  onBlur?: (v: string) => void;
+  className?: string;
+  placeholder?: string;
+  title?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  const sesuaikan = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    sesuaikan(ref.current);
+  }, [value]);
+
+  return (
+    <textarea
+      ref={(el) => {
+        ref.current = el;
+        sesuaikan(el);
+      }}
+      rows={1}
+      value={value}
+      defaultValue={defaultValue}
+      placeholder={placeholder}
+      title={title}
+      onChange={(e) => {
+        sesuaikan(e.currentTarget);
+        onChange?.(e.target.value);
+      }}
+      onBlur={(e) => onBlur?.(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+      /*
+       * 🔴 `break-normal` — kata TIDAK boleh dipenggal di tengah.
+       *
+       * Bawaan textarea memenggal kata yang lebih panjang daripada kotaknya,
+       * jadi "PEKERJAAN LAINNYA" terbaca "PEKERJAA / N LAINNYA" dan
+       * "BELUM/TIDAK BEKERJA" jadi "BELUM/TID / AK BEKERJA". Pada judul kolom
+       * data kependudukan itu bukan cuma jelek: dua kolom berbeda bisa
+       * terlihat sama setelah dipenggal, dan petugas menyunting yang keliru.
+       * Kotaknya yang dilebarkan, bukan katanya yang dipotong.
+       */
+      className={cn('resize-none overflow-hidden break-normal leading-snug', className)}
+    />
+  );
+}
 const toEdit = (r: { kode: string; wilayah: string; data: Record<string, number> }): EditRow => ({
   _id: nid(),
   kode: r.kode,
@@ -146,6 +244,16 @@ function EditGrid({
   kodePlaceholder: string;
   emptyText: string;
 }) {
+  /*
+   * Baris yang ikut dijumlah di kaki tabel.
+   *
+   * ⚠️ Baris KABUPATEN (kode 4 digit) dikecualikan: nilainya sudah
+   * merupakan jumlah kecamatan di bawahnya, jadi mengikutkannya membuat TOTAL
+   * menghitung seluruh wilayah dua kali. Ini aturan yang sama dengan yang
+   * dipakai /api/stats saat menghitung angka kartu beranda.
+   */
+  const barisDijumlah = rows.filter((r) => digits(r.kode).length > 4);
+
   return (
     <div className="flex-1 overflow-auto rounded-xl border border-slate-300 bg-white">
       <table className="w-full text-sm">
@@ -160,28 +268,30 @@ function EditGrid({
               <th key={k} className="px-2.5 py-2">
                 <div className="flex items-center gap-1">
                   <div className="relative flex-1">
-                    <input
+                    <TeksTumbuh
                       defaultValue={k}
-                      onBlur={(e) => onRenameCol(k, e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                      }}
+                      onBlur={(v) => onRenameCol(k, v)}
                       title="Klik untuk ganti nama kolom"
                       className={cn(
-                        'h-8 w-full min-w-[5.5rem] rounded border bg-white pr-3 text-right text-xs font-bold uppercase tracking-wide text-slate-700 outline-none focus:border-primary',
+                        /* Rata KIRI: judul kolom SIAK kerap dua-tiga baris
+                           ("TENAGA KERJA LAINNYA"), dan teks membungkus yang
+                           rata kanan menghasilkan tepi kiri bergerigi yang
+                           sulit dibaca sekilas. Angkanya tetap rata kanan
+                           supaya satuannya sejajar. */
+                        'w-full min-w-[11rem] rounded border bg-white px-2 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-slate-700 outline-none focus:border-primary',
                         highlight === k
                           ? 'border-amber-400 bg-amber-50 hover:border-amber-500'
                           : kartuLain.has(k)
                             ? 'border-amber-200 bg-amber-50/40 hover:border-amber-300'
                             : 'border-slate-300 hover:border-slate-400',
-                        kolom.length > 1 ? 'pl-7' : 'pl-3',
+                        kolom.length > 1 ? 'pr-7' : 'pr-2',
                       )}
                     />
                     {kolom.length > 1 && (
                       <button
                         onClick={() => onRemoveCol(k)}
                         title={`Hapus kolom ${k}`}
-                        className="absolute left-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-destructive hover:text-white"
+                        className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-destructive hover:text-white"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -238,11 +348,11 @@ function EditGrid({
                   />
                 </td>
                 <td className="px-2.5 py-1.5">
-                  <Input
+                  <TeksTumbuh
                     value={r.wilayah}
-                    onChange={(e) => onWilayah(r._id, e.target.value)}
+                    onChange={(v) => onWilayah(r._id, v)}
                     placeholder="Nama wilayah"
-                    className="h-9 min-w-44 border-slate-300 bg-white font-medium text-slate-900"
+                    className="w-full min-w-[14rem] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-primary"
                   />
                 </td>
                 {kolom.map((k) => (
@@ -291,6 +401,49 @@ function EditGrid({
             </tr>
           )}
         </tbody>
+
+        {/*
+          🔴 Baris TOTAL — inilah angka yang dipakai kartu beranda.
+
+          Tanpa baris ini, satu-satunya angka besar yang terlihat di layar
+          adalah baris teratas (KOTA/KABUPATEN, ringkasan bawaan berkas SIAK),
+          dan wajar disangka itulah yang diambil beranda. Yang sebenarnya
+          diambil adalah JUMLAH seluruh baris pada tingkat terinci. Menyebutnya
+          di sini membuat keduanya bisa dibandingkan langsung: kalau baris
+          kabupaten dan TOTAL tidak sama, ada data yang keliru dan petugas
+          melihatnya saat itu juga, bukan berbulan kemudian.
+
+          ⚠️ Baris kabupaten SENGAJA TIDAK IKUT dijumlah. Nilainya sudah
+          merupakan jumlah kecamatan di bawahnya; mengikutkannya membuat TOTAL
+          menghitung seluruh wilayah dua kali.
+        */}
+        {rows.length > 0 && (
+          <tfoot>
+            <tr>
+              <td className={cn(SEL_TOTAL, 'text-xs font-bold uppercase tracking-wide text-slate-600')}>
+                Total
+              </td>
+              <td className={cn(SEL_TOTAL, 'text-[0.68rem] leading-tight text-slate-500')}>
+                {barisDijumlah.length} baris dijumlah
+                {rows.length > barisDijumlah.length && (
+                  <span className="block">baris kabupaten tidak ikut</span>
+                )}
+              </td>
+              {kolom.map((k) => (
+                <td
+                  key={k}
+                  className={cn(SEL_TOTAL, 'text-right text-sm font-bold tabular-nums text-slate-900')}
+                >
+                  {barisDijumlah
+                    .reduce((a, r) => a + (Number(r.data[k]) || 0), 0)
+                    .toLocaleString('id-ID')}
+                </td>
+              ))}
+              {onDetail && <td className={SEL_TOTAL} />}
+              <td className={SEL_TOTAL} />
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );
@@ -828,7 +981,11 @@ export function DemografiEditor({
             </>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        {/* Baris tombol membentang PENUH supaya "Kembali" benar-benar di kiri
+            dan Simpan/Export benar-benar di kanan. Dengan `shrink-0` wadahnya
+            hanya selebar isinya, jadi `ml-auto` di dalamnya tidak punya ruang
+            kosong untuk mendorong apa pun — ketiganya menumpuk di kiri. */}
+        <div className="flex w-full flex-wrap items-center gap-2">
           {/*
             🔴 Pemilih periode berdiri DI LUAR <Button asChild>.
             `asChild` meneruskan propsnya ke SATU anak; memberi dua anak
@@ -844,35 +1001,50 @@ export function DemografiEditor({
               ukuran="kecil"
             />
           )}
+          {/*
+            🔴 KIRI keluar, KANAN mengerjakan sesuatu.
+
+            Sebelumnya "Batal" duduk berdempetan dengan "Simpan" di kanan, dan
+            keduanya berukuran sama. Pada layar yang dipakai mengoreksi angka
+            penduduk, tombol yang MEMBUANG suntingan tidak boleh bertetangga
+            dengan tombol yang MENYIMPANNYA — satu klik meleset menghapus
+            pekerjaan setengah jam tanpa bisa dikembalikan.
+
+            Namanya juga diganti jadi "Kembali": tombol itu memang tidak
+            membatalkan apa pun yang sudah tersimpan, ia cuma menutup layar.
+            "Batal" menjanjikan pembatalan yang tidak pernah terjadi.
+          */}
           <Button
             variant="outline"
-            asChild
-            title={`Unduh data ${label} tersimpan sebagai Excel`}
+            onClick={() => (detail ? setDetail(null) : onOpenChange(false))}
+            disabled={saving}
+            title={detail ? 'Kembali ke daftar kecamatan' : 'Tutup editor'}
           >
-            <a
-              href={`/api/admin/demografi/export?kategori=${encodeURIComponent(kategori)}&${kueriPeriode(periode)}`}
-              download
+            <ArrowLeft className="mr-1.5 h-4 w-4" /> Kembali
+          </Button>
+
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              asChild
+              title={`Unduh data ${label} tersimpan sebagai Excel`}
             >
-              <Download className="mr-1.5 h-4 w-4" /> Export Excel
-            </a>
-          </Button>
-          {detail ? (
-            <Button variant="outline" onClick={() => setDetail(null)} disabled={saving}>
-              <ArrowLeft className="mr-1.5 h-4 w-4" /> Kembali
+              <a
+                href={`/api/admin/demografi/export?kategori=${encodeURIComponent(kategori)}&${kueriPeriode(periode)}`}
+                download
+              >
+                <Download className="mr-1.5 h-4 w-4" /> Export Excel
+              </a>
             </Button>
-          ) : (
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
-              <X className="mr-1.5 h-4 w-4" /> Batal
+            <Button onClick={save} disabled={saving || loading}>
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-1.5 h-4 w-4" />
+              )}
+              Simpan
             </Button>
-          )}
-          <Button onClick={save} disabled={saving || loading}>
-            {saving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="mr-1.5 h-4 w-4" />
-            )}
-            Simpan
-          </Button>
+          </div>
         </div>
         </div>
       </header>
@@ -1075,7 +1247,18 @@ export function DemografiEditor({
                 />
               </div>
               <span className="text-xs font-medium text-slate-500">
-                {kecRows.length} kecamatan · {pekonRows.length} pekon
+                {/*
+                  🔴 Yang berkode 6 digit saja yang kecamatan.
+
+                  `kecRows` memuat juga baris KABUPATEN (berkode 4 digit) supaya
+                  bisa disunting di tabel yang sama, jadi menghitung panjangnya
+                  mengumumkan "9 kecamatan" untuk daerah yang punya 8 — dan
+                  angka itu persis yang dipakai petugas untuk memeriksa
+                  kelengkapan impor.
+                */}
+                {kecRows.filter((r) => digits(r.kode).length === 6).length} kecamatan
+                {kecRows.some((r) => digits(r.kode).length <= 4) && ' + 1 kabupaten'}
+                {' · '}{pekonRows.length} pekon
               </span>
             </div>
 
