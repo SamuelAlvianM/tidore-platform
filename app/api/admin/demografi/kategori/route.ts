@@ -83,8 +83,21 @@ export async function GET() {
   ]);
 
   const barisPer = new Map(hitungBaris.map((r) => [r.kategori, r._count._all]));
+  /*
+   * 🔴 Dihitung dari hasil SELARAS, bukan dari konfigurasi mentah.
+   *
+   * Baris `beranda.statistik` masih boleh memuat sisa susunan lama — tiga
+   * kartu berkategori `jenis-kelamin`, misalnya. Yang benar-benar tampil
+   * di beranda adalah hasil `selaraskanKartu`, satu per kategori. Kalau
+   * panel ini menghitung yang mentah, ia berkata "3 kartu beranda" untuk
+   * kategori yang di beranda cuma punya satu — dan seluruh gunanya panel
+   * ini adalah mengatakan apa yang SUNGGUH tampil.
+   */
   const kartuPer = new Map<string, number>();
-  for (const kartu of normalizeKartu((kartuRow?.konten as { kartu?: unknown } | null)?.kartu)) {
+  for (const kartu of selaraskanKartu(
+    normalizeKartu((kartuRow?.konten as { kartu?: unknown } | null)?.kartu),
+    await kategoriTampil(),
+  )) {
     if (kartu.kategori) kartuPer.set(kartu.kategori, (kartuPer.get(kartu.kategori) ?? 0) + 1);
   }
 
