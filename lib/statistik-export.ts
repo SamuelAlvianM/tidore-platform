@@ -57,14 +57,14 @@ const BULAN_PENDEK = [
   "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
 ];
 
-interface Kolom {
+export interface Kolom {
   label: string;
   lebar: number;
   /** Rata kanan + format ribuan + ikut dijumlah di baris TOTAL. */
   angka?: boolean;
 }
 
-interface Tabel {
+export interface Tabel {
   /** Nama tab sheet (dipotong 31 karakter, batas Excel). */
   sheet: string;
   judul: string;
@@ -90,7 +90,7 @@ function ukuranPng(buf: Buffer): { lebar: number; tinggi: number } | null {
 
 const TINGGI_LOGO_PX = 70;
 
-async function muatLogo(wb: ExcelJS.Workbook) {
+export async function muatLogo(wb: ExcelJS.Workbook) {
   const buf = await readFile(
     join(process.cwd(), "public", INSTANSI.logo),
   ).catch(() => null);
@@ -141,7 +141,7 @@ function kolomHuruf(n: number): string {
  * kolom A dan tidak lagi menimpa tulisan (sebelumnya teks di-merge dari kolom A
  * sehingga logo menutupinya).
  */
-function tulisSheet(
+export function tulisSheet(
   wb: ExcelJS.Workbook,
   t: Tabel,
   logo: { id: number; lebar: number; tinggi: number } | null,

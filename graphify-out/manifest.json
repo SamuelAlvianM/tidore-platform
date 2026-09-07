@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "app/dashboard/demografi/AdminDemografi.tsx": {
-    "mtime": 1788716508.1783965,
-    "seen": 1788717072.6310968,
-    "ast_hash": "b6bda2303985beaf5cc83b9d7de2366c",
+    "mtime": 1788751823.5472722,
+    "seen": 1788753112.8992853,
+    "ast_hash": "72ae150fbb6523bdc5618a68dc52c2eb",
     "semantic_hash": ""
   },
   "app/dashboard/demografi/page.tsx": {
@@ -1122,9 +1122,9 @@
     "semantic_hash": "05becd0bfac26251b06d30a71b00b655"
   },
   "components/landingpage/stats.tsx": {
-    "mtime": 1788513005.1778522,
-    "seen": 1788513647.995402,
-    "ast_hash": "7f4cd849c2681bbd0ed4c6624d05d287",
+    "mtime": 1788717722.5132363,
+    "seen": 1788753112.899661,
+    "ast_hash": "7a9d009e019fc3a04f62ba8aa789d2cd",
     "semantic_hash": ""
   },
   "components/landingpage/struktur-chart.tsx": {
@@ -1674,15 +1674,15 @@
     "semantic_hash": "39aaef04d93fe686616f6a2672a572b1"
   },
   "lib/demografi-export.ts": {
-    "mtime": 1788711094.4309652,
-    "seen": 1788712448.4225438,
-    "ast_hash": "66809ad1431c3db36f35dbee7cc0dec4",
+    "mtime": 1788751949.2016935,
+    "seen": 1788753112.900047,
+    "ast_hash": "8559bdb14ca50c8b41e44745ae596e30",
     "semantic_hash": ""
   },
   "lib/demografi-import.ts": {
-    "mtime": 1788716507.8333755,
-    "seen": 1788717072.632073,
-    "ast_hash": "23651295ebc4eb5f7ca996775da08c07",
+    "mtime": 1788752364.2503674,
+    "seen": 1788753112.9000506,
+    "ast_hash": "1112894176b89fe23ca761f1a9403707",
     "semantic_hash": ""
   },
   "lib/demografi-kategori.ts": {
@@ -1878,16 +1878,16 @@
     "semantic_hash": "52d047f3e33b439b636e81c4c016f94b"
   },
   "lib/static-content-registry.ts": {
-    "mtime": 1786640970.8532698,
-    "seen": 1788252657.570695,
-    "ast_hash": "50b6badbcd7b0dd3dd6e0be9abd8ffc8",
-    "semantic_hash": "50b6badbcd7b0dd3dd6e0be9abd8ffc8"
+    "mtime": 1788717722.5167837,
+    "seen": 1788753112.9002037,
+    "ast_hash": "e98fca2c00b00844b5e2f3aa06c785e6",
+    "semantic_hash": ""
   },
   "lib/statistik-export.ts": {
-    "mtime": 1786608645.016412,
-    "seen": 1788252657.5706964,
-    "ast_hash": "160fa271bc24ce2a7028753d9e4adfdf",
-    "semantic_hash": "160fa271bc24ce2a7028753d9e4adfdf"
+    "mtime": 1788717961.4702802,
+    "seen": 1788753112.9002075,
+    "ast_hash": "08efd0b2df28a26ca6b6e0d4293bfcbf",
+    "semantic_hash": ""
   },
   "lib/struktur.ts": {
     "mtime": 1785551630.1711075,

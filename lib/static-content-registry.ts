@@ -381,17 +381,25 @@ STATIC_BLOCKS.push({
   },
 });
 
-/** Kunci blok konten statis untuk label periode data DKB (badge beranda). */
-export const DKB_PERIODE_KUNCI = "beranda.dkb-periode";
-
-STATIC_BLOCKS.push({
-  kunci: DKB_PERIODE_KUNCI,
-  judul: "Beranda — Periode Data Kependudukan (DKB)",
-  deskripsi:
-    "Label periode sumber data kependudukan (badge di pojok kanan atas kartu Statistik Demografi), mis. \"DKB Semester II 2024\". Perbarui tiap kali Disdukcapil menerima data DKB baru dari Kemendagri.",
-  fields: [{ name: "label", label: "Label Periode", type: "text" }],
-  defaults: { label: process.env.NEXT_PUBLIC_DKB_PERIODE ?? "DKB Semester II 2024" },
-});
+/*
+ * 🔴 BLOK "Periode Data Kependudukan (DKB)" SENGAJA DIHAPUS.
+ *
+ * Dulu ada satu medan teks bebas di sini yang isinya dipakai sebagai badge
+ * periode di beranda — dan nilainya MENANG atas periode yang dihitung dari
+ * data. Jadi badge bisa berbunyi "DKB Semester II 2024" sementara angka di
+ * bawahnya berasal dari semester lain, tanpa satu pun tanda di layar. Untuk
+ * angka kependudukan resmi, keterangan periode yang keliru lebih berbahaya
+ * daripada tidak ada keterangan.
+ *
+ * Medan itu juga menjanjikan yang tidak bisa ditepatinya: mengetik "Semester I
+ * 2026" tidak membuat data 2026 ada. Periode lahir dari berkas yang diunggah.
+ *
+ * Badge-nya sekarang selalu menyebut periode yang benar-benar dipakai, dan di
+ * mode edit ia menampilkan daftar periode yang datanya siap plus tombol menuju
+ * dasbor — lihat `BadgePeriodeEdit` di components/landingpage/stats.tsx.
+ *
+ * Baris lamanya di `t_static_contents` dibiarkan; tidak ada yang membacanya.
+ */
 
 // ───────────────────────────────────────────────────────────────────────────
 // Produk Disdukcapil — diport dari app lama (fronts/products/productdisdukcapil).

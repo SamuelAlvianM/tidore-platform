@@ -55,7 +55,25 @@ const cellNum = (v: unknown): number => {
  * pemanggil melewatinya, tidak menebaknya.
  */
 export function klasifikasiKode(raw: string): { kode: string; level: number } | null {
-  const digits = String(raw ?? "").replace(/\D/g, "");
+  const teks = String(raw ?? "").trim();
+
+  /*
+   * 🔴 Mengandung HURUF → ditolak, bukan dikupas hurufnya.
+   *
+   * Dulu baris ini langsung membuang semua yang bukan angka. Untuk ".DUSUN"
+   * hasilnya kebetulan benar (tak ada angka tersisa → null), tapi untuk teks
+   * yang memuat angka hasilnya bencana: catatan kaki ekspor "Dicetak dari
+   * Portal ... pada 07 Sep 2026, 10.33" menyusut jadi "0720261033" — sepuluh
+   * digit, jadi terbaca sebagai KODE DESA yang sah, dan angka-angkanya ikut
+   * tersimpan sebagai jumlah penduduk. Terukur saat berkas hasil ekspor
+   * diunggah balik: satu desa hantu berpenduduk 720.261.033 jiwa, tanpa galat.
+   *
+   * Kode wilayah Kemendagri tidak pernah berhuruf; yang berhuruf memang bukan
+   * baris data.
+   */
+  if (/[a-z]/i.test(teks)) return null;
+
+  const digits = teks.replace(/\D/g, "");
   if (!digits) return null;
   if (digits.length === 10) return { kode: digits, level: 5 };
   if (digits.length === 6) return { kode: digits, level: 4 };
@@ -77,35 +95,63 @@ function classifyKode(raw: string): { kode: string; level: number } | null {
   return hasil && hasil.level >= 4 ? hasil : null;
 }
 
-export async function parseDemografiExcel(buffer: Buffer): Promise<ParseResult> {
-  const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(buffer as unknown as ArrayBuffer);
-  const ws = wb.worksheets[0];
-  if (!ws) throw new Error("File Excel tidak memiliki sheet");
+/** Akhiran nama sheet rincian desa yang dibuat oleh ekspor portal ini. */
+const AKHIRAN_DESA = "— DESA";
 
-  // Baris header (baris 1). Temukan kolom IDEM/KODE/WILAYAH, sisanya = nilai.
-  const header: string[] = [];
-  ws.getRow(1).eachCell({ includeEmpty: true }, (cell, col) => {
-    header[col] = norm(cell.value).toUpperCase();
-  });
-  const findCol = (name: string) => header.findIndex((h) => h === name);
-  const cIdem = findCol("IDEM");
-  const cKode = findCol("KODE");
-  const cWil = findCol("WILAYAH");
-  if (cIdem < 0 || cKode < 0 || cWil < 0) {
-    throw new Error("Header tidak dikenali (butuh kolom IDEM, KODE, WILAYAH)");
+/** Baca satu lembar: baris data + nama kolom nilainya. */
+function bacaLembar(ws: ExcelJS.Worksheet): {
+  rows: DemografiRow[];
+  kolom: string[];
+} {
+  /*
+   * Baris header DICARI, tidak dipakukan ke baris 1.
+   *
+   * 🔴 Berkas hasil ekspor portal ini sendiri berkop surat: nama dinas,
+   * logo, judul laporan — barulah tabelnya, di baris kesepuluh. Selama
+   * pengimpor bersikeras membaca baris 1, berkas yang baru saja diunduh
+   * petugas ditolak "Header tidak dikenali", padahal isinya persis benar.
+   * Lima belas baris pertama cukup untuk kop mana pun.
+   *
+   * IDEM juga tak lagi diwajibkan: levelnya toh ditentukan dari STRUKTUR KODE,
+   * dan angka IDEM tidak konsisten antar berkas SIAK. Mewajibkan kolom yang
+   * tidak pernah dipakai hanya menolak berkas yang sebetulnya bisa dibaca.
+   */
+  const BARIS_HEADER_MAKS = 15;
+  /** Kolom penomoran laporan — bukan data, jangan ikut tersimpan. */
+  const BUKAN_NILAI = new Set(["IDEM", "KODE", "WILAYAH", "NO", "NO."]);
+
+  let header: string[] = [];
+  let barisHeader = 0;
+  for (let r = 1; r <= Math.min(BARIS_HEADER_MAKS, ws.rowCount); r++) {
+    const calon: string[] = [];
+    ws.getRow(r).eachCell({ includeEmpty: true }, (cell, col) => {
+      calon[col] = norm(cell.value).toUpperCase();
+    });
+    if (calon.includes("KODE") && calon.includes("WILAYAH")) {
+      header = calon;
+      barisHeader = r;
+      break;
+    }
+  }
+  if (!barisHeader) {
+    throw new Error(
+      "Header tidak dikenali (butuh kolom KODE dan WILAYAH pada 15 baris pertama)",
+    );
   }
 
-  // Kolom nilai = kolom selain IDEM/KODE/WILAYAH yang punya nama header.
+  const findCol = (name: string) => header.findIndex((h) => h === name);
+  const cKode = findCol("KODE");
+  const cWil = findCol("WILAYAH");
+
+  // Kolom nilai = kolom bernama yang bukan kolom penanda/penomoran.
   const valueCols: { col: number; name: string }[] = [];
   header.forEach((h, col) => {
-    if (col === cIdem || col === cKode || col === cWil) return;
-    if (h) valueCols.push({ col, name: header[col] });
+    if (h && !BUKAN_NILAI.has(h)) valueCols.push({ col, name: h });
   });
 
   const rows: DemografiRow[] = [];
   ws.eachRow((row, rowNumber) => {
-    if (rowNumber === 1) return;
+    if (rowNumber <= barisHeader) return;
     const cls = classifyKode(norm(row.getCell(cKode).value));
     if (!cls) return; // bukan kecamatan/pekon (kab/dusun/lainnya)
     const wilayah = norm(row.getCell(cWil).value);
@@ -120,9 +166,48 @@ export async function parseDemografiExcel(buffer: Buffer): Promise<ParseResult> 
     rows.push({ kode: cls.kode, wilayah, level: cls.level, parentKode, data });
   });
 
+  return { rows, kolom: valueCols.map((v) => v.name) };
+}
+
+/**
+ * Baca berkas Excel agregat: sheet pertama, plus sheet rincian desanya bila ada.
+ */
+export async function parseDemografiExcel(buffer: Buffer): Promise<ParseResult> {
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(buffer as unknown as ArrayBuffer);
+  const ws = wb.worksheets[0];
+  if (!ws) throw new Error("File Excel tidak memiliki sheet");
+
+  /*
+   * 🔴 Sheet KEDUA ikut dibaca bila ia rincian desa dari sheet pertama.
+   *
+   * Ekspor portal ini memisahkan kecamatan dan desa ke dua sheet, supaya baris
+   * TOTAL tidak menjumlahkan angka yang sama dua kali. Membaca sheet pertama
+   * saja berarti berkas yang diunduh lalu diunggah balik kehilangan SELURUH
+   * rincian desanya — tanpa galat, tanpa peringatan; petugas baru sadar saat
+   * tabel desa di halaman publik mendadak kosong.
+   *
+   * Hanya sheet ke-2, dan hanya bila namanya berakhiran "— Desa". Membaca
+   * semua sheet akan menuang delapan kategori dari berkas "Export Semua" ke
+   * dalam satu kategori tujuan — angka agama tersimpan sebagai jenis kelamin.
+   */
+  const wsDesa = wb.worksheets[1];
+  const ikutDesa = !!wsDesa
+    && wsDesa.name.trim().toUpperCase().endsWith(AKHIRAN_DESA);
+
+  const utama = bacaLembar(ws);
+  const rows = [...utama.rows];
+  if (ikutDesa) {
+    // Kode yang sudah ada menang: sheet kecamatan adalah sumber resminya.
+    const ada = new Set(rows.map((r) => r.kode));
+    for (const r of bacaLembar(wsDesa).rows) {
+      if (!ada.has(r.kode)) rows.push(r);
+    }
+  }
+
   return {
     rows,
-    kolom: valueCols.map((v) => v.name),
+    kolom: utama.kolom,
     kecamatan: rows.filter((r) => r.level === 4).length,
     pekon: rows.filter((r) => r.level === 5).length,
   };

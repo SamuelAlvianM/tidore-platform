@@ -20,6 +20,7 @@ import {
   MapPin,
   Pencil,
   MousePointerClick,
+  LayoutDashboard,
 } from 'lucide-react';
 
 // Ikon header kartu peta & pelayanan — lebih terlihat dari flat, tapi tetap
@@ -510,6 +511,147 @@ function BadgePeriode({
   );
 }
 
+/**
+ * Badge periode versi MODE EDIT — daftar periode yang benar-benar siap,
+ * bukan kotak teks bebas.
+ *
+ * 🔴 Sebelumnya mode edit membuka penyunting konten statis berisi satu medan
+ * teks "Label Periode". Dua hal buruk sekaligus.
+ *
+ * Pertama, label ketik-tangan itu MENANG atas periode yang dihitung dari data
+ * (`dkbPeriode?.label || stats.periodeKependudukan`). Jadi badge bisa berbunyi
+ * "DKB Semester II 2024" sementara angka di bawahnya berasal dari semester
+ * lain — dan tidak ada satu pun tanda di layar. Untuk angka kependudukan
+ * resmi, keterangan periode yang keliru lebih berbahaya daripada tidak ada
+ * keterangan sama sekali.
+ *
+ * Kedua, medan teks itu menjanjikan sesuatu yang tidak bisa ditepatinya:
+ * mengetik "DKB Semester I 2026" tidak membuat data 2026 ada. Periode lahir
+ * dari berkas yang diunggah, bukan dari label yang diketik.
+ *
+ * Maka di sini petugas melihat daftar periode yang MEMANG punya data, bisa
+ * berpindah ke salah satunya, dan untuk menambah yang baru diantar ke dasbor —
+ * tempat berkasnya benar-benar diunggah.
+ */
+function BadgePeriodeEdit({
+  periode,
+  tersedia,
+  onPilih,
+}: {
+  periode: Periode | null;
+  tersedia: PeriodeTersedia[];
+  onPilih: (p: Periode) => void;
+}) {
+  const [buka, setBuka] = useState(false);
+  const bungkus = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!buka) return;
+
+    const klikLuar = (e: MouseEvent) => {
+      if (bungkus.current && !bungkus.current.contains(e.target as Node)) setBuka(false);
+    };
+    const tekan = (e: KeyboardEvent) => { if (e.key === 'Escape') setBuka(false); };
+
+    document.addEventListener('mousedown', klikLuar);
+    document.addEventListener('keydown', tekan);
+
+    return () => {
+      document.removeEventListener('mousedown', klikLuar);
+      document.removeEventListener('keydown', tekan);
+    };
+  }, [buka]);
+
+  return (
+    <div ref={bungkus} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setBuka((b) => !b)}
+        aria-haspopup="listbox"
+        aria-expanded={buka}
+        title="Lihat periode yang datanya sudah siap"
+        className="flex items-center gap-1.5 rounded-full border border-dashed border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary shrink-0 transition-colors hover:bg-primary/20"
+      >
+        <CalendarClock className="h-3.5 w-3.5" />
+        {periode
+          ? labelPeriodePanjang(periode.tahun, periode.semester)
+          : 'Belum ada data'}
+        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', buka && 'rotate-180')} />
+      </button>
+
+      {buka && (
+        <div
+          role="listbox"
+          className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+        >
+          <p className="border-b border-slate-100 bg-slate-50 px-3 py-2 text-[0.65rem] font-bold uppercase tracking-widest text-slate-500">
+            Periode yang datanya siap
+          </p>
+
+          <div className="max-h-56 overflow-y-auto">
+            {tersedia.length === 0 && (
+              <p className="px-3 py-3 text-xs text-slate-500">
+                Belum ada periode yang berisi data.
+              </p>
+            )}
+
+            {tersedia.map((t) => {
+              const aktif = periodeSama(t, periode);
+
+              return (
+                <button
+                  key={`${t.tahun}-${t.semester}`}
+                  type="button"
+                  role="option"
+                  aria-selected={aktif}
+                  onClick={() => { setBuka(false); onPilih({ tahun: t.tahun, semester: t.semester }); }}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm transition-colors',
+                    aktif ? 'bg-primary/10 font-bold text-primary' : 'text-slate-700 hover:bg-slate-50',
+                  )}
+                >
+                  <span>{labelPeriode(t.tahun, t.semester)}</span>
+                  <span className="flex items-center gap-1.5">
+                    {/* Jumlah barisnya ikut disebut: periode yang cuma berisi
+                        satu kategori tidak boleh terlihat selengkap periode
+                        yang berisi delapan. */}
+                    <span className="text-[0.65rem] font-normal text-slate-400">
+                      {t.baris.toLocaleString('id-ID')} baris
+                    </span>
+                    {aktif && <CheckCircle2 className="h-4 w-4" />}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/*
+            Menambah periode TIDAK dilakukan di sini.
+
+            Periode lahir dari berkas DKB yang diunggah, bukan dari label yang
+            diketik. Menyediakan tombol "tambah" di halaman ini hanya akan
+            membuat wadah kosong yang seluruh angkanya "—", dan petugas tidak
+            akan tahu kenapa. Jadi ia diantar ke tempat berkasnya masuk.
+          */}
+          <div className="border-t border-slate-100 bg-slate-50/60 px-3 py-3">
+            <p className="mb-2 text-[0.7rem] leading-relaxed text-slate-500">
+              Periode baru muncul di sini setelah berkas DKB-nya diunggah.
+              Menambah dan mengunggahnya dilakukan di dasbor.
+            </p>
+            <a
+              href="/dashboard/demografi"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Dashboard
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function StatsGrid() {
   const [stats, setStats] = useState<StatsData>(FALLBACK);
   /*
@@ -520,12 +662,6 @@ export default function StatsGrid() {
   const [dimintaPeriode, setDimintaPeriode] = useState<Periode | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const { editMode, openEditor } = useInlineEdit();
-  // Label periode DKB — utamakan versi CMS (auto-refresh via refreshStaticContent
-  // setelah disimpan), fallback ke nilai dari /api/stats bila belum pernah diubah.
-  const dkbPeriode = useStaticContent(['beranda.dkb-periode'])['beranda.dkb-periode'] as {
-    label?: string;
-  };
-
   // Modal rincian demografi (dibuka saat kartu diklik di mode biasa).
   const [demoCard, setDemoCard] = useState<KartuDemografi | null>(null);
   // Mode edit: klik kartu → editor data Excel kategori tsb, difokuskan ke
@@ -602,15 +738,11 @@ export default function StatsGrid() {
           filter akan bertabrakan dengan gestur "klik untuk sunting".
         */}
         {editMode ? (
-          <button
-            type="button"
-            onClick={() => openEditor('beranda.dkb-periode')}
-            title="Ubah label periode data DKB"
-            className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 border border-dashed border-primary/40 px-3 py-1.5 rounded-full shrink-0 hover:bg-primary/20 transition-colors"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-            {dkbPeriode?.label || stats.periodeKependudukan || 'Periode DKB'}
-          </button>
+          <BadgePeriodeEdit
+            periode={stats.periode ?? null}
+            tersedia={stats.periodeTersedia ?? []}
+            onPilih={setDimintaPeriode}
+          />
         ) : (
           <BadgePeriode
             periode={stats.periode ?? null}
