@@ -214,6 +214,16 @@ export async function GET(req: Request) {
       title: k.title,
       icon: k.icon,
       kategori: k.kategori,
+      /*
+       * 🔴 Nama kategori dikirim dari SINI, bukan dicari ulang di peramban.
+       *
+       * Sejak dinas bisa mengganti nama kategori, `getDemografiKategori()` di
+       * sisi klien membaca konstanta di kode dan mengembalikan nama LAMA —
+       * sementara tab, judul sheet ekspor, dan panel dasbor sudah memakai nama
+       * baru. Satu portal menyebut satu kategori dengan dua nama berbeda, dan
+       * yang melihatnya tidak punya cara menebak mana yang benar.
+       */
+      kategoriLabel: tampil.find((t) => t.slug === k.kategori)?.label ?? k.kategori,
       kolom: k.kolom,
       accent: preset.accent,
       accentBg: preset.accentBg,

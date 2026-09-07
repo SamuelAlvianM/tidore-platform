@@ -37,7 +37,6 @@ import { DemografiMetric } from '@/components/landingpage/demografi-metric';
 // kini langsung membuka editor data Excel. Buka komentar untuk mengaktifkan lagi.
 // import { StatistikKartuEditor } from '@/components/landingpage/statistik-kartu-editor';
 import { DemografiEditor } from '@/components/dashboard/demografi-editor';
-import { getDemografiKategori } from '@/lib/demografi-kategori';
 import { getIcon } from '@/lib/icon-map';
 import { DEFAULT_KARTU, warnaPreset } from '@/lib/beranda-statistik';
 import {
@@ -107,6 +106,8 @@ interface KartuDemografi {
   title: string;
   icon: string; // nama ikon Lucide
   kategori: string;
+  /** Nama tampilan kategori, sudah mengikuti penggantian nama oleh dinas. */
+  kategoriLabel: string;
   kolom: string;
   accent: string; // kelas warna teks (badge)
   accentBg: string; // kelas gradient latar ikon
@@ -369,6 +370,7 @@ const FALLBACK: StatsData = {
       title: c.title,
       icon: c.icon,
       kategori: c.kategori,
+      kategoriLabel: c.title,
       kolom: c.kolom,
       accent: p.accent,
       accentBg: p.accentBg,
@@ -666,7 +668,9 @@ export default function StatsGrid() {
   const [demoCard, setDemoCard] = useState<KartuDemografi | null>(null);
   // Mode edit: klik kartu → editor data Excel kategori tsb, difokuskan ke
   // KARTU yang diklik (kategori + kolom) agar preview & simpan tepat sasaran.
-  const [editTarget, setEditTarget] = useState<{ kategori: string; kolom: string } | null>(null);
+  const [editTarget, setEditTarget] = useState<
+    { kategori: string; kategoriLabel: string; kolom: string } | null
+  >(null);
   // Editor template kartu (dinonaktifkan sementara):
   // const [editorIndex, setEditorIndex] = useState<number | null>(null);
 
@@ -776,7 +780,11 @@ export default function StatsGrid() {
               editHint={editMode}
               onClick={() =>
                 editMode
-                  ? setEditTarget({ kategori: card.kategori, kolom: card.kolom })
+                  ? setEditTarget({
+                    kategori: card.kategori,
+                    kategoriLabel: card.kategoriLabel,
+                    kolom: card.kolom,
+                  })
                   : setDemoCard(card)
               }
             />
@@ -803,6 +811,7 @@ export default function StatsGrid() {
           {demoCard && (
             <DemografiMetric
               kategori={demoCard.kategori}
+              kategoriLabel={demoCard.kategoriLabel}
               kolom={demoCard.kolom}
               title={demoCard.title}
               onDataChanged={refetchStats}
@@ -815,7 +824,7 @@ export default function StatsGrid() {
       {editTarget && (
         <DemografiEditor
           kategori={editTarget.kategori}
-          label={getDemografiKategori(editTarget.kategori)?.label ?? editTarget.kategori}
+          label={editTarget.kategoriLabel}
           kartuKolom={editTarget.kolom}
           open
           onOpenChange={(o) => !o && setEditTarget(null)}

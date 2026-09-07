@@ -998,63 +998,24 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "row",
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L16"
+      "source_location": "L15"
     },
     {
-      "id": "components_landingpage_stats_kartudemografi",
-      "label": "KartuDemografi",
+      "id": "components_landingpage_demografi_view_row",
+      "label": "Row",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "kartudemografi",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L106"
-    },
-    {
-      "id": "components_landingpage_stats_pelayananstat",
-      "label": "PelayananStat",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "pelayananstat",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L96"
-    },
-    {
-      "id": "components_landingpage_stats_topjenis",
-      "label": "TopJenis",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "topjenis",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L88"
-    },
-    {
-      "id": "components_landingpage_stats_trendpoint",
-      "label": "TrendPoint",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "trendpoint",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L92"
+      "norm_label": "row",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L27"
     },
     {
       "id": "components_media_image_cropper_dialog_imagecropperdialogprops",
@@ -1063,7 +1024,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "imagecropperdialogprops",
       "source_file": "components/media/image-cropper-dialog.tsx",
@@ -1315,32 +1276,6 @@
       "norm_label": "kategoriadmin",
       "source_file": "app/dashboard/demografi/AdminDemografi.tsx",
       "source_location": "L129"
-    },
-    {
-      "id": "components_landingpage_demografi_view_row",
-      "label": "Row",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "row",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L27"
-    },
-    {
-      "id": "components_landingpage_stats_statsdata",
-      "label": "StatsData",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "statsdata",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L124"
     },
     {
       "id": "lib_demografi_kategori_demografikategori",
@@ -2823,6 +2758,71 @@
       "norm_label": "news",
       "source_file": "app/media/berita/berita-list-client.tsx",
       "source_location": "L15"
+    },
+    {
+      "id": "components_landingpage_stats_kartudemografi",
+      "label": "KartuDemografi",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "kartudemografi",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L105"
+    },
+    {
+      "id": "components_landingpage_stats_pelayananstat",
+      "label": "PelayananStat",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "pelayananstat",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L95"
+    },
+    {
+      "id": "components_landingpage_stats_statsdata",
+      "label": "StatsData",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "statsdata",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L125"
+    },
+    {
+      "id": "components_landingpage_stats_topjenis",
+      "label": "TopJenis",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "topjenis",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L87"
+    },
+    {
+      "id": "components_landingpage_stats_trendpoint",
+      "label": "TrendPoint",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "trendpoint",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L91"
     },
     {
       "id": "components_permohonan_online_kiamodal_formdata",
@@ -4547,6 +4547,18 @@
       "source_location": "L4"
     },
     {
+      "id": "app_api_stats_route_get",
+      "label": "GET()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "get()",
+      "source_file": "app/api/stats/route.ts",
+      "source_location": "L26"
+    },
+    {
       "id": "components_dashboard_demografi_editor_demografieditor",
       "label": "DemografiEditor()",
       "_callable": true,
@@ -4691,6 +4703,18 @@
       "source_location": "L389"
     },
     {
+      "id": "components_landingpage_statistik_kartu_editor_statistikkartueditor",
+      "label": "StatistikKartuEditor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "statistikkartueditor()",
+      "source_file": "components/landingpage/statistik-kartu-editor.tsx",
+      "source_location": "L52"
+    },
+    {
       "id": "components_landingpage_statistik_kartu_editor_warnapicker",
       "label": "WarnaPicker()",
       "_callable": true,
@@ -4701,6 +4725,90 @@
       "norm_label": "warnapicker()",
       "source_file": "components/landingpage/statistik-kartu-editor.tsx",
       "source_location": "L422"
+    },
+    {
+      "id": "components_landingpage_stats_statcard",
+      "label": "StatCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "statcard()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L159"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_formkartu",
+      "label": "FormKartu()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "formkartu()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L56"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_formkartu_simpan",
+      "label": "simpan()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "simpan()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L86"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_keslug",
+      "label": "keSlug()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "keslug()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L35"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_ppidaksikartu",
+      "label": "PpidAksiKartu()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "ppidaksikartu()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L302"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_ppidaksikartu_hapus",
+      "label": "hapus()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "hapus()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L316"
+    },
+    {
+      "id": "components_ppid_kelola_kartu_simpandaftar",
+      "label": "simpanDaftar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "simpandaftar()",
+      "source_file": "components/ppid/kelola-kartu.tsx",
+      "source_location": "L44"
     },
     {
       "id": "lib_beranda_statistik_kolomdugaan",
@@ -4749,6 +4857,30 @@
       "norm_label": "warnapreset()",
       "source_file": "lib/beranda-statistik.ts",
       "source_location": "L148"
+    },
+    {
+      "id": "lib_demografi_kategori_getdemografikategori",
+      "label": "getDemografiKategori()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "getdemografikategori()",
+      "source_file": "lib/demografi-kategori.ts",
+      "source_location": "L99"
+    },
+    {
+      "id": "lib_icon_map_geticon",
+      "label": "getIcon()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "geticon()",
+      "source_file": "lib/icon-map.ts",
+      "source_location": "L127"
     },
     {
       "id": "app_api_admin_demografi_kategori_route_delete",
@@ -4845,18 +4977,6 @@
       "norm_label": "get()",
       "source_file": "app/api/demografi/kategori/route.ts",
       "source_location": "L15"
-    },
-    {
-      "id": "app_api_stats_route_get",
-      "label": "GET()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "admin/demografi/kategori/route.ts",
-      "file_type": "code",
-      "norm_label": "get()",
-      "source_file": "app/api/stats/route.ts",
-      "source_location": "L26"
     },
     {
       "id": "app_media_demografi_slug_page_demografikategoripage",
@@ -5632,7 +5752,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "levelof()",
       "source_file": "prisma/etl-demografi.ts",
@@ -5644,7 +5764,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "main()",
       "source_file": "prisma/etl-demografi.ts",
@@ -5656,7 +5776,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "num()",
       "source_file": "prisma/etl-demografi.ts",
@@ -5668,47 +5788,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "parentof()",
       "source_file": "prisma/etl-demografi.ts",
       "source_location": "L28"
-    },
-    {
-      "id": "scripts_migrasi_periode_demografi_adaindeks",
-      "label": "adaIndeks()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "adaindeks()",
-      "source_file": "scripts/migrasi-periode-demografi.ts",
-      "source_location": "L40"
-    },
-    {
-      "id": "scripts_migrasi_periode_demografi_adakolom",
-      "label": "adaKolom()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "adakolom()",
-      "source_file": "scripts/migrasi-periode-demografi.ts",
-      "source_location": "L29"
-    },
-    {
-      "id": "scripts_migrasi_periode_demografi_main",
-      "label": "main()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "main()",
-      "source_file": "scripts/migrasi-periode-demografi.ts",
-      "source_location": "L51"
     },
     {
       "id": "app_hubungi_kami_slug_page_generatestaticparams",
@@ -6568,11 +6652,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "demografimetric()",
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L28"
+      "source_location": "L27"
     },
     {
       "id": "components_landingpage_demografi_metric_fmt",
@@ -6580,119 +6664,59 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "fmt()",
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L22"
+      "source_location": "L21"
     },
     {
-      "id": "components_landingpage_statistik_kartu_editor_statistikkartueditor",
-      "label": "StatistikKartuEditor()",
+      "id": "components_landingpage_demografi_view_demografiview",
+      "label": "DemografiView()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "statistikkartueditor()",
-      "source_file": "components/landingpage/statistik-kartu-editor.tsx",
-      "source_location": "L52"
+      "norm_label": "demografiview()",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L50"
     },
     {
-      "id": "components_landingpage_stats_animatednumber",
-      "label": "AnimatedNumber()",
+      "id": "components_landingpage_demografi_view_fmt",
+      "label": "fmt()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "animatednumber()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L134"
+      "norm_label": "fmt()",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L42"
     },
     {
-      "id": "components_landingpage_stats_charts_toplayananchart",
-      "label": "TopLayananChart()",
+      "id": "components_landingpage_demografi_view_labelkolom",
+      "label": "labelKolom()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "toplayananchart()",
-      "source_file": "components/landingpage/stats-charts.tsx",
-      "source_location": "L87"
+      "norm_label": "labelkolom()",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L41"
     },
     {
-      "id": "components_landingpage_stats_charts_trenchart",
-      "label": "TrenChart()",
+      "id": "components_landingpage_demografi_view_sumkolom",
+      "label": "sumKolom()",
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "trenchart()",
-      "source_file": "components/landingpage/stats-charts.tsx",
-      "source_location": "L48"
-    },
-    {
-      "id": "components_landingpage_stats_divider",
-      "label": "Divider()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "divider()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L152"
-    },
-    {
-      "id": "components_landingpage_stats_mapcard",
-      "label": "MapCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "mapcard()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L300"
-    },
-    {
-      "id": "components_landingpage_stats_servicecard",
-      "label": "ServiceCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "servicecard()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L216"
-    },
-    {
-      "id": "components_landingpage_stats_statcard",
-      "label": "StatCard()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "statcard()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L158"
-    },
-    {
-      "id": "components_landingpage_stats_statsgrid",
-      "label": "StatsGrid()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "statsgrid()",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L655"
+      "norm_label": "sumkolom()",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L44"
     },
     {
       "id": "components_media_image_cropper_dialog_imagecropperdialog",
@@ -6700,83 +6724,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "imagecropperdialog()",
       "source_file": "components/media/image-cropper-dialog.tsx",
       "source_location": "L30"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_formkartu",
-      "label": "FormKartu()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "formkartu()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L56"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_formkartu_simpan",
-      "label": "simpan()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "simpan()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L86"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_keslug",
-      "label": "keSlug()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "keslug()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L35"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_ppidaksikartu",
-      "label": "PpidAksiKartu()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "ppidaksikartu()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L302"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_ppidaksikartu_hapus",
-      "label": "hapus()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "hapus()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L316"
-    },
-    {
-      "id": "components_ppid_kelola_kartu_simpandaftar",
-      "label": "simpanDaftar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "simpandaftar()",
-      "source_file": "components/ppid/kelola-kartu.tsx",
-      "source_location": "L44"
     },
     {
       "id": "components_ui_dialog_dialog",
@@ -6784,7 +6736,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialog()",
       "source_file": "components/ui/dialog.tsx",
@@ -6796,7 +6748,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogclose()",
       "source_file": "components/ui/dialog.tsx",
@@ -6808,7 +6760,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogcontent()",
       "source_file": "components/ui/dialog.tsx",
@@ -6820,7 +6772,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogdescription()",
       "source_file": "components/ui/dialog.tsx",
@@ -6832,7 +6784,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogfooter()",
       "source_file": "components/ui/dialog.tsx",
@@ -6844,7 +6796,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogheader()",
       "source_file": "components/ui/dialog.tsx",
@@ -6856,7 +6808,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogoverlay()",
       "source_file": "components/ui/dialog.tsx",
@@ -6868,7 +6820,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogportal()",
       "source_file": "components/ui/dialog.tsx",
@@ -6880,7 +6832,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogtitle()",
       "source_file": "components/ui/dialog.tsx",
@@ -6892,35 +6844,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialogtrigger()",
       "source_file": "components/ui/dialog.tsx",
       "source_location": "L16"
-    },
-    {
-      "id": "lib_demografi_kategori_getdemografikategori",
-      "label": "getDemografiKategori()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "getdemografikategori()",
-      "source_file": "lib/demografi-kategori.ts",
-      "source_location": "L99"
-    },
-    {
-      "id": "lib_icon_map_geticon",
-      "label": "getIcon()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "geticon()",
-      "source_file": "lib/icon-map.ts",
-      "source_location": "L127"
     },
     {
       "id": "app_api_ocr_ktp_route_getworker",
@@ -7439,54 +7367,6 @@
       "source_location": "L79"
     },
     {
-      "id": "components_landingpage_demografi_view_demografiview",
-      "label": "DemografiView()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "demografiview()",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L50"
-    },
-    {
-      "id": "components_landingpage_demografi_view_fmt",
-      "label": "fmt()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "fmt()",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L42"
-    },
-    {
-      "id": "components_landingpage_demografi_view_labelkolom",
-      "label": "labelKolom()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "labelkolom()",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L41"
-    },
-    {
-      "id": "components_landingpage_demografi_view_sumkolom",
-      "label": "sumKolom()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "sumkolom()",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L44"
-    },
-    {
       "id": "components_landingpage_stats_badgeperiode",
       "label": "BadgePeriode()",
       "_callable": true,
@@ -7496,7 +7376,7 @@
       "file_type": "code",
       "norm_label": "badgeperiode()",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L408"
+      "source_location": "L410"
     },
     {
       "id": "components_landingpage_stats_badgeperiodeedit",
@@ -7508,7 +7388,19 @@
       "file_type": "code",
       "norm_label": "badgeperiodeedit()",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L536"
+      "source_location": "L538"
+    },
+    {
+      "id": "components_landingpage_stats_statsgrid",
+      "label": "StatsGrid()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "statsgrid()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L657"
     },
     {
       "id": "components_shared_pemilih_periode_pemilihperiode",
@@ -7617,6 +7509,42 @@
       "norm_label": "tahunpilihan()",
       "source_file": "lib/periode-demografi.ts",
       "source_location": "L113"
+    },
+    {
+      "id": "scripts_migrasi_periode_demografi_adaindeks",
+      "label": "adaIndeks()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "adaindeks()",
+      "source_file": "scripts/migrasi-periode-demografi.ts",
+      "source_location": "L40"
+    },
+    {
+      "id": "scripts_migrasi_periode_demografi_adakolom",
+      "label": "adaKolom()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "adakolom()",
+      "source_file": "scripts/migrasi-periode-demografi.ts",
+      "source_location": "L29"
+    },
+    {
+      "id": "scripts_migrasi_periode_demografi_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "scripts/migrasi-periode-demografi.ts",
+      "source_location": "L51"
     },
     {
       "id": "scripts_uji_periode_bersihkan",
@@ -12208,7 +12136,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "flyin()",
       "source_file": "components/landingpage/office-map.tsx",
@@ -12220,11 +12148,83 @@
       "_callable": true,
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "officemap()",
       "source_file": "components/landingpage/office-map.tsx",
       "source_location": "L46"
+    },
+    {
+      "id": "components_landingpage_stats_animatednumber",
+      "label": "AnimatedNumber()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "animatednumber()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L135"
+    },
+    {
+      "id": "components_landingpage_stats_charts_toplayananchart",
+      "label": "TopLayananChart()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "toplayananchart()",
+      "source_file": "components/landingpage/stats-charts.tsx",
+      "source_location": "L87"
+    },
+    {
+      "id": "components_landingpage_stats_charts_trenchart",
+      "label": "TrenChart()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "trenchart()",
+      "source_file": "components/landingpage/stats-charts.tsx",
+      "source_location": "L48"
+    },
+    {
+      "id": "components_landingpage_stats_divider",
+      "label": "Divider()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "divider()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L153"
+    },
+    {
+      "id": "components_landingpage_stats_mapcard",
+      "label": "MapCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "mapcard()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L301"
+    },
+    {
+      "id": "components_landingpage_stats_servicecard",
+      "label": "ServiceCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "servicecard()",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L217"
     },
     {
       "id": "prisma_etl_chat_dt",
@@ -15034,6 +15034,28 @@
       "source_location": "L41"
     },
     {
+      "id": "app_api_stats_route",
+      "label": "stats/route.ts",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "stats/route.ts",
+      "source_file": "app/api/stats/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_api_stats_route_bulan_pendek",
+      "label": "BULAN_PENDEK",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "bulan_pendek",
+      "source_file": "app/api/stats/route.ts",
+      "source_location": "L14"
+    },
+    {
       "id": "components_dashboard_demografi_editor",
       "label": "demografi-editor.tsx",
       "_origin": "ast",
@@ -15053,6 +15075,17 @@
       "file_type": "code",
       "norm_label": "statistik-kartu-editor.tsx",
       "source_file": "components/landingpage/statistik-kartu-editor.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "components_ppid_kelola_kartu",
+      "label": "kelola-kartu.tsx",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "kelola-kartu.tsx",
+      "source_file": "components/ppid/kelola-kartu.tsx",
       "source_location": "L1"
     },
     {
@@ -15076,6 +15109,17 @@
       "norm_label": "default_kartu",
       "source_file": "lib/beranda-statistik.ts",
       "source_location": "L211"
+    },
+    {
+      "id": "lib_beranda_statistik_kartu_statistik_kunci",
+      "label": "KARTU_STATISTIK_KUNCI",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "statistik-kartu-editor.tsx",
+      "file_type": "code",
+      "norm_label": "kartu_statistik_kunci",
+      "source_file": "lib/beranda-statistik.ts",
+      "source_location": "L12"
     },
     {
       "id": "lib_beranda_statistik_kolom_dugaan",
@@ -15617,28 +15661,6 @@
       "source_location": "L4"
     },
     {
-      "id": "app_api_stats_route",
-      "label": "stats/route.ts",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "admin/demografi/kategori/route.ts",
-      "file_type": "code",
-      "norm_label": "stats/route.ts",
-      "source_file": "app/api/stats/route.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_api_stats_route_bulan_pendek",
-      "label": "BULAN_PENDEK",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "admin/demografi/kategori/route.ts",
-      "file_type": "code",
-      "norm_label": "bulan_pendek",
-      "source_file": "app/api/stats/route.ts",
-      "source_location": "L14"
-    },
-    {
       "id": "app_media_demografi_slug_page",
       "label": "demografi/[slug]/page.tsx",
       "_origin": "ast",
@@ -15659,17 +15681,6 @@
       "norm_label": "dynamic",
       "source_file": "app/media/demografi/[slug]/page.tsx",
       "source_location": "L17"
-    },
-    {
-      "id": "lib_beranda_statistik_kartu_statistik_kunci",
-      "label": "KARTU_STATISTIK_KUNCI",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "admin/demografi/kategori/route.ts",
-      "file_type": "code",
-      "norm_label": "kartu_statistik_kunci",
-      "source_file": "lib/beranda-statistik.ts",
-      "source_location": "L12"
     },
     {
       "id": "lib_demografi_kategori",
@@ -16255,66 +16266,11 @@
       "source_location": "L575"
     },
     {
-      "id": "lib_periode_demografi",
-      "label": "periode-demografi.ts",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "periode-demografi.ts",
-      "source_file": "lib/periode-demografi.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "lib_periode_demografi_romawi",
-      "label": "ROMAWI",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "romawi",
-      "source_file": "lib/periode-demografi.ts",
-      "source_location": "L37"
-    },
-    {
-      "id": "lib_periode_demografi_semester_bawaan",
-      "label": "SEMESTER_BAWAAN",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "semester_bawaan",
-      "source_file": "lib/periode-demografi.ts",
-      "source_location": "L32"
-    },
-    {
-      "id": "lib_periode_demografi_tahun_bawaan",
-      "label": "TAHUN_BAWAAN",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "tahun_bawaan",
-      "source_file": "lib/periode-demografi.ts",
-      "source_location": "L31"
-    },
-    {
-      "id": "lib_periode_demografi_tahun_min",
-      "label": "TAHUN_MIN",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "tahun_min",
-      "source_file": "lib/periode-demografi.ts",
-      "source_location": "L35"
-    },
-    {
       "id": "prisma_etl_demografi",
       "label": "etl-demografi.ts",
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "etl-demografi.ts",
       "source_file": "prisma/etl-demografi.ts",
@@ -16325,7 +16281,7 @@
       "label": "GROUP_SLUG",
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "group_slug",
       "source_file": "prisma/etl-demografi.ts",
@@ -16336,7 +16292,7 @@
       "label": "prisma",
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "prisma",
       "source_file": "prisma/etl-demografi.ts",
@@ -16347,33 +16303,11 @@
       "label": "SOURCE",
       "_origin": "ast",
       "community": 20,
-      "community_name": "periode-demografi.ts",
+      "community_name": "etl-demografi.ts",
       "file_type": "code",
       "norm_label": "source",
       "source_file": "prisma/etl-demografi.ts",
       "source_location": "L18"
-    },
-    {
-      "id": "scripts_migrasi_periode_demografi",
-      "label": "migrasi-periode-demografi.ts",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "migrasi-periode-demografi.ts",
-      "source_file": "scripts/migrasi-periode-demografi.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "scripts_migrasi_periode_demografi_prisma",
-      "label": "prisma",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "periode-demografi.ts",
-      "file_type": "code",
-      "norm_label": "prisma",
-      "source_file": "scripts/migrasi-periode-demografi.ts",
-      "source_location": "L25"
     },
     {
       "id": "claude",
@@ -17166,109 +17100,43 @@
       "label": "demografi-metric.tsx",
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "demografi-metric.tsx",
       "source_file": "components/landingpage/demografi-metric.tsx",
       "source_location": "L1"
     },
     {
-      "id": "components_landingpage_stats",
-      "label": "stats.tsx",
+      "id": "components_landingpage_demografi_view",
+      "label": "demografi-view.tsx",
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "stats.tsx",
-      "source_file": "components/landingpage/stats.tsx",
+      "norm_label": "demografi-view.tsx",
+      "source_file": "components/landingpage/demografi-view.tsx",
       "source_location": "L1"
     },
     {
-      "id": "components_landingpage_stats_charts",
-      "label": "stats-charts.tsx",
+      "id": "components_landingpage_demografi_view_kolom_label",
+      "label": "KOLOM_LABEL",
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
-      "norm_label": "stats-charts.tsx",
-      "source_file": "components/landingpage/stats-charts.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "components_landingpage_stats_charts_base",
-      "label": "base",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "base",
-      "source_file": "components/landingpage/stats-charts.tsx",
-      "source_location": "L28"
-    },
-    {
-      "id": "components_landingpage_stats_fallback",
-      "label": "FALLBACK",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "fallback",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L365"
-    },
-    {
-      "id": "components_landingpage_stats_toplayananchart",
-      "label": "TopLayananChart",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "toplayananchart",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L74"
-    },
-    {
-      "id": "components_landingpage_stats_trenchart",
-      "label": "TrenChart",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "trenchart",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L70"
-    },
-    {
-      "id": "components_landingpage_stats_wilayah",
-      "label": "WILAYAH",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "wilayah",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L295"
+      "norm_label": "kolom_label",
+      "source_file": "components/landingpage/demografi-view.tsx",
+      "source_location": "L36"
     },
     {
       "id": "components_media_image_cropper_dialog",
       "label": "image-cropper-dialog.tsx",
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "image-cropper-dialog.tsx",
       "source_file": "components/media/image-cropper-dialog.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "components_ppid_kelola_kartu",
-      "label": "kelola-kartu.tsx",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "stats.tsx",
-      "file_type": "code",
-      "norm_label": "kelola-kartu.tsx",
-      "source_file": "components/ppid/kelola-kartu.tsx",
       "source_location": "L1"
     },
     {
@@ -17276,7 +17144,7 @@
       "label": "dialog.tsx",
       "_origin": "ast",
       "community": 25,
-      "community_name": "stats.tsx",
+      "community_name": "demografi-view.tsx",
       "file_type": "code",
       "norm_label": "dialog.tsx",
       "source_file": "components/ui/dialog.tsx",
@@ -17932,28 +17800,6 @@
       "source_location": "L1"
     },
     {
-      "id": "components_landingpage_demografi_view",
-      "label": "demografi-view.tsx",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "demografi-view.tsx",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "components_landingpage_demografi_view_kolom_label",
-      "label": "KOLOM_LABEL",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "AdminDemografi.tsx",
-      "file_type": "code",
-      "norm_label": "kolom_label",
-      "source_file": "components/landingpage/demografi-view.tsx",
-      "source_location": "L36"
-    },
-    {
       "id": "components_shared_pemilih_periode",
       "label": "pemilih-periode.tsx",
       "_origin": "ast",
@@ -17963,6 +17809,83 @@
       "norm_label": "pemilih-periode.tsx",
       "source_file": "components/shared/pemilih-periode.tsx",
       "source_location": "L1"
+    },
+    {
+      "id": "lib_periode_demografi",
+      "label": "periode-demografi.ts",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "periode-demografi.ts",
+      "source_file": "lib/periode-demografi.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_periode_demografi_romawi",
+      "label": "ROMAWI",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "romawi",
+      "source_file": "lib/periode-demografi.ts",
+      "source_location": "L37"
+    },
+    {
+      "id": "lib_periode_demografi_semester_bawaan",
+      "label": "SEMESTER_BAWAAN",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "semester_bawaan",
+      "source_file": "lib/periode-demografi.ts",
+      "source_location": "L32"
+    },
+    {
+      "id": "lib_periode_demografi_tahun_bawaan",
+      "label": "TAHUN_BAWAAN",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "tahun_bawaan",
+      "source_file": "lib/periode-demografi.ts",
+      "source_location": "L31"
+    },
+    {
+      "id": "lib_periode_demografi_tahun_min",
+      "label": "TAHUN_MIN",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "tahun_min",
+      "source_file": "lib/periode-demografi.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "scripts_migrasi_periode_demografi",
+      "label": "migrasi-periode-demografi.ts",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "migrasi-periode-demografi.ts",
+      "source_file": "scripts/migrasi-periode-demografi.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_migrasi_periode_demografi_prisma",
+      "label": "prisma",
+      "_origin": "ast",
+      "community": 31,
+      "community_name": "AdminDemografi.tsx",
+      "file_type": "code",
+      "norm_label": "prisma",
+      "source_file": "scripts/migrasi-periode-demografi.ts",
+      "source_location": "L25"
     },
     {
       "id": "scripts_uji_periode",
@@ -23200,7 +23123,7 @@
       "label": "office-map.tsx",
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "office-map.tsx",
       "source_file": "components/landingpage/office-map.tsx",
@@ -23211,7 +23134,7 @@
       "label": "OFFICE_LAT",
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "office_lat",
       "source_file": "components/landingpage/office-map.tsx",
@@ -23222,7 +23145,7 @@
       "label": "OFFICE_LNG",
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "office_lng",
       "source_file": "components/landingpage/office-map.tsx",
@@ -23233,22 +23156,99 @@
       "label": "pulseIcon",
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "pulseicon",
       "source_file": "components/landingpage/office-map.tsx",
       "source_location": "L14"
     },
     {
+      "id": "components_landingpage_stats",
+      "label": "stats.tsx",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "stats.tsx",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "components_landingpage_stats_charts",
+      "label": "stats-charts.tsx",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "stats-charts.tsx",
+      "source_file": "components/landingpage/stats-charts.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "components_landingpage_stats_charts_base",
+      "label": "base",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "base",
+      "source_file": "components/landingpage/stats-charts.tsx",
+      "source_location": "L28"
+    },
+    {
+      "id": "components_landingpage_stats_fallback",
+      "label": "FALLBACK",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "fallback",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L366"
+    },
+    {
       "id": "components_landingpage_stats_officemap",
       "label": "OfficeMap",
       "_origin": "ast",
       "community": 82,
-      "community_name": "office-map.tsx",
+      "community_name": "stats.tsx",
       "file_type": "code",
       "norm_label": "officemap",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L60"
+      "source_location": "L59"
+    },
+    {
+      "id": "components_landingpage_stats_toplayananchart",
+      "label": "TopLayananChart",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "toplayananchart",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L73"
+    },
+    {
+      "id": "components_landingpage_stats_trenchart",
+      "label": "TrenChart",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "trenchart",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L69"
+    },
+    {
+      "id": "components_landingpage_stats_wilayah",
+      "label": "WILAYAH",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "stats.tsx",
+      "file_type": "code",
+      "norm_label": "wilayah",
+      "source_file": "components/landingpage/stats.tsx",
+      "source_location": "L296"
     },
     {
       "id": "components_permohonan_online_kiamodal",
@@ -29319,7 +29319,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/api/stats/route.ts",
-      "source_location": "L226",
+      "source_location": "L236",
       "weight": 1.0
     },
     {
@@ -29331,7 +29331,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/api/stats/route.ts",
-      "source_location": "L250",
+      "source_location": "L260",
       "weight": 1.0
     },
     {
@@ -31347,7 +31347,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/demografi-editor.tsx",
-      "source_location": "L1134",
+      "source_location": "L1130",
       "weight": 1.0
     },
     {
@@ -31359,7 +31359,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/demografi-editor.tsx",
-      "source_location": "L1138",
+      "source_location": "L1134",
       "weight": 1.0
     },
     {
@@ -31371,7 +31371,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/demografi-editor.tsx",
-      "source_location": "L1140",
+      "source_location": "L1136",
       "weight": 1.0
     },
     {
@@ -31455,7 +31455,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/demografi-editor.tsx",
-      "source_location": "L846",
+      "source_location": "L855",
       "weight": 1.0
     },
     {
@@ -31467,7 +31467,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/dashboard/demografi-editor.tsx",
-      "source_location": "L966",
+      "source_location": "L962",
       "weight": 1.0
     },
     {
@@ -31911,19 +31911,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L100",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_demografi_metric_demografimetric",
-      "target": "lib_demografi_kategori_getdemografikategori",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L210",
+      "source_location": "L108",
       "weight": 1.0
     },
     {
@@ -32343,7 +32331,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L446",
+      "source_location": "L448",
       "weight": 1.0
     },
     {
@@ -32355,7 +32343,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L468",
+      "source_location": "L470",
       "weight": 1.0
     },
     {
@@ -32367,7 +32355,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L488",
+      "source_location": "L490",
       "weight": 1.0
     },
     {
@@ -32379,7 +32367,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L502",
+      "source_location": "L504",
       "weight": 1.0
     },
     {
@@ -32391,7 +32379,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L577",
+      "source_location": "L579",
       "weight": 1.0
     },
     {
@@ -32403,7 +32391,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L579",
+      "source_location": "L581",
       "weight": 1.0
     },
     {
@@ -32415,7 +32403,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L599",
+      "source_location": "L601",
       "weight": 1.0
     },
     {
@@ -32427,7 +32415,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L613",
+      "source_location": "L615",
       "weight": 1.0
     },
     {
@@ -32439,7 +32427,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -32451,7 +32439,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L226",
+      "source_location": "L227",
       "weight": 1.0
     },
     {
@@ -32463,7 +32451,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L159",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -32475,7 +32463,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L164",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
@@ -32487,7 +32475,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L664",
+      "source_location": "L666",
       "weight": 1.0
     },
     {
@@ -32499,19 +32487,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L674",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_stats_statsgrid",
-      "target": "lib_demografi_kategori_getdemografikategori",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L818",
+      "source_location": "L678",
       "weight": 1.0
     },
     {
@@ -37616,30 +37592,6 @@
       "weight": 1.0
     },
     {
-      "source": "components_landingpage_stats_statsdata",
-      "target": "lib_periode_demografi_periode",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "field",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L128",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_stats_statsdata",
-      "target": "lib_periode_demografi_periodetersedia",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "field",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L129",
-      "weight": 1.0
-    },
-    {
       "source": "components_media_media_picker_mediapickerprops",
       "target": "components_media_media_upload_mediaitem",
       "relation": "references",
@@ -37736,7 +37688,7 @@
       "context": "import",
       "deferred": true,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L60",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -37749,7 +37701,7 @@
       "context": "import",
       "deferred": true,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L74",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -37762,7 +37714,7 @@
       "context": "import",
       "deferred": true,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L70",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -50633,18 +50585,6 @@
     },
     {
       "source": "components_landingpage_demografi_metric",
-      "target": "lib_demografi_kategori_getdemografikategori",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_demografi_metric",
       "target": "components_ui_dialog_dialog",
       "relation": "imports",
       "_origin": "ast",
@@ -51461,7 +51401,7 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_demografi_kategori_getdemografikategori",
+      "target": "lib_icon_map_geticon",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -51473,7 +51413,7 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_icon_map_geticon",
+      "target": "lib_beranda_statistik_default_kartu",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -51485,18 +51425,6 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_beranda_statistik_default_kartu",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L42",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_stats",
       "target": "lib_beranda_statistik_warnapreset",
       "relation": "imports",
       "_origin": "ast",
@@ -51504,7 +51432,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L42",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -51516,7 +51444,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -51528,7 +51456,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -51540,7 +51468,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -51552,7 +51480,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -51564,7 +51492,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -51576,7 +51504,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -51588,7 +51516,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -51600,7 +51528,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -51612,7 +51540,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -51624,7 +51552,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -51636,7 +51564,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -69427,18 +69355,6 @@
     },
     {
       "source": "components_landingpage_demografi_metric",
-      "target": "lib_demografi_kategori",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_demografi_metric",
       "target": "components_ui_dialog",
       "relation": "imports_from",
       "_origin": "ast",
@@ -69883,7 +69799,7 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_demografi_kategori",
+      "target": "lib_icon_map",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -69895,7 +69811,7 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_icon_map",
+      "target": "lib_beranda_statistik",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -69907,7 +69823,7 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "lib_beranda_statistik",
+      "target": "components_ui_dialog",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -69919,18 +69835,6 @@
     },
     {
       "source": "components_landingpage_stats",
-      "target": "components_ui_dialog",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L43",
-      "weight": 1.0
-    },
-    {
-      "source": "components_landingpage_stats",
       "target": "lib_periode_demografi",
       "relation": "imports_from",
       "_origin": "ast",
@@ -69938,7 +69842,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L50",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -80642,7 +80546,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L16",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -80653,7 +80557,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L22",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -80664,7 +80568,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/demografi-metric.tsx",
-      "source_location": "L28",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -81302,7 +81206,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L106",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -81313,7 +81217,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L124",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -81324,7 +81228,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L134",
+      "source_location": "L135",
       "weight": 1.0
     },
     {
@@ -81335,7 +81239,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L152",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -81346,7 +81250,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L158",
+      "source_location": "L159",
       "weight": 1.0
     },
     {
@@ -81357,7 +81261,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L216",
+      "source_location": "L217",
       "weight": 1.0
     },
     {
@@ -81368,7 +81272,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L295",
+      "source_location": "L296",
       "weight": 1.0
     },
     {
@@ -81379,7 +81283,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L300",
+      "source_location": "L301",
       "weight": 1.0
     },
     {
@@ -81390,7 +81294,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L365",
+      "source_location": "L366",
       "weight": 1.0
     },
     {
@@ -81401,7 +81305,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L408",
+      "source_location": "L410",
       "weight": 1.0
     },
     {
@@ -81412,7 +81316,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L536",
+      "source_location": "L538",
       "weight": 1.0
     },
     {
@@ -81423,7 +81327,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L60",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -81434,7 +81338,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L655",
+      "source_location": "L657",
       "weight": 1.0
     },
     {
@@ -81445,7 +81349,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L70",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -81456,7 +81360,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L74",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -81467,7 +81371,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L88",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -81478,7 +81382,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L92",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -81489,7 +81393,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/landingpage/stats.tsx",
-      "source_location": "L96",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -92891,5 +92795,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "19c0dcd511643cdcf08fa71c4c40ffb338ed9e0c"
+  "built_at_commit": "ae03f9b2e26a0791d54de21e8151a329b87cf875"
 }

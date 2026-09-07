@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, BarChart3, ChevronRight, Pencil } from 'lucide-react';
 import { DemografiEditor } from '@/components/dashboard/demografi-editor';
-import { getDemografiKategori } from '@/lib/demografi-kategori';
 
 interface Row {
   kode: string;
@@ -27,12 +26,21 @@ const fmt = (n: number) => (n ?? 0).toLocaleString('id-ID');
  */
 export function DemografiMetric({
   kategori,
+  kategoriLabel,
   kolom,
   title,
   editable = false,
   onDataChanged,
 }: {
   kategori: string;
+  /**
+   * Nama tampilan kategori, DIKIRIM dari pemanggil.
+   *
+   * 🔴 Dulu dicari sendiri lewat `getDemografiKategori()`, yang membaca
+   * konstanta di kode. Sejak dinas bisa mengganti nama kategori, cara itu
+   * mengembalikan nama LAMA sementara sisa portal sudah memakai nama baru.
+   */
+  kategoriLabel?: string;
   /** Nama kolom nilai yang ditampilkan (mis. 'JML', 'L', 'KK_JML'). */
   kolom: string;
   /** Judul metrik (mis. 'Jumlah Penduduk'). */
@@ -207,7 +215,7 @@ export function DemografiMetric({
       {editable && (
         <DemografiEditor
           kategori={kategori}
-          label={getDemografiKategori(kategori)?.label ?? kategori}
+          label={kategoriLabel ?? kategori}
           open={editorOpen}
           onOpenChange={setEditorOpen}
           onSaved={() => {

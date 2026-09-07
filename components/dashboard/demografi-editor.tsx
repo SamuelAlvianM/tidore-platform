@@ -823,12 +823,22 @@ export function DemografiEditor({
   }, [highlightNyata, pekonRows, kecRows]);
 
   /**
-   * Perbarui HANYA kartu beranda yang sedang diedit (identitas =
-   * kategori + targetKolom). Kartu lain — termasuk kartu lain di kategori
-   * yang sama, mis. Laki-laki vs Perempuan — dibiarkan utuh.
-   * - highlight ada: kartu target diganti kolom/ikon/warna terbaru (bila
-   *   kolomnya sama, badge & judul lama dipertahankan);
-   * - highlight kosong: kartu target dihapus.
+   * Perbarui kartu beranda kategori ini.
+   *
+   * 🔴 SATU KATEGORI HANYA PUNYA SATU KARTU, jadi menyimpan berarti
+   * MENGGANTI kartu kategori ini — bukan menambah kartu baru di sebelahnya.
+   *
+   * Dulu yang dibuang hanya kartu dengan kolom yang sama persis, sehingga
+   * membintangi kolom lain pada kategori yang sama menghasilkan kartu KEDUA.
+   * Sejak beranda hanya menampilkan satu kartu per kategori, kartu kedua itu
+   * dibuang saat dibaca — dan yang dialami petugas adalah tombol bintang yang
+   * ditekan, disimpan, tidak memberi galat apa pun, lalu tidak mengubah apa-apa
+   * di halaman utama. Kegagalan diam-diam seperti itu lebih buruk daripada
+   * penolakan yang jelas.
+   *
+   * - highlight ada: kartu kategori ini diganti dengan kolom/ikon/warna
+   *   terbaru (bila kolomnya sama, badge & judul lama dipertahankan);
+   * - highlight kosong: kartu kategori ini dihapus.
    */
   const simpanHighlight = async () => {
     const prev = kartuSemua;
@@ -836,9 +846,8 @@ export function DemografiEditor({
       (c) => c.kategori === kategori && c.kolom === targetKolom,
     );
     const lama = posisi >= 0 ? prev[posisi] : undefined;
-    const kartu = prev.filter(
-      (c) => !(c.kategori === kategori && c.kolom === targetKolom),
-    );
+    // SELURUH kartu kategori ini dibuang; satu entri baru disisipkan di bawah.
+    const kartu = prev.filter((c) => c.kategori !== kategori);
     if (highlight) {
       const kolomSama = lama?.kolom === highlight;
       const entri: KartuStatistik = {
@@ -851,19 +860,6 @@ export function DemografiEditor({
         kolom: highlightNyata ?? highlight,
         warna: kartuWarna,
       };
-      /*
-       * 🔴 Jaring pengaman terakhir: buang kartu lain yang kebetulan sudah
-       * memakai kolom ini. `toggleHighlight` seharusnya sudah mencegahnya,
-       * tapi konfigurasi lama di basis data bisa saja sudah kembar sejak
-       * sebelum perbaikan ini — dan menyimpan ulang tidak boleh melanggengkan.
-       */
-      const bentrok = kartu.findIndex(
-        (c) =>
-          c.kategori === kategori &&
-          (resolveKolom(kolom, c.kolom) ?? c.kolom) === (highlightNyata ?? highlight),
-      );
-      if (bentrok >= 0) kartu.splice(bentrok, 1);
-
       kartu.splice(posisi >= 0 ? Math.min(posisi, kartu.length) : kartu.length, 0, entri);
     }
     // Setelah simpan, kartu target kini beridentitas kolom highlight terbaru.
