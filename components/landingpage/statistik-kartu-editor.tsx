@@ -1,3 +1,26 @@
+/*
+ * ⚠️ KOMPONEN INI SEDANG DINONAKTIFKAN.
+ *
+ * Pemakaiannya di `components/landingpage/stats.tsx` dikomentari beserta impor
+ * dan state `editorIndex`-nya. Berkas ini dipertahankan, bukan dibuang, karena
+ * susunan kartu beranda cepat atau lambat perlu bisa disunting lagi.
+ *
+ * 🔴 DUA HAL WAJIB DIBETULKAN SEBELUM DIAKTIFKAN KEMBALI:
+ *
+ * 1. `getDemografiKategori()` membaca konstanta di kode, bukan registri, jadi
+ *    ia mengembalikan nama LAMA untuk kategori yang sudah diganti namanya oleh
+ *    dinas — sementara tab beranda, judul sheet ekspor, dan panel dasbor
+ *    memakai nama baru. Jalur yang hidup sudah diperbaiki dengan mengirim
+ *    `kategoriLabel` dari `/api/stats`; komponen ini belum, karena tidak
+ *    terjangkau. Ikuti pola yang sama.
+ *
+ * 2. Satu kategori hanya berhak atas SATU kartu (lihat `selaraskanKartu` di
+ *    lib/beranda-statistik.ts). Editor ini masih bisa menambah kartu, dan
+ *    kartu kedua untuk kategori yang sama akan dibuang diam-diam saat dibaca.
+ *    Jumlah kartu ditentukan oleh sakelar "Tampil di Halaman utama" di dasbor
+ *    demografi, bukan di sini.
+ */
+
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';

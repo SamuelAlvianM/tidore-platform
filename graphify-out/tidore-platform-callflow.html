@@ -60,7 +60,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 <div class="container">
 
 <h1>tidore-platform — Complete Call Flow &amp; Architecture Documentation</h1>
-<p class="subtitle">Generated from graphify knowledge graph: 2045 nodes, 5886 edges, 155 communities. Commit: ae03f9b</p>
+<p class="subtitle">Generated from graphify knowledge graph: 2046 nodes, 5888 edges, 156 communities. Commit: c2d5332</p>
 
 <div class="nav">
     <a href="#overview">Architecture Overview</a>
@@ -96,9 +96,9 @@ flowchart LR
     class ANALYSIS_CLUSTERING_C79796DA module;
     OUTPUTS_DOCS_ED82387C("Outputs &amp; Docs<br/><small>69 nodes</small>")
     class OUTPUTS_DOCS_ED82387C module;
-    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>59 nodes</small>")
+    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>19 nodes</small>")
     class CLI_SKILLS_9964CBB8 module;
-    SERVE_API_35EC8E86("Serving API<br/><small>695 nodes</small>")
+    SERVE_API_35EC8E86("Serving API<br/><small>705 nodes</small>")
     class SERVE_API_35EC8E86 module;
     SECURITY_GLOBAL_5B9C6A04("Security &amp; Global Graph<br/><small>14 nodes</small>")
     class SECURITY_GLOBAL_5B9C6A04 module;
@@ -116,20 +116,20 @@ flowchart LR
     class CN_B0BC9ABD module;
     PPID_SLUG_PAGE_TSX_41F392EC("ppid/[...slug]/page.tsx<br/><small>34 nodes</small>")
     class PPID_SLUG_PAGE_TSX_41F392EC module;
-    OTHER_D0941E68("Other<br/><small>659 nodes</small>")
+    OTHER_D0941E68("Other<br/><small>690 nodes</small>")
     class OTHER_D0941E68 module;
-    OTHER_D0941E68 -->|imports x243| SERVE_API_35EC8E86
-    SERVE_API_35EC8E86 -->|imports x141| OTHER_D0941E68
+    OTHER_D0941E68 -->|imports x268| SERVE_API_35EC8E86
+    SERVE_API_35EC8E86 -->|imports x182| OTHER_D0941E68
     KKPERUBAHANBIODATAMODAL_TSX_AF6BA357 -->|imports x97| SERVE_API_35EC8E86
-    OTHER_D0941E68 -->|calls x79| CN_B0BC9ABD
+    OTHER_D0941E68 -->|calls x85| CN_B0BC9ABD
     SERVE_API_35EC8E86 -->|imports x68| CN_B0BC9ABD
-    SERVE_API_35EC8E86 -->|imports x61| CLI_SKILLS_9964CBB8
     KKPERUBAHANBIODATAMODAL_TSX_AF6BA357 -->|imports x60| CN_B0BC9ABD
     KKPERUBAHANBIODATAMODAL_TSX_AF6BA357 -->|imports x55| KKTAMBAHANAKMODAL_TSX_82FFBD16
     KKTAMBAHANAKMODAL_TSX_82FFBD16 -->|imports x54| SERVE_API_35EC8E86
     SERVE_API_35EC8E86 -->|imports x51| KKTAMBAHANAKMODAL_TSX_82FFBD16
     SERVE_API_35EC8E86 -->|imports x43| KKPERUBAHANBIODATAMODAL_TSX_AF6BA357
-    OTHER_D0941E68 -->|imports x40| CLI_SKILLS_9964CBB8
+    OUTPUTS_DOCS_ED82387C -->|imports x30| SERVE_API_35EC8E86
+    KKTAMBAHANAKMODAL_TSX_82FFBD16 -->|calls x28| CN_B0BC9ABD
     classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
     classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
     classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
@@ -146,7 +146,7 @@ flowchart LR
     <h4>Architecture Layers</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
-      <tr><td>Extraction Pipeline</td><td>2</td><td><code>173</code></td></tr><tr><td>Graph Build</td><td>190</td><td><code>16, 35, 53, 62, 59, 80, 100, 101, 102, 103, 104, 107, 108, 109, 110, 111, 113, 114, 115, 116, 117, 118, 119, 120, 121, 124, 127, 129, 130, 131, 132, 133, 135, 137, 138, 139, 140, 144, 145, 146, 147, 148, 149, 150, 151, 164, 172, 187, 188, 189, 190, 87, 99</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>19</td><td><code>77</code></td></tr><tr><td>Outputs &amp; Docs</td><td>69</td><td><code>2, 56</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>59</td><td><code>31, 40, 200</code></td></tr><tr><td>Serving API</td><td>695</td><td><code>22, 11, 15, 12, 13, 30, 1, 17, 73, 8, 41, 34, 18, 7, 26, 48, 50, 24, 29, 69, 54, 19, 88, 106, 122</code></td></tr><tr><td>Security &amp; Global Graph</td><td>14</td><td><code>23</code></td></tr><tr><td>KKPerubahanBiodataModal.tsx</td><td>72</td><td><code>0</code></td></tr><tr><td>PermohonanDetail.tsx</td><td>61</td><td><code>5</code></td></tr><tr><td>KKTambahAnakModal.tsx</td><td>46</td><td><code>10</code></td></tr><tr><td>useStaticContent</td><td>44</td><td><code>38</code></td></tr><tr><td>struktur-editor.tsx</td><td>43</td><td><code>45</code></td></tr><tr><td>cn</td><td>38</td><td><code>14</code></td></tr><tr><td>ppid/[...slug]/page.tsx</td><td>34</td><td><code>21</code></td></tr><tr><td>Other</td><td>659</td><td><code>51, 25, 82, 4, 55, 9, 3, 71, 74, 39, 52, 32, 33, 36, 43, 47, 57, 49, 60, 37, 64, 65, 46, 66, 67, 28, 58, 70, 6, 61, 42, 68, 78, 81, 20, 27, 44, 63, 75, 83, 105, 79, 72, 84, 85, 86, 76, 89, 90, 91, 123, 92, 112, 174, 93, 94, 95, 96, 97, 98, 180, 184</code></td></tr>
+      <tr><td>Extraction Pipeline</td><td>2</td><td><code>173</code></td></tr><tr><td>Graph Build</td><td>190</td><td><code>16, 35, 53, 62, 59, 80, 100, 101, 102, 103, 104, 107, 108, 109, 110, 111, 113, 114, 115, 116, 117, 118, 119, 120, 121, 124, 127, 129, 130, 131, 132, 133, 135, 137, 138, 139, 140, 144, 145, 146, 147, 148, 149, 150, 151, 164, 172, 187, 188, 189, 190, 87, 99</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>19</td><td><code>77</code></td></tr><tr><td>Outputs &amp; Docs</td><td>69</td><td><code>2, 56</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>19</td><td><code>40, 200</code></td></tr><tr><td>Serving API</td><td>705</td><td><code>22, 11, 12, 15, 13, 30, 1, 17, 73, 8, 41, 34, 18, 7, 26, 48, 50, 24, 29, 69, 54, 19, 88, 106, 122</code></td></tr><tr><td>Security &amp; Global Graph</td><td>14</td><td><code>23</code></td></tr><tr><td>KKPerubahanBiodataModal.tsx</td><td>72</td><td><code>0</code></td></tr><tr><td>PermohonanDetail.tsx</td><td>61</td><td><code>5</code></td></tr><tr><td>KKTambahAnakModal.tsx</td><td>46</td><td><code>10</code></td></tr><tr><td>useStaticContent</td><td>44</td><td><code>38</code></td></tr><tr><td>struktur-editor.tsx</td><td>43</td><td><code>45</code></td></tr><tr><td>cn</td><td>38</td><td><code>14</code></td></tr><tr><td>ppid/[...slug]/page.tsx</td><td>34</td><td><code>21</code></td></tr><tr><td>Other</td><td>690</td><td><code>51, 82, 31, 25, 4, 55, 9, 3, 71, 74, 39, 52, 32, 33, 36, 43, 47, 57, 49, 60, 37, 64, 65, 46, 66, 67, 28, 58, 70, 6, 61, 42, 68, 78, 81, 20, 27, 44, 63, 75, 83, 105, 79, 72, 84, 85, 86, 76, 89, 90, 91, 123, 92, 112, 174, 93, 94, 95, 96, 97, 98, 125, 180, 184</code></td></tr>
     </table>
   </div>
   <div class="card">
@@ -158,7 +158,7 @@ flowchart LR
   <div class="card">
     <h4>Graph Report Highlights</h4>
     <ul>
-      <li>2045 nodes · 5886 edges · 155 communities (94 shown, 53 thin omitted)</li>
+      <li>2046 nodes · 5888 edges · 156 communities (94 shown, 53 thin omitted)</li>
       <li>Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.85)</li>
       <li>Token cost: 0 input · 0 output</li>
       <li>1. `cn()` - 212 edges</li>
@@ -672,7 +672,7 @@ flowchart LR
   <td>1</td>
   <td><code>InfoBerkas</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>editable-info-page.tsx</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+4 more</td>
+  <td><code>editable-info-page.tsx</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/profil-kependudukan/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+4 more</td>
   <td>No direct outbound edge</td>
   <td>InfoBerkas node in components/shared/info-page.tsx.</td>
 </tr>
@@ -800,7 +800,7 @@ flowchart LR
   <td>17</td>
   <td><code>editable-info-page.tsx</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br>+2 more</td>
+  <td><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">wbs/[...slug]/page.tsx</small><br>+2 more</td>
   <td><code>EditableBlock()</code><br><small style="color:var(--muted)">components/konten/inline-edit.tsx</small><br><code>info-page.tsx</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small><br><code>InfoBerkas</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small><br>+5 more</td>
   <td>Module file in components/shared/editable-info-page.tsx.</td>
 </tr>
@@ -808,7 +808,7 @@ flowchart LR
   <td>18</td>
   <td><code>info-page.tsx</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>editable-info-page.tsx</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small><br><code>info-content.ts</code><br><small style="color:var(--muted)">lib/info-content.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/privasi/page.tsx</small><br>+7 more</td>
+  <td><code>editable-info-page.tsx</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small><br><code>info-content.ts</code><br><small style="color:var(--muted)">lib/info-content.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/profil-kependudukan/page.tsx</small><br>+7 more</td>
   <td><code>Button()</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br><code>button.tsx</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br><code>Footer()</code><br><small style="color:var(--muted)">components/shared/footer.tsx</small><br>+5 more</td>
   <td>Module file in components/shared/info-page.tsx.</td>
 </tr>
@@ -1203,81 +1203,68 @@ flowchart LR
 
 <!-- ====== 6. CLI & Skill Installers ====== -->
 <h2 id="cli-skills">6. CLI &amp; Skill Installers</h2>
-<p>CLI &amp; Skill Installers groups implementation around periode, demografits, scripts, akun, mostly in lib/periode-demografi.ts, lib/akun-level.ts, dashboard/demografi/AdminDemografi.tsx. This section covers 59 nodes and 115 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>CLI &amp; Skill Installers groups implementation around akun, levelts, scripts, level, mostly in lib/akun-level.ts, lib/validasi-akun.ts, scripts/buat-akun-uji.ts. This section covers 19 nodes and 25 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: CLI &amp; Skill Installers (59 nodes, 115 edges)
-    subgraph cli_skills_lib_periode_demografi_ts_58c6bbf7["lib/periode-demografi.ts"]
-        lib_periode_demografi_periodedugaan_eca9767f("periodeDugaan()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_gabungperiode_b2919436("gabungPeriode()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_kunciperiode_ad7d1aee("kunciPeriode()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_kueriperiode_ad7c294f("kueriPeriode()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_tahunpilihan_7e524992("tahunPilihan()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_labelperiode_a44ac40e("labelPeriode()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_labelperiodepanjang_2af5f0ae("labelPeriodePanjang()<br/><small>lib/periode-demografi.ts</small>")
-        lib_periode_demografi_periodesama_78ea6d42("periodeSama()<br/><small>lib/periode-demografi.ts</small>")
+    %% Section: CLI &amp; Skill Installers (19 nodes, 25 edges)
+    subgraph cli_skills_lib_akun_level_ts_bdcd0e35["lib/akun-level.ts"]
+        lib_akun_level_level_opd_473f1225("LEVEL_OPD<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_level_warga_3b8bd316("LEVEL_WARGA<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_91cf4bb3("akun-level.ts")
+        lib_akun_level_level_admin_fff5ba1b("LEVEL_ADMIN<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_level_operator_07213284("LEVEL_OPERATOR<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_level_staff_fcfc1248("LEVEL_STAFF<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_nama_peran_05312d8c("NAMA_PERAN<br/><small>lib/akun-level.ts</small>")
+        lib_akun_level_isstaf_22c11ea8("isStaf()<br/><small>lib/akun-level.ts</small>")
     end
-    subgraph cli_skills_dashboard_demografi_AdminDemografi_ts_ec3da1a6["dashboard/demografi/AdminDemografi.tsx"]
-        app_dashboard_demografi_admindemografi_b76cf203("AdminDemografi.tsx")
-        app_dashboard_demografi_admindemografi_admindemo_772b2f32("AdminDemografi()<br/><small>dashboard/demografi/AdminDemografi.tsx</small>")
-        app_dashboard_demografi_admindemografi_usuljudul_7d48571c("usulJudul()<br/><small>dashboard/demografi/AdminDemografi.tsx</small>")
-        app_dashboard_demografi_admindemografi_downloadf_962d1453("downloadFile()<br/><small>dashboard/demografi/AdminDemografi.tsx</small>")
+    subgraph cli_skills_lib_validasi_akun_ts_b553b6c7["lib/validasi-akun.ts"]
+        lib_validasi_akun_b46c2f7d("validasi-akun.ts")
+        lib_validasi_akun_dataakun_78b9ea94("DataAkun<br/><small>lib/validasi-akun.ts</small>")
+        lib_validasi_akun_masuk_nik_769bf7b5("MASUK_NIK<br/><small>lib/validasi-akun.ts</small>")
     end
-    subgraph cli_skills_components_landingpage_stats_tsx_e5c32270["components/landingpage/stats.tsx"]
-        components_landingpage_stats_badgeperiode_1ebefc6d("BadgePeriode()<br/><small>components/landingpage/stats.tsx</small>")
-        components_landingpage_stats_badgeperiodeedit_00fbc868("BadgePeriodeEdit()<br/><small>components/landingpage/stats.tsx</small>")
+    subgraph cli_skills_scripts_buat_akun_uji_ts_3da57c51["scripts/buat-akun-uji.ts"]
+        scripts_buat_akun_uji_ce93edef("buat-akun-uji.ts")
+        scripts_buat_akun_uji_main_34ef62e7("main()<br/><small>scripts/buat-akun-uji.ts</small>")
+        scripts_buat_akun_uji_prisma_7d5b8e14("prisma<br/><small>scripts/buat-akun-uji.ts</small>")
     end
-    subgraph cli_skills_scripts_uji_periode_ts_16040d13["scripts/uji-periode.ts"]
-        scripts_uji_periode_main_95ba7b3a("main()<br/><small>scripts/uji-periode.ts</small>")
-        scripts_uji_periode_74f7c84a("uji-periode.ts")
+    subgraph cli_skills_scripts_periksa_peran_ts_3eb905a9["scripts/periksa-peran.ts"]
+        scripts_periksa_peran_b5677179("periksa-peran.ts")
+        scripts_periksa_peran_main_6815c64f("main()<br/><small>scripts/periksa-peran.ts</small>")
+        scripts_periksa_peran_prisma_830d3788("prisma<br/><small>scripts/periksa-peran.ts</small>")
     end
-    components_shared_pemilih_periode_a9b8f698("pemilih-periode.tsx")
-    scripts_buat_akun_uji_ce93edef("buat-akun-uji.ts")
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_periodedugaan_eca9767f
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_gabungperiode_b2919436
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_kunciperiode_ad7d1aee
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_kueriperiode_ad7c294f
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_tahunpilihan_7e524992
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| app_dashboard_demografi_admindemografi_usuljudul_7d48571c
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| lib_periode_demografi_labelperiode_a44ac40e
-    app_dashboard_demografi_admindemografi_admindemo_772b2f32 -->|calls| app_dashboard_demografi_admindemografi_downloadf_962d1453
-    components_landingpage_stats_badgeperiode_1ebefc6d -->|calls| lib_periode_demografi_labelperiodepanjang_2af5f0ae
-    components_landingpage_stats_badgeperiode_1ebefc6d -->|calls| lib_periode_demografi_periodesama_78ea6d42
-    components_landingpage_stats_badgeperiode_1ebefc6d -->|calls| lib_periode_demografi_labelperiode_a44ac40e
-    components_landingpage_stats_badgeperiodeedit_00fbc868 -->|calls| lib_periode_demografi_labelperiodepanjang_2af5f0ae
-    components_landingpage_stats_badgeperiodeedit_00fbc868 -->|calls| lib_periode_demografi_periodesama_78ea6d42
-    components_landingpage_stats_badgeperiodeedit_00fbc868 -->|calls| lib_periode_demografi_labelperiode_a44ac40e
-    lib_periode_demografi_gabungperiode_b2919436 -->|calls| lib_periode_demografi_kunciperiode_ad7d1aee
-    lib_periode_demografi_labelperiodepanjang_2af5f0ae -->|calls| lib_periode_demografi_labelperiode_a44ac40e
-    scripts_uji_periode_main_95ba7b3a -->|calls| lib_periode_demografi_labelperiode_a44ac40e
-    scripts_uji_periode_main_95ba7b3a -->|calls| lib_periode_demografi_labelperiodepanjang_2af5f0ae
-    scripts_uji_periode_main_95ba7b3a -->|calls| lib_periode_demografi_periodesama_78ea6d42
-    scripts_uji_periode_main_95ba7b3a -->|calls| lib_periode_demografi_kueriperiode_ad7c294f
-    scripts_uji_periode_main_95ba7b3a -->|calls| lib_periode_demografi_gabungperiode_b2919436
-    app_dashboard_demografi_admindemografi_b76cf203 -->|imports| lib_periode_demografi_gabungperiode_b2919436
-    app_dashboard_demografi_admindemografi_b76cf203 -->|imports| lib_periode_demografi_kueriperiode_ad7c294f
-    app_dashboard_demografi_admindemografi_b76cf203 -->|imports| lib_periode_demografi_kunciperiode_ad7d1aee
-    %% Omitted for readability: 41 nodes, 11 edges
-    class lib_periode_demografi_periodedugaan_eca9767f function;
-    class lib_periode_demografi_gabungperiode_b2919436 function;
-    class lib_periode_demografi_kunciperiode_ad7d1aee function;
-    class lib_periode_demografi_kueriperiode_ad7c294f function;
-    class lib_periode_demografi_tahunpilihan_7e524992 function;
-    class lib_periode_demografi_labelperiode_a44ac40e function;
-    class lib_periode_demografi_labelperiodepanjang_2af5f0ae function;
-    class lib_periode_demografi_periodesama_78ea6d42 function;
-    class app_dashboard_demografi_admindemografi_b76cf203 ui;
-    class app_dashboard_demografi_admindemografi_admindemo_772b2f32 ui;
-    class app_dashboard_demografi_admindemografi_usuljudul_7d48571c ui;
-    class app_dashboard_demografi_admindemografi_downloadf_962d1453 ui;
-    class components_landingpage_stats_badgeperiode_1ebefc6d ui;
-    class components_landingpage_stats_badgeperiodeedit_00fbc868 ui;
-    class scripts_uji_periode_main_95ba7b3a function;
-    class scripts_uji_periode_74f7c84a module;
-    class components_shared_pemilih_periode_a9b8f698 ui;
+    claude_f1dda22f("CLAUDE.md")
+    lib_validasi_akun_b46c2f7d -->|imports| lib_akun_level_level_opd_473f1225
+    lib_validasi_akun_b46c2f7d -->|imports| lib_akun_level_level_warga_3b8bd316
+    lib_validasi_akun_b46c2f7d -->|imports| lib_akun_level_91cf4bb3
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_level_admin_fff5ba1b
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_level_opd_473f1225
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_level_operator_07213284
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_level_staff_fcfc1248
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_level_warga_3b8bd316
+    scripts_buat_akun_uji_ce93edef -->|imports| lib_akun_level_91cf4bb3
+    scripts_periksa_peran_b5677179 -->|imports| lib_akun_level_nama_peran_05312d8c
+    scripts_periksa_peran_b5677179 -->|imports| lib_akun_level_91cf4bb3
+    %% Omitted for readability: 1 nodes, 0 edges
+    class lib_akun_level_level_opd_473f1225 klass;
+    class lib_akun_level_level_warga_3b8bd316 klass;
+    class lib_akun_level_91cf4bb3 module;
+    class lib_akun_level_level_admin_fff5ba1b klass;
+    class lib_akun_level_level_operator_07213284 klass;
+    class lib_akun_level_level_staff_fcfc1248 klass;
+    class lib_akun_level_nama_peran_05312d8c klass;
+    class lib_akun_level_isstaf_22c11ea8 function;
+    class lib_validasi_akun_b46c2f7d module;
+    class lib_validasi_akun_dataakun_78b9ea94 klass;
+    class lib_validasi_akun_masuk_nik_769bf7b5 klass;
     class scripts_buat_akun_uji_ce93edef module;
+    class scripts_buat_akun_uji_main_34ef62e7 function;
+    class scripts_buat_akun_uji_prisma_7d5b8e14 function;
+    class scripts_periksa_peran_b5677179 module;
+    class scripts_periksa_peran_main_6815c64f function;
+    class scripts_periksa_peran_prisma_830d3788 function;
+    class claude_f1dda22f concept;
     classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
     classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
     classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
@@ -1301,243 +1288,155 @@ flowchart LR
 </tr>
 <tr>
   <td>1</td>
-  <td><code>AntreImpor</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>DataAkun</code><br><small style="color:var(--muted)">lib/validasi-akun.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
   <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>AntreImpor node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>DataAkun node in lib/validasi-akun.ts.</td>
 </tr>
 <tr>
   <td>2</td>
-  <td><code>HitunganPeriode</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td>External entry / no inbound edge</td>
+  <td><code>isStaf()</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>isPetugas()</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
   <td>No direct outbound edge</td>
-  <td>HitunganPeriode node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>isStaf() node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>3</td>
-  <td><code>KategoriAdmin</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>main()</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>KategoriAdmin node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>main() node in scripts/buat-akun-uji.ts.</td>
 </tr>
 <tr>
   <td>4</td>
-  <td><code>DemografiKategori</code><br><small style="color:var(--muted)">lib/demografi-kategori.ts</small></td>
-  <td><span class="tag tag-class">Class</span></td>
-  <td><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>demografi-registri.ts</code><br><small style="color:var(--muted)">lib/demografi-registri.ts</small><br><code>demografi-view.tsx</code><br><small style="color:var(--muted)">components/landingpage/demografi-view.tsx</small></td>
+  <td><code>main()</code><br><small style="color:var(--muted)">scripts/periksa-peran.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>DemografiKategori node in lib/demografi-kategori.ts.</td>
+  <td>main() node in scripts/periksa-peran.ts.</td>
 </tr>
 <tr>
   <td>5</td>
-  <td><code>Periode</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-class">Class</span></td>
-  <td><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>demografi-editor.tsx</code><br><small style="color:var(--muted)">components/dashboard/demografi-editor.tsx</small><br><code>demografi-export.ts</code><br><small style="color:var(--muted)">lib/demografi-export.ts</small><br>+7 more</td>
+  <td><code>akun-level.ts</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>AdminUsers.tsx</code><br><small style="color:var(--muted)">app/dashboard/AdminUsers.tsx</small><br><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>dashboard-sidebar.tsx</code><br><small style="color:var(--muted)">components/shared/dashboard-sidebar.tsx</small><br>+23 more</td>
   <td>No direct outbound edge</td>
-  <td>Periode node in lib/periode-demografi.ts.</td>
+  <td>Module file in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>6</td>
-  <td><code>PeriodeTersedia</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
+  <td><code>LEVEL_ADMIN</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
   <td><span class="tag tag-class">Class</span></td>
-  <td><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>demografi-editor.tsx</code><br><small style="color:var(--muted)">components/dashboard/demografi-editor.tsx</small><br><code>demografi-periode.ts</code><br><small style="color:var(--muted)">lib/demografi-periode.ts</small><br>+3 more</td>
+  <td><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/dashboard/page.tsx</small><br><code>route.ts</code><br><small style="color:var(--muted)">users/[id]/route.ts</small><br>+2 more</td>
   <td>No direct outbound edge</td>
-  <td>PeriodeTersedia node in lib/periode-demografi.ts.</td>
+  <td>LEVEL_ADMIN node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>7</td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/page.tsx</small></td>
-  <td><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br><code>deteksiKategori()</code><br><small style="color:var(--muted)">lib/demografi-kategori.ts</small><br><code>downloadFile()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br>+8 more</td>
-  <td>AdminDemografi() node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td><code>LEVEL_OPD</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>AdminUsers.tsx</code><br><small style="color:var(--muted)">app/dashboard/AdminUsers.tsx</small><br><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>isi-wilayah-akun.ts</code><br><small style="color:var(--muted)">scripts/isi-wilayah-akun.ts</small><br>+5 more</td>
+  <td>No direct outbound edge</td>
+  <td>LEVEL_OPD node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>8</td>
-  <td><code>downloadFile()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
+  <td><code>LEVEL_OPERATOR</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>isi-wilayah-akun.ts</code><br><small style="color:var(--muted)">scripts/isi-wilayah-akun.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/dashboard/page.tsx</small><br>+2 more</td>
   <td>No direct outbound edge</td>
-  <td>downloadFile() node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>LEVEL_OPERATOR node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>9</td>
-  <td><code>usulJudul()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
+  <td><code>LEVEL_STAFF</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/dashboard/page.tsx</small><br><code>route.ts</code><br><small style="color:var(--muted)">admin/users/route.ts</small><br>+1 more</td>
   <td>No direct outbound edge</td>
-  <td>usulJudul() node in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>LEVEL_STAFF node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>10</td>
-  <td><code>BadgePeriode()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br><code>labelPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br><code>labelPeriodePanjang()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br>+1 more</td>
-  <td>BadgePeriode() node in components/landingpage/stats.tsx.</td>
+  <td><code>LEVEL_WARGA</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/dashboard/page.tsx</small><br><code>route.ts</code><br><small style="color:var(--muted)">admin/users/route.ts</small><br>+2 more</td>
+  <td>No direct outbound edge</td>
+  <td>LEVEL_WARGA node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>11</td>
-  <td><code>BadgePeriodeEdit()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br><code>labelPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br><code>labelPeriodePanjang()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br>+1 more</td>
-  <td>BadgePeriodeEdit() node in components/landingpage/stats.tsx.</td>
+  <td><code>NAMA_PERAN</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td><code>periksa-peran.ts</code><br><small style="color:var(--muted)">scripts/periksa-peran.ts</small><br><code>route.ts</code><br><small style="color:var(--muted)">users/[id]/route.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>NAMA_PERAN node in lib/akun-level.ts.</td>
 </tr>
 <tr>
   <td>12</td>
-  <td><code>StatsGrid()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">app/page.tsx</small></td>
-  <td><code>kueriPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br><code>useInlineEdit()</code><br><small style="color:var(--muted)">components/konten/inline-edit.tsx</small></td>
-  <td>StatsGrid() node in components/landingpage/stats.tsx.</td>
+  <td><code>validasi-akun.ts</code><br><small style="color:var(--muted)">lib/validasi-akun.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td><code>route.ts</code><br><small style="color:var(--muted)">[id]/sandi/route.ts</small><br><code>route.ts</code><br><small style="color:var(--muted)">users/[id]/route.ts</small></td>
+  <td><code>akun-level.ts</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br><code>LEVEL_OPD</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br><code>LEVEL_WARGA</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td>Module file in lib/validasi-akun.ts.</td>
 </tr>
 <tr>
   <td>13</td>
-  <td><code>PemilihPeriode()</code><br><small style="color:var(--muted)">components/shared/pemilih-periode.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>demografi-editor.tsx</code><br><small style="color:var(--muted)">components/dashboard/demografi-editor.tsx</small><br><code>demografi-view.tsx</code><br><small style="color:var(--muted)">components/landingpage/demografi-view.tsx</small></td>
-  <td><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br><code>labelPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br><code>periodeSama()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br>+1 more</td>
-  <td>PemilihPeriode() node in components/shared/pemilih-periode.tsx.</td>
+  <td><code>MASUK_NIK</code><br><small style="color:var(--muted)">lib/validasi-akun.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MASUK_NIK node in lib/validasi-akun.ts.</td>
 </tr>
 <tr>
   <td>14</td>
-  <td><code>gabungPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small><br>+1 more</td>
-  <td><code>kunciPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td>gabungPeriode() node in lib/periode-demografi.ts.</td>
+  <td><code>buat-akun-uji.ts</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>akun-level.ts</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br><code>LEVEL_ADMIN</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br><code>LEVEL_OPD</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br>+3 more</td>
+  <td>Module file in scripts/buat-akun-uji.ts.</td>
 </tr>
 <tr>
   <td>15</td>
-  <td><code>kueriPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
+  <td><code>prisma</code><br><small style="color:var(--muted)">scripts/buat-akun-uji.ts</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>demografi-editor.tsx</code><br><small style="color:var(--muted)">components/dashboard/demografi-editor.tsx</small><br>+7 more</td>
+  <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>kueriPeriode() node in lib/periode-demografi.ts.</td>
+  <td>prisma node in scripts/buat-akun-uji.ts.</td>
 </tr>
 <tr>
   <td>16</td>
-  <td><code>kunciPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>gabungPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>kunciPeriode() node in lib/periode-demografi.ts.</td>
+  <td><code>periksa-peran.ts</code><br><small style="color:var(--muted)">scripts/periksa-peran.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>akun-level.ts</code><br><small style="color:var(--muted)">lib/akun-level.ts</small><br><code>NAMA_PERAN</code><br><small style="color:var(--muted)">lib/akun-level.ts</small></td>
+  <td>Module file in scripts/periksa-peran.ts.</td>
 </tr>
 <tr>
   <td>17</td>
-  <td><code>labelPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
+  <td><code>prisma</code><br><small style="color:var(--muted)">scripts/periksa-peran.ts</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>BadgePeriode()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small><br>+18 more</td>
+  <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>labelPeriode() node in lib/periode-demografi.ts.</td>
+  <td>prisma node in scripts/periksa-peran.ts.</td>
 </tr>
 <tr>
   <td>18</td>
-  <td><code>labelPeriodePanjang()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>BadgePeriode()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small><br><code>BadgePeriodeEdit()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small><br><code>buildDemografiWorkbook()</code><br><small style="color:var(--muted)">lib/demografi-export.ts</small><br>+6 more</td>
-  <td><code>labelPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td>labelPeriodePanjang() node in lib/periode-demografi.ts.</td>
+  <td><code>CLAUDE.md</code><br><small style="color:var(--muted)">CLAUDE.md</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Documentation node describing CLAUDE.md.</td>
 </tr>
 <tr>
   <td>19</td>
-  <td><code>periodeDugaan()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td>No direct outbound edge</td>
-  <td>periodeDugaan() node in lib/periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>20</td>
-  <td><code>periodeSama()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>BadgePeriode()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small><br><code>BadgePeriodeEdit()</code><br><small style="color:var(--muted)">components/landingpage/stats.tsx</small><br><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small><br>+4 more</td>
-  <td>No direct outbound edge</td>
-  <td>periodeSama() node in lib/periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>21</td>
-  <td><code>tahunPilihan()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>AdminDemografi()</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small><br><code>pemilih-periode.tsx</code><br><small style="color:var(--muted)">components/shared/pemilih-periode.tsx</small><br>+1 more</td>
-  <td>No direct outbound edge</td>
-  <td>tahunPilihan() node in lib/periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>22</td>
-  <td><code>adaIndeks()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>adaIndeks() node in scripts/migrasi-periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>23</td>
-  <td><code>adaKolom()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>adaKolom() node in scripts/migrasi-periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>24</td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
+  <td><code>graphify</code><br><small style="color:var(--muted)">CLAUDE.md</small></td>
+  <td><span class="tag tag-func">Concept</span></td>
   <td>External entry / no inbound edge</td>
-  <td><code>adaIndeks()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small><br><code>adaKolom()</code><br><small style="color:var(--muted)">scripts/migrasi-periode-demografi.ts</small></td>
-  <td>main() node in scripts/migrasi-periode-demografi.ts.</td>
-</tr>
-<tr>
-  <td>25</td>
-  <td><code>bersihkan()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
   <td>No direct outbound edge</td>
-  <td>bersihkan() node in scripts/uji-periode.ts.</td>
-</tr>
-<tr>
-  <td>26</td>
-  <td><code>cek()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>cek() node in scripts/uji-periode.ts.</td>
-</tr>
-<tr>
-  <td>27</td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>bersihkan()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small><br><code>cek()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small><br><code>gabungPeriode()</code><br><small style="color:var(--muted)">lib/periode-demografi.ts</small><br>+10 more</td>
-  <td>main() node in scripts/uji-periode.ts.</td>
-</tr>
-<tr>
-  <td>28</td>
-  <td><code>sama()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>sama() node in scripts/uji-periode.ts.</td>
-</tr>
-<tr>
-  <td>29</td>
-  <td><code>tulis()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>main()</code><br><small style="color:var(--muted)">scripts/uji-periode.ts</small></td>
-  <td>No direct outbound edge</td>
-  <td>tulis() node in scripts/uji-periode.ts.</td>
-</tr>
-<tr>
-  <td>30</td>
-  <td><code>AdminDemografi.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/AdminDemografi.tsx</small></td>
-  <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">dashboard/demografi/page.tsx</small></td>
-  <td><code>beranda-statistik.ts</code><br><small style="color:var(--muted)">lib/beranda-statistik.ts</small><br><code>Button()</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br><code>button.tsx</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br>+29 more</td>
-  <td>Module file in dashboard/demografi/AdminDemografi.tsx.</td>
+  <td>Documentation node describing graphify.</td>
 </tr>
 </table>
 
@@ -1546,31 +1445,28 @@ flowchart LR
     <h4>Key Files</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>lib/periode-demografi.ts</code></td><td>15 nodes</td></tr>
-<tr><td><code>lib/akun-level.ts</code></td><td>8 nodes</td></tr>
-<tr><td><code>dashboard/demografi/AdminDemografi.tsx</code></td><td>7 nodes</td></tr>
-<tr><td><code>scripts/uji-periode.ts</code></td><td>7 nodes</td></tr>
-<tr><td><code>scripts/migrasi-periode-demografi.ts</code></td><td>5 nodes</td></tr>
-<tr><td><code>components/landingpage/stats.tsx</code></td><td>3 nodes</td></tr>
+      <tr><td><code>lib/akun-level.ts</code></td><td>8 nodes</td></tr>
 <tr><td><code>lib/validasi-akun.ts</code></td><td>3 nodes</td></tr>
 <tr><td><code>scripts/buat-akun-uji.ts</code></td><td>3 nodes</td></tr>
+<tr><td><code>scripts/periksa-peran.ts</code></td><td>3 nodes</td></tr>
+<tr><td><code>CLAUDE.md</code></td><td>2 nodes</td></tr>
     </table>
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x45, calls x31, imports x29, imports x7. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x14, imports x8, imports x3. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
 
 <!-- ====== 7. Serving API ====== -->
 <h2 id="serve-api">7. Serving API</h2>
-<p>Serving API groups implementation around routets, app, api, components, mostly in lib/beranda-statistik.ts, ocr/ktp/route.ts, lib/static-content-registry.ts. This section covers 695 nodes and 2205 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>Serving API groups implementation around routets, app, api, components, mostly in lib/beranda-statistik.ts, ocr/ktp/route.ts, lib/static-content-registry.ts. This section covers 705 nodes and 2235 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Serving API (695 nodes, 2205 edges)
+    %% Section: Serving API (705 nodes, 2235 edges)
     subgraph serve_api_lib_notifikasi_ts_abe5543c["lib/notifikasi.ts"]
         lib_notifikasi_safenotify_5a5ad252("safeNotify()<br/><small>lib/notifikasi.ts</small>")
         lib_notifikasi_createnotifikasi_39571221("createNotifikasi()<br/><small>lib/notifikasi.ts</small>")
@@ -1584,7 +1480,7 @@ flowchart LR
         lib_api_response_fail_bbb162eb("fail()<br/><small>lib/api-response.ts</small>")
         lib_api_response_ok_278fc88e("ok()<br/><small>lib/api-response.ts</small>")
     end
-    app_api_layanan_action_route_86230ed1("route.ts")
+    app_api_admin_demografi_route_f48f0ee7("route.ts")
     app_api_admin_users_route_48940bbf("route.ts")
     app_api_auth_ajukan_ulang_route_post_ffed6963("POST()<br/><small>auth/ajukan-ulang/route.ts</small>")
     app_api_auth_cek_status_route_post_64d33b91("POST()<br/><small>auth/cek-status/route.ts</small>")
@@ -1617,9 +1513,9 @@ flowchart LR
     app_api_auth_register_route_32361e3c -->|imports| lib_notifikasi_notifypetugas_b76e9e0e
     app_api_auth_register_route_32361e3c -->|imports| lib_notifikasi_safenotify_5a5ad252
     app_api_auth_register_route_32361e3c -->|imports| lib_foto_profil_simpanfotoprofil_4a94c6c5
-    app_api_layanan_action_route_86230ed1 -->|imports| lib_notifikasi_createnotifikasi_39571221
-    app_api_layanan_action_route_86230ed1 -->|imports| lib_notifikasi_notifypetugas_b76e9e0e
-    %% Omitted for readability: 677 nodes, 22 edges
+    app_api_admin_demografi_route_f48f0ee7 -->|imports| lib_api_response_fail_bbb162eb
+    app_api_admin_demografi_route_f48f0ee7 -->|imports| lib_api_response_ok_278fc88e
+    %% Omitted for readability: 687 nodes, 19 edges
     class lib_notifikasi_safenotify_5a5ad252 function;
     class lib_notifikasi_createnotifikasi_39571221 function;
     class lib_notifikasi_notifypetugas_b76e9e0e function;
@@ -1627,7 +1523,7 @@ flowchart LR
     class app_api_auth_register_route_post_1459f369 function;
     class lib_api_response_fail_bbb162eb function;
     class lib_api_response_ok_278fc88e function;
-    class app_api_layanan_action_route_86230ed1 api;
+    class app_api_admin_demografi_route_f48f0ee7 api;
     class app_api_admin_users_route_48940bbf api;
     class app_api_auth_ajukan_ulang_route_post_ffed6963 function;
     class app_api_auth_cek_status_route_post_64d33b91 function;
@@ -1918,7 +1814,7 @@ flowchart LR
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: imports x631, calls x600, contains x517, imports x451. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: imports x641, calls x601, contains x527, imports x460. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -2756,7 +2652,7 @@ flowchart LR
   <td>22</td>
   <td><code>RiwayatList()</code><br><small style="color:var(--muted)">components/shared/riwayat-list.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">app/riwayat/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">user/pengajuan/page.tsx</small></td>
+  <td><code>page.tsx</code><br><small style="color:var(--muted)">user/pengajuan/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/riwayat/page.tsx</small></td>
   <td><code>useInfiniteScroll()</code><br><small style="color:var(--muted)">lib/use-infinite-scroll.ts</small></td>
   <td>RiwayatList() node in components/shared/riwayat-list.tsx.</td>
 </tr>
@@ -3102,7 +2998,7 @@ flowchart LR
   <td>20</td>
   <td><code>TiketPanel()</code><br><small style="color:var(--muted)">components/tiket/tiket-panel.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">app/tiket/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">dashboard/tiket/page.tsx</small></td>
+  <td><code>page.tsx</code><br><small style="color:var(--muted)">dashboard/tiket/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/tiket/page.tsx</small></td>
   <td><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br><code>fmtWaktu()</code><br><small style="color:var(--muted)">components/tiket/tiket-panel.tsx</small><br><code>notifyError()</code><br><small style="color:var(--muted)">lib/notify.tsx</small><br>+1 more</td>
   <td>TiketPanel() node in components/tiket/tiket-panel.tsx.</td>
 </tr>
@@ -3899,7 +3795,7 @@ flowchart LR
   <td>29</td>
   <td><code>struktur-editor.tsx</code><br><small style="color:var(--muted)">components/konten/struktur-editor.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>StrukturEditor</code><br><small style="color:var(--muted)">components/landingpage/profile-tabs.tsx</small><br><code>StrukturEditor</code><br><small style="color:var(--muted)">components/ppid/profil-terhubung.tsx</small></td>
+  <td><code>StrukturEditor</code><br><small style="color:var(--muted)">components/ppid/profil-terhubung.tsx</small><br><code>StrukturEditor</code><br><small style="color:var(--muted)">components/landingpage/profile-tabs.tsx</small></td>
   <td><code>Button()</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br><code>button.tsx</code><br><small style="color:var(--muted)">components/ui/button.tsx</small><br><code>cn()</code><br><small style="color:var(--muted)">lib/utils.ts</small><br>+26 more</td>
   <td>Module file in components/konten/struktur-editor.tsx.</td>
 </tr>
@@ -4466,7 +4362,7 @@ flowchart LR
   <td>10</td>
   <td><code>EditableInfoPage()</code><br><small style="color:var(--muted)">components/shared/editable-info-page.tsx</small></td>
   <td><span class="tag tag-hook">UI</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br>+2 more</td>
+  <td><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">wbs/[...slug]/page.tsx</small><br>+2 more</td>
   <td><code>useStaticContent()</code><br><small style="color:var(--muted)">lib/use-static-content.ts</small></td>
   <td>Organizes documentation pages, navigation, or content lookup.</td>
 </tr>
@@ -4474,7 +4370,7 @@ flowchart LR
   <td>11</td>
   <td><code>dokumenJenisForPath()</code><br><small style="color:var(--muted)">lib/dokumen-registry.ts</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>informasi-index.tsx</code><br><small style="color:var(--muted)">components/ppid/informasi-index.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+3 more</td>
+  <td><code>informasi-index.tsx</code><br><small style="color:var(--muted)">components/ppid/informasi-index.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br>+3 more</td>
   <td>No direct outbound edge</td>
   <td>dokumenJenisForPath() node in lib/dokumen-registry.ts.</td>
 </tr>
@@ -4482,7 +4378,7 @@ flowchart LR
   <td>12</td>
   <td><code>infoBlockKey()</code><br><small style="color:var(--muted)">lib/static-content-registry.ts</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>HubungiKamiPage()</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+7 more</td>
+  <td><code>HubungiKamiPage()</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br>+7 more</td>
   <td>No direct outbound edge</td>
   <td>infoBlockKey() node in lib/static-content-registry.ts.</td>
 </tr>
@@ -4594,7 +4490,7 @@ flowchart LR
   <td>26</td>
   <td><code>dokumen-registry.ts</code><br><small style="color:var(--muted)">lib/dokumen-registry.ts</small></td>
   <td><span class="tag tag-class">Module</span></td>
-  <td><code>AdminProduk.tsx</code><br><small style="color:var(--muted)">dashboard/produk/AdminProduk.tsx</small><br><code>informasi-index.tsx</code><br><small style="color:var(--muted)">components/ppid/informasi-index.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br>+2 more</td>
+  <td><code>AdminProduk.tsx</code><br><small style="color:var(--muted)">dashboard/produk/AdminProduk.tsx</small><br><code>informasi-index.tsx</code><br><small style="color:var(--muted)">components/ppid/informasi-index.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+2 more</td>
   <td>No direct outbound edge</td>
   <td>Module file in lib/dokumen-registry.ts.</td>
 </tr>
@@ -4618,7 +4514,7 @@ flowchart LR
   <td>29</td>
   <td><code>info-content.ts</code><br><small style="color:var(--muted)">lib/info-content.ts</small></td>
   <td><span class="tag tag-class">Module</span></td>
-  <td><code>page.tsx</code><br><small style="color:var(--muted)">app/sitemap/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br>+3 more</td>
+  <td><code>page.tsx</code><br><small style="color:var(--muted)">produk/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">hubungi-kami/[...slug]/page.tsx</small><br><code>page.tsx</code><br><small style="color:var(--muted)">ppid/[...slug]/page.tsx</small><br>+3 more</td>
   <td><code>info-page.tsx</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small><br><code>InfoPageContent</code><br><small style="color:var(--muted)">components/shared/info-page.tsx</small></td>
   <td>Module file in lib/info-content.ts.</td>
 </tr>
@@ -4656,64 +4552,62 @@ flowchart LR
 
 <!-- ====== 16. Other ====== -->
 <h2 id="other">16. Other</h2>
-<p>Other groups implementation around components, app, pagetsx, dashboard, mostly in lib/layanan-forms.ts, JOURNAL.md, app/dashboard/AdminUsers.tsx. This section covers 659 nodes and 1059 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>Other groups implementation around components, app, pagetsx, dashboard, mostly in lib/layanan-forms.ts, JOURNAL.md, components/landingpage/stats.tsx. This section covers 690 nodes and 1157 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Other (659 nodes, 1059 edges)
-    subgraph other_prisma_etl_demografi_ts_98317ff8["prisma/etl-demografi.ts"]
-        prisma_etl_demografi_main_b31f0e3d("main()<br/><small>prisma/etl-demografi.ts</small>")
-        prisma_etl_demografi_num_b255a268("num()<br/><small>prisma/etl-demografi.ts</small>")
-        prisma_etl_demografi_levelof_260ba712("levelOf()<br/><small>prisma/etl-demografi.ts</small>")
-        prisma_etl_demografi_parentof_d41bfc1b("parentOf()<br/><small>prisma/etl-demografi.ts</small>")
-    end
-    subgraph other_components_landingpage_demografi_metric_ts_c3d4d17b["components/landingpage/demografi-metric.tsx"]
-        components_landingpage_demografi_metric_demograf_388dc6ca("DemografiMetric()<br/><small>components/landingpage/demografi-metric.tsx</small>")
-        components_landingpage_demografi_metric_fmt_d08667b1("fmt()<br/><small>components/landingpage/demografi-metric.tsx</small>")
+    %% Section: Other (690 nodes, 1157 edges)
+    subgraph other_lib_demografi_import_ts_e2b1502a["lib/demografi-import.ts"]
+        lib_demografi_import_bacalembar_60d74e65("bacaLembar()<br/><small>lib/demografi-import.ts</small>")
+        lib_demografi_import_norm_d0954ab6("norm()<br/><small>lib/demografi-import.ts</small>")
+        lib_demografi_import_classifykode_a51cbebe("classifyKode()<br/><small>lib/demografi-import.ts</small>")
+        lib_demografi_import_cellnum_5161efb3("cellNum()<br/><small>lib/demografi-import.ts</small>")
+        lib_demografi_import_klasifikasikode_afca26dd("klasifikasiKode()<br/><small>lib/demografi-import.ts</small>")
     end
     subgraph other_components_shared_camera_capture_tsx_1c6dc1f7["components/shared/camera-capture.tsx"]
         components_shared_camera_capture_cameracapture_47aef5b8("CameraCapture()<br/><small>components/shared/camera-capture.tsx</small>")
         components_shared_camera_capture_kedataurl_f77c50c2("keDataUrl()<br/><small>components/shared/camera-capture.tsx</small>")
     end
     app_dashboard_adminusers_cec5a2dc("AdminUsers.tsx")
-    app_forgot_password_page_0ca9e421("page.tsx")
     app_login_logincontent_75fe696b("LoginContent.tsx")
     app_register_registercontent_76a1e66a("RegisterContent.tsx")
     components_dashboard_staff_pengajuan_form_staffp_240eeff7("StaffPengajuanForm()<br/><small>components/dashboard/staff-pengajuan-form.tsx</small>")
+    components_landingpage_demografi_metric_demograf_388dc6ca("DemografiMetric()<br/><small>components/landingpage/demografi-metric.tsx</small>")
     components_permohonan_online_jam_layanan_gate_us_6a4a333b("useStatusJamLayanan()<br/><small>components/permohonan-online/jam-layanan-gate.tsx</small>")
     components_shared_image_viewer_useimageviewer_3e784813("useImageViewer()<br/><small>components/shared/image-viewer.tsx</small>")
     components_shared_navbar_3d000071("navbar.tsx")
+    app_dashboard_demografi_admindemografi_b76cf203("AdminDemografi.tsx")
     app_dashboard_pengajuan_baru_pengajuanbaruclient_3546fa30("PengajuanBaruClient.tsx")
     lib_layanan_forms_wajibsekarang_2da48615("wajibSekarang()<br/><small>lib/layanan-forms.ts</small>")
     components_shared_camera_capture_cameracapture_47aef5b8 -->|calls| components_shared_camera_capture_kedataurl_f77c50c2
     components_dashboard_staff_pengajuan_form_staffp_240eeff7 -->|calls| lib_layanan_forms_wajibsekarang_2da48615
     components_dashboard_staff_pengajuan_form_staffp_240eeff7 -->|calls| components_shared_image_viewer_useimageviewer_3e784813
     components_dashboard_staff_pengajuan_form_staffp_240eeff7 -->|calls| components_permohonan_online_jam_layanan_gate_us_6a4a333b
-    prisma_etl_demografi_main_b31f0e3d -->|calls| prisma_etl_demografi_num_b255a268
-    prisma_etl_demografi_main_b31f0e3d -->|calls| prisma_etl_demografi_levelof_260ba712
-    prisma_etl_demografi_main_b31f0e3d -->|calls| prisma_etl_demografi_parentof_d41bfc1b
-    components_landingpage_demografi_metric_demograf_388dc6ca -->|calls| components_landingpage_demografi_metric_fmt_d08667b1
+    lib_demografi_import_bacalembar_60d74e65 -->|calls| lib_demografi_import_norm_d0954ab6
+    lib_demografi_import_bacalembar_60d74e65 -->|calls| lib_demografi_import_classifykode_a51cbebe
+    lib_demografi_import_bacalembar_60d74e65 -->|calls| lib_demografi_import_cellnum_5161efb3
+    lib_demografi_import_classifykode_a51cbebe -->|calls| lib_demografi_import_klasifikasikode_afca26dd
     app_dashboard_pengajuan_baru_pengajuanbaruclient_3546fa30 -->|imports| components_dashboard_staff_pengajuan_form_staffp_240eeff7
     app_register_registercontent_76a1e66a -->|imports| components_shared_camera_capture_cameracapture_47aef5b8
     app_dashboard_adminusers_cec5a2dc -->|imports| components_shared_camera_capture_cameracapture_47aef5b8
-    %% Omitted for readability: 641 nodes, 0 edges
-    class prisma_etl_demografi_main_b31f0e3d function;
-    class prisma_etl_demografi_num_b255a268 function;
-    class prisma_etl_demografi_levelof_260ba712 function;
-    class prisma_etl_demografi_parentof_d41bfc1b function;
-    class components_landingpage_demografi_metric_demograf_388dc6ca ui;
-    class components_landingpage_demografi_metric_fmt_d08667b1 ui;
+    %% Omitted for readability: 672 nodes, 0 edges
+    class lib_demografi_import_bacalembar_60d74e65 function;
+    class lib_demografi_import_norm_d0954ab6 function;
+    class lib_demografi_import_classifykode_a51cbebe function;
+    class lib_demografi_import_cellnum_5161efb3 function;
+    class lib_demografi_import_klasifikasikode_afca26dd function;
     class components_shared_camera_capture_cameracapture_47aef5b8 ui;
     class components_shared_camera_capture_kedataurl_f77c50c2 ui;
     class app_dashboard_adminusers_cec5a2dc ui;
-    class app_forgot_password_page_0ca9e421 ui;
     class app_login_logincontent_75fe696b ui;
     class app_register_registercontent_76a1e66a ui;
     class components_dashboard_staff_pengajuan_form_staffp_240eeff7 ui;
+    class components_landingpage_demografi_metric_demograf_388dc6ca ui;
     class components_permohonan_online_jam_layanan_gate_us_6a4a333b ui;
     class components_shared_image_viewer_useimageviewer_3e784813 ui;
     class components_shared_navbar_3d000071 ui;
+    class app_dashboard_demografi_admindemografi_b76cf203 ui;
     class app_dashboard_pengajuan_baru_pengajuanbaruclient_3546fa30 entry;
     class lib_layanan_forms_wajibsekarang_2da48615 function;
     classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
@@ -4765,7 +4659,7 @@ flowchart LR
   <td>4</td>
   <td><code>SiteConfig</code><br><small style="color:var(--muted)">lib/site-config.ts</small></td>
   <td><span class="tag tag-class">Class</span></td>
-  <td><code>navigation.ts</code><br><small style="color:var(--muted)">lib/navigation.ts</small><br><code>notifikasi-wa.ts</code><br><small style="color:var(--muted)">lib/notifikasi-wa.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">media/peta/page.tsx</small><br>+2 more</td>
+  <td><code>navigation.ts</code><br><small style="color:var(--muted)">lib/navigation.ts</small><br><code>notifikasi-wa.ts</code><br><small style="color:var(--muted)">lib/notifikasi-wa.ts</small><br><code>page.tsx</code><br><small style="color:var(--muted)">app/hubungi-kami/page.tsx</small><br>+2 more</td>
   <td>No direct outbound edge</td>
   <td>Reads, resolves, or persists project configuration.</td>
 </tr>
@@ -4987,8 +4881,8 @@ flowchart LR
       <tr><td><code>lib/layanan-forms.ts</code></td><td>23 nodes</td></tr>
 <tr><td><code>JOURNAL.md</code></td><td>21 nodes</td></tr>
 <tr><td><code>app/dashboard/AdminUsers.tsx</code></td><td>18 nodes</td></tr>
+<tr><td><code>components/landingpage/stats.tsx</code></td><td>18 nodes</td></tr>
 <tr><td><code>components/shared/dashboard-sidebar.tsx</code></td><td>18 nodes</td></tr>
-<tr><td><code>components/landingpage/stats.tsx</code></td><td>15 nodes</td></tr>
 <tr><td><code>components/ppid/galeri-profil.tsx</code></td><td>15 nodes</td></tr>
 <tr><td><code>components/ppid/profil-terhubung.tsx</code></td><td>12 nodes</td></tr>
 <tr><td><code>lib/a11y.ts</code></td><td>12 nodes</td></tr>
@@ -4996,7 +4890,7 @@ flowchart LR
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x519, imports x261, imports x154, calls x119. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x535, imports x301, imports x158, calls x152. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -5007,17 +4901,17 @@ flowchart LR
   <div class="card">
     <h4>Graph</h4>
     <table style="width:100%;font-size:0.85rem;">
-      <tr><td>Nodes</td><td>2045</td></tr>
-      <tr><td>Edges</td><td>5886</td></tr>
+      <tr><td>Nodes</td><td>2046</td></tr>
+      <tr><td>Edges</td><td>5888</td></tr>
       <tr><td>Hyperedges</td><td>0</td></tr>
-      <tr><td>Communities</td><td>155</td></tr>
+      <tr><td>Communities</td><td>156</td></tr>
       <tr><td>Documented Sections</td><td>15</td></tr>
     </table>
   </div>
   <div class="card">
     <h4>Edge Confidence</h4>
     <table style="width:100%;font-size:0.85rem;">
-      <tr><td>EXTRACTED</td><td>5874</td></tr>
+      <tr><td>EXTRACTED</td><td>5876</td></tr>
       <tr><td>INFERRED</td><td>12</td></tr>
       <tr><td>AMBIGUOUS</td><td>0</td></tr>
     </table>
@@ -5026,7 +4920,7 @@ flowchart LR
 
 <div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
   <p>tidore-platform — Architecture Documentation</p>
-  <p>Generated: 2026-09-07 18:00 UTC · graphify callflow-html</p>
+  <p>Generated: 2026-09-08 02:30 UTC · graphify callflow-html</p>
 </div>
 
 </div><!-- .container -->
