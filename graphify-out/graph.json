@@ -14451,17 +14451,6 @@
       "source_location": "L60"
     },
     {
-      "id": "sharp_sharp",
-      "label": "sharp",
-      "_origin": "ast",
-      "community": 125,
-      "community_name": "sharp",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "sharp",
-      "source_file": "sharp"
-    },
-    {
       "id": "package_dependencies_react_redux",
       "label": "react-redux",
       "_origin": "ast",
@@ -92830,5 +92819,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c2d53321c918a138566835f57f657e4dc478f609"
+  "built_at_commit": "e75cb43bd8166ca435bc6466b69757e31da3a92a"
 }
