@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e75cb43b`
+- Built from commit: `ab862033`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -176,15 +176,15 @@
 10. `notifyError()` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `WarnaPicker()` --calls--> `cn()`  [EXTRACTED]
-  components/landingpage/statistik-kartu-editor.tsx → lib/utils.ts
-- `IconPicker()` --calls--> `cn()`  [EXTRACTED]
-  components/landingpage/statistik-kartu-editor.tsx → lib/utils.ts
+- `TeksTumbuh()` --calls--> `cn()`  [EXTRACTED]
+  components/dashboard/demografi-editor.tsx → lib/utils.ts
 - `AlertTitle()` --calls--> `cn()`  [EXTRACTED]
   components/ui/alert.tsx → lib/utils.ts
 - `ImageColumnInput()` --calls--> `cn()`  [EXTRACTED]
   components/konten/field-editor.tsx → lib/utils.ts
 - `SelectScrollDownButton()` --calls--> `cn()`  [EXTRACTED]
+  components/ui/select.tsx → lib/utils.ts
+- `SelectScrollUpButton()` --calls--> `cn()`  [EXTRACTED]
   components/ui/select.tsx → lib/utils.ts
 
 ## Import Cycles
@@ -569,7 +569,7 @@ Cohesion: 0.67
 Nodes (3): StaffPengajuanForm(), useStatusJamLayanan(), useImageViewer()
 
 ## Knowledge Gaps
-- **641 isolated node(s):** `KategoriData`, `AktaNikahModalProps`, `FormData`, `UploadedFile`, `AktaPerceraianModalProps` (+636 more)
+- **641 isolated node(s):** `EditRow`, `ParsedRow`, `Conflict`, `AktaNikahModalProps`, `FormData` (+636 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 756 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -577,12 +577,12 @@ Nodes (3): StaffPengajuanForm(), useStatusJamLayanan(), useImageViewer()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `cn` to `KKPerubahanBiodataModal.tsx`, `PermohonanDetail.tsx`, `static-content-registry.ts`, `KKTambahAnakModal.tsx`, `informasi-index.tsx`, `statistik-kartu-editor.tsx`, `demografi-view.tsx`, `notification-bell.tsx`, `button.tsx`, `AdminDemografi.tsx`, `PengajuanBaruClient.tsx`, `jam-layanan.ts`, `dashboard-sidebar.tsx`, `useStaticContent`, `app/page.tsx`, `utils.ts`, `accessibility-widget.tsx`, `struktur-editor.tsx`, `PilihLayananClient.tsx`, `time-picker.tsx`, `textarea.tsx`, `LoginContent.tsx`, `navbar.tsx`, `AdminUsers.tsx`, `info-page.tsx`, `AdminKonten.tsx`, `stats.tsx`, `KIAModal.tsx`, `image-upload-field.tsx`, `StaffPengajuanForm`?**
-  _High betweenness centrality (0.136) - this node is a cross-community bridge._
+  _High betweenness centrality (0.133) - this node is a cross-community bridge._
 - **Why does `getSession()` connect `ok` to `[action]/route.ts`, `statistik-export.ts`, `back-button.tsx`, `PermohonanDetail.tsx`, `users/route.ts`, `prisma.ts`, `periode-demografi.ts`, `informasi-index.tsx`, `admin/demografi/kategori/route.ts`, `admin/skm/route.ts`, `ktp/route.ts`, `permohonan/[id]/page.tsx`, `[layanan]/page.tsx`, `AdminPengaduan.tsx`, `permohonan/[id]/route.ts`, `bolehDashboard`, `footer.tsx`, `media/upload/route.ts`, `dashboard/page.tsx`, `skm/page.tsx`, `CekStatusClient.tsx`, `tiket/[id]/route.ts`, `produk/page.tsx`, `isPetugas`, `navigasi/page.tsx`, `AdminKonten.tsx`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
 - **Why does `prisma` connect `prisma.ts` to `[action]/route.ts`, `statistik-export.ts`, `PermohonanDetail.tsx`, `users/route.ts`, `static-content-registry.ts`, `periode-demografi.ts`, `informasi-index.tsx`, `statistik-kartu-editor.tsx`, `admin/demografi/kategori/route.ts`, `kunjungan/route.ts`, `ppid/[...slug]/page.tsx`, `ok`, `admin/skm/route.ts`, `permohonan/[id]/page.tsx`, `halaman/[slug]/page.tsx`, `jam-layanan.ts`, `permohonan/[id]/route.ts`, `footer.tsx`, `media/upload/route.ts`, `dashboard/page.tsx`, `tiket/[id]/route.ts`, `isPetugas`, `info-page.tsx`, `sitemap.xml/route.ts`, `cek-pendaftaran/route.ts`?**
-  _High betweenness centrality (0.062) - this node is a cross-community bridge._
-- **What connects `KategoriData`, `AktaNikahModalProps`, `FormData` to the rest of the system?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **What connects `EditRow`, `ParsedRow`, `Conflict` to the rest of the system?**
   _641 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `KKPerubahanBiodataModal.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.07589984350547731 - nodes in this community are weakly interconnected._

@@ -1225,7 +1225,7 @@ export function DemografiEditor({
                   Import Excel
                 </Button>
                 <Button variant="outline" size="sm" onClick={addKec}>
-                  <Plus className="mr-1.5 h-4 w-4" /> Tambah Kecamatan
+                  <Plus className="mr-1.5 h-4 w-4" /> Tambah Baris
                 </Button>
                 <Button variant="outline" size="sm" onClick={addCol}>
                   <Plus className="mr-1.5 h-4 w-4" /> Kolom
@@ -1274,7 +1274,7 @@ export function DemografiEditor({
               detailCounts={detailCounts}
               onDetail={(r) => setDetail({ kode: digits(r.kode), wilayah: r.wilayah || 'Kecamatan' })}
               kodePlaceholder="6 digit"
-              emptyText="Belum ada kecamatan. Import Excel atau klik “Tambah Kecamatan”."
+              emptyText="Belum ada baris. Import Excel atau klik “Tambah Baris”."
             />
           </>
         )}
