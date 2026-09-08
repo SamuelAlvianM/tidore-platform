@@ -667,6 +667,9 @@ export function DemografiEditor({
     // menyimpan ejaan lain untuk kolom yang sama.
     if (highlightNyata === key) {
       setHighlight(null);
+      // Judul ikut dibuang: kartunya sudah tidak ada, judul lama yang tertinggal
+      // akan terpakai ulang saat kolom lain dibintangi — diam-diam dan salah.
+      setKartuJudul(null);
       return;
     }
 
@@ -685,6 +688,16 @@ export function DemografiEditor({
     }
 
     setHighlight(key);
+    /*
+     * Judul mengikuti kolom baru, KECUALI petugas sudah menuliskannya sendiri.
+     * Membintangi kolom lain tidak boleh menghapus judul ketikan; sebaliknya
+     * judul yang cuma warisan label kolom lama tidak boleh ikut menempel.
+     */
+    setKartuJudul((j) =>
+      !j || (highlightNyata !== null && j === labelKolom(highlightNyata))
+        ? labelKolom(key)
+        : j,
+    );
   };
 
   const addCol = () => {
@@ -852,7 +865,15 @@ export function DemografiEditor({
       const kolomSama = lama?.kolom === highlight;
       const entri: KartuStatistik = {
         ...(kolomSama ? lama : {}),
-        title: kolomSama && lama ? lama.title : (kartuJudul ?? labelKolom(highlight)),
+        /*
+         * 🔴 Judul yang DIKETIK petugas menang.
+         *
+         * Dulu, selama kolomnya tidak berubah, judul lama dari konfigurasi
+         * selalu dipakai — sehingga mengetik judul baru lalu menekan Simpan
+         * tidak mengubah apa pun di beranda, tanpa galat. Dikosongkan berarti
+         * kembali ke label kolom.
+         */
+        title: (kartuJudul ?? '').trim() || labelKolom(highlightNyata ?? highlight),
         icon: kartuIkon,
         kategori,
         // Nama kolom NYATA yang ditulis, bukan ejaan lama dari konfigurasi:
@@ -1187,12 +1208,31 @@ export function DemografiEditor({
                         . Klik bintang kolomnya untuk mengedit kartu tersebut.
                       </p>
                     )}
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="text-xs font-medium text-white/80">Ikon kartu:</span>
-                      {/* text-slate-700: tanpa ini teks tombol mewarisi putih dari
-                          banner dan hilang di atas latar putih tombol. */}
-                      <div className="w-36 text-slate-700">
-                        <IconColumnInput value={kartuIkon} onChange={setKartuIkon} elevated />
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                      {/*
+                        🔴 Judul kartu harus bisa diketik, bukan sekadar ikut
+                        nama kolom. Nama kolom datang dari header berkas DKB
+                        ("JML", "WNI_L", "BUDHA") — bahasa berkas, bukan bahasa
+                        warga yang membaca beranda. Tanpa isian ini satu-satunya
+                        cara memperbaiki judul adalah mengganti nama KOLOM, dan
+                        nama kolom itu ikut terbawa saat data diekspor.
+                      */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-white/80">Judul kartu:</span>
+                        <Input
+                          value={kartuJudul ?? ''}
+                          onChange={(e) => setKartuJudul(e.target.value)}
+                          placeholder={labelKolom(highlightNyata ?? highlight)}
+                          className="h-9 w-56 border-white/30 bg-white text-sm text-slate-900"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-white/80">Ikon kartu:</span>
+                        {/* text-slate-700: tanpa ini teks tombol mewarisi putih dari
+                            banner dan hilang di atas latar putih tombol. */}
+                        <div className="w-36 text-slate-700">
+                          <IconColumnInput value={kartuIkon} onChange={setKartuIkon} elevated />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1254,7 +1294,7 @@ export function DemografiEditor({
                 */}
                 {kecRows.filter((r) => digits(r.kode).length === 6).length} kecamatan
                 {kecRows.some((r) => digits(r.kode).length <= 4) && ' + 1 kabupaten'}
-                {' · '}{pekonRows.length} pekon
+                {' · '}{pekonRows.length} desa
               </span>
             </div>
 
