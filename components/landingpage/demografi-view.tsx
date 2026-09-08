@@ -28,8 +28,8 @@ interface Row {
   kode: string;
   wilayah: string;
   data: Record<string, number>;
-  /** Jumlah pekon/kelurahan di bawah kecamatan ini (dari API ringkasan). */
-  jumlahPekon?: number;
+  /** Jumlah desa/kelurahan di bawah kecamatan ini (dari API ringkasan). */
+  jumlahDesa?: number;
 }
 
 // Label ramah untuk kode kolom singkat (jenis kelamin). Kolom lain sudah bernama lengkap.
@@ -83,7 +83,7 @@ export function DemografiView({
   const [loading, setLoading] = useState(true);
   const [editorOpen, setEditorOpen] = useState(false);
 
-  // Popup detail pekon
+  // Popup detail desa
   const [detail, setDetail] = useState<{ kode: string; wilayah: string } | null>(null);
   const [detailKolom, setDetailKolom] = useState<string[]>([]);
   const [detailRows, setDetailRows] = useState<Row[]>([]);
@@ -297,10 +297,10 @@ export function DemografiView({
                     <td className="px-4 py-2.5 text-center">
                       <button
                         onClick={() => openDetail(r)}
-                        title={`Lihat rincian ${r.jumlahPekon ?? ''} desa/kelurahan`.replace('  ', ' ')}
+                        title={`Lihat rincian ${r.jumlahDesa ?? ''} desa/kelurahan`.replace('  ', ' ')}
                         className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/20"
                       >
-                        Detail{typeof r.jumlahPekon === 'number' && r.jumlahPekon > 0 ? ` (${r.jumlahPekon})` : ''}
+                        Detail{typeof r.jumlahDesa === 'number' && r.jumlahDesa > 0 ? ` (${r.jumlahDesa})` : ''}
                         <ChevronRight className="h-3.5 w-3.5" />
                       </button>
                     </td>
@@ -321,7 +321,7 @@ export function DemografiView({
         )}
       </div>
 
-      {/* Popup detail per pekon */}
+      {/* Popup detail per desa */}
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>

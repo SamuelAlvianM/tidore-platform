@@ -194,7 +194,7 @@ function petaKartuLain(
   return peta;
 }
 
-// ── Grid tabel editable (dipakai untuk kecamatan & pekon) ──────────────────
+// ── Grid tabel editable (dipakai untuk kecamatan & desa) ──────────────────
 function EditGrid({
   rows,
   kolom,
@@ -238,7 +238,7 @@ function EditGrid({
    */
   kartuLain: Map<string, string>;
   onToggleHighlight: (key: string) => void;
-  /** Peta kode kecamatan → jumlah pekon (hanya untuk tabel kecamatan). */
+  /** Peta kode kecamatan → jumlah desa (hanya untuk tabel kecamatan). */
   detailCounts?: Record<string, number>;
   onDetail?: (r: EditRow) => void;
   kodePlaceholder: string;
@@ -476,7 +476,7 @@ export function DemografiEditor({
 }) {
   const [kolom, setKolom] = useState<string[]>([]);
   const [kecRows, setKecRows] = useState<EditRow[]>([]); // level 4 (kecamatan)
-  const [pekonRows, setPekonRows] = useState<EditRow[]>([]); // level 5 (semua pekon)
+  const [desaRows, setDesaRows] = useState<EditRow[]>([]); // level 5 (semua desa)
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -541,7 +541,7 @@ export function DemografiEditor({
         const rows: { kode: string; wilayah: string; level: number; data: Record<string, number> }[] =
           j.data?.rows ?? [];
         setKecRows(rows.filter((r) => r.level !== 5).map(toEdit));
-        setPekonRows(rows.filter((r) => r.level === 5).map(toEdit));
+        setDesaRows(rows.filter((r) => r.level === 5).map(toEdit));
       })
       .catch(() => toast.error('Gagal memuat data'))
       .finally(() => setLoading(false));
@@ -557,24 +557,24 @@ export function DemografiEditor({
     [kolom],
   );
 
-  // Jumlah pekon per kecamatan (untuk badge tombol Detail).
+  // Jumlah desa per kecamatan (untuk badge tombol Detail).
   const detailCounts = useMemo(() => {
     const m: Record<string, number> = {};
-    for (const p of pekonRows) {
+    for (const p of desaRows) {
       const parent = digits(p.kode).slice(0, 6);
       if (parent.length === 6) m[parent] = (m[parent] ?? 0) + 1;
     }
     return m;
-  }, [pekonRows]);
+  }, [desaRows]);
 
-  // Pekon milik kecamatan yang sedang dibuka.
+  // Desa milik kecamatan yang sedang dibuka.
   const detailRows = useMemo(() => {
     if (!detail) return [];
     const parent = digits(detail.kode);
-    return pekonRows.filter((p) => digits(p.kode).slice(0, 6) === parent);
-  }, [detail, pekonRows]);
+    return desaRows.filter((p) => digits(p.kode).slice(0, 6) === parent);
+  }, [detail, desaRows]);
 
-  // ── Editor sel (berlaku untuk kec & pekon via setter) ──
+  // ── Editor sel (berlaku untuk kec & desa via setter) ──
   const cellSetter =
     (setter: React.Dispatch<React.SetStateAction<EditRow[]>>) =>
     (id: string, col: string, v: string) =>
@@ -597,15 +597,15 @@ export function DemografiEditor({
       setter((rs) => rs.filter((r) => r._id !== id));
 
   const setKecCell = cellSetter(setKecRows);
-  const setPekonCell = cellSetter(setPekonRows);
+  const setDesaCell = cellSetter(setDesaRows);
 
   const addKec = () =>
     setKecRows((rs) => [
       ...rs,
       { _id: nid(), kode: '', wilayah: '', data: Object.fromEntries(kolom.map((k) => [k, 0])) },
     ]);
-  const addPekon = () =>
-    setPekonRows((rs) => [
+  const addDesa = () =>
+    setDesaRows((rs) => [
       ...rs,
       {
         _id: nid(),
@@ -634,7 +634,7 @@ export function DemografiEditor({
     }
     setKolom((ks) => ks.map((k) => (k === oldKey ? nextKey : k)));
     setKecRows(renameKeyInRows(oldKey, nextKey));
-    setPekonRows(renameKeyInRows(oldKey, nextKey));
+    setDesaRows(renameKeyInRows(oldKey, nextKey));
     // Highlight ikut nama kolom baru.
     setHighlight((h) => (h === oldKey ? nextKey : h));
     setTargetKolom((t) => (t === oldKey ? nextKey : t));
@@ -707,7 +707,7 @@ export function DemografiEditor({
     setKolom((ks) => [...ks, name]);
     const addKey = (rs: EditRow[]) => rs.map((r) => ({ ...r, data: { ...r.data, [name]: 0 } }));
     setKecRows(addKey);
-    setPekonRows(addKey);
+    setDesaRows(addKey);
     toast.success(`Kolom "${name}" ditambahkan — klik judulnya untuk ganti nama`);
   };
 
@@ -722,7 +722,7 @@ export function DemografiEditor({
         return { ...r, data };
       });
     setKecRows(dropKey);
-    setPekonRows(dropKey);
+    setDesaRows(dropKey);
   };
 
   // ── Import Excel: gabung baris + auto-pilih opsi pertama bila ada konflik ──
@@ -764,7 +764,7 @@ export function DemografiEditor({
       const rows = await parseFiles(fileList);
       if (!rows) return;
       setKecRows(rows.filter((r) => r.level !== 5).map(toEdit));
-      setPekonRows(rows.filter((r) => r.level === 5).map(toEdit));
+      setDesaRows(rows.filter((r) => r.level === 5).map(toEdit));
       const kec = rows.filter((r) => r.level !== 5).length;
       const pek = rows.filter((r) => r.level === 5).length;
       toast.success(`${kec} kecamatan & ${pek} desa dimuat — periksa lalu Simpan`);
@@ -782,19 +782,19 @@ export function DemografiEditor({
       const rows = await parseFiles(fileList);
       if (!rows) return;
       const parent = digits(detail.kode);
-      const pekonForKec = rows.filter(
+      const desaForKec = rows.filter(
         (r) => r.level === 5 && digits(r.kode).slice(0, 6) === parent,
       );
-      if (pekonForKec.length === 0) {
+      if (desaForKec.length === 0) {
         toast.error(`File tidak memuat desa untuk kecamatan ${detail.wilayah} (kode ${parent}).`);
         return;
       }
-      // Ganti pekon kecamatan ini; pertahankan pekon kecamatan lain.
-      setPekonRows((rs) => [
+      // Ganti desa kecamatan ini; pertahankan desa kecamatan lain.
+      setDesaRows((rs) => [
         ...rs.filter((p) => digits(p.kode).slice(0, 6) !== parent),
-        ...pekonForKec.map(toEdit),
+        ...desaForKec.map(toEdit),
       ]);
-      toast.success(`${pekonForKec.length} desa dimuat untuk ${detail.wilayah} — periksa lalu Simpan`);
+      toast.success(`${desaForKec.length} desa dimuat untuk ${detail.wilayah} — periksa lalu Simpan`);
     } catch {
       toast.error('Gagal memproses file');
     } finally {
@@ -828,12 +828,12 @@ export function DemografiEditor({
   );
 
   // Total kolom highlight untuk PREVIEW kartu — sama dengan hitungan beranda:
-  // jumlahkan baris pekon bila ada, kalau belum pakai baris kecamatan.
+  // jumlahkan baris desa bila ada, kalau belum pakai baris kecamatan.
   const previewTotal = useMemo(() => {
     if (!highlightNyata) return 0;
-    const sumber = pekonRows.length ? pekonRows : kecRows;
+    const sumber = desaRows.length ? desaRows : kecRows;
     return sumber.reduce((a, r) => a + (Number(r.data[highlightNyata]) || 0), 0);
-  }, [highlightNyata, pekonRows, kecRows]);
+  }, [highlightNyata, desaRows, kecRows]);
 
   /**
    * Perbarui kartu beranda kategori ini.
@@ -899,7 +899,7 @@ export function DemografiEditor({
   const save = async () => {
     setSaving(true);
     try {
-      const all = [...kecRows, ...pekonRows]
+      const all = [...kecRows, ...desaRows]
         .filter((r) => r.wilayah.trim() && digits(r.kode))
         .map((r) => ({ kode: digits(r.kode), wilayah: r.wilayah.trim(), data: r.data }));
       const res = await fetch('/api/admin/demografi', {
@@ -942,7 +942,7 @@ export function DemografiEditor({
   }, [open]);
 
   // Dirender sebagai HALAMAN penuh via portal ke <body> (bukan modal) supaya
-  // area edit lega; tampilan Detail pekon juga jadi halaman tersendiri.
+  // area edit lega; tampilan Detail desa juga jadi halaman tersendiri.
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
@@ -1073,7 +1073,7 @@ export function DemografiEditor({
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : detail ? (
-          // ── Halaman DETAIL (pekon satu kecamatan) ──
+          // ── Halaman DETAIL (desa satu kecamatan) ──
           <>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -1090,7 +1090,7 @@ export function DemografiEditor({
                   )}
                   Import Excel Detail
                 </Button>
-                <Button variant="outline" size="sm" onClick={addPekon}>
+                <Button variant="outline" size="sm" onClick={addDesa}>
                   <Plus className="mr-1.5 h-4 w-4" /> Tambah Desa
                 </Button>
                 <Button variant="outline" size="sm" onClick={addCol}>
@@ -1115,10 +1115,10 @@ export function DemografiEditor({
               rows={detailRows}
               kolom={kolom}
               isJK={isJK}
-              onKode={kodeSetter(setPekonRows)}
-              onWilayah={wilayahSetter(setPekonRows)}
-              onCell={setPekonCell}
-              onRemove={remover(setPekonRows)}
+              onKode={kodeSetter(setDesaRows)}
+              onWilayah={wilayahSetter(setDesaRows)}
+              onCell={setDesaCell}
+              onRemove={remover(setDesaRows)}
               onRenameCol={renameCol}
               onRemoveCol={removeCol}
               highlight={highlightNyata}
@@ -1294,7 +1294,7 @@ export function DemografiEditor({
                 */}
                 {kecRows.filter((r) => digits(r.kode).length === 6).length} kecamatan
                 {kecRows.some((r) => digits(r.kode).length <= 4) && ' + 1 kabupaten'}
-                {' · '}{pekonRows.length} desa
+                {' · '}{desaRows.length} desa
               </span>
             </div>
 

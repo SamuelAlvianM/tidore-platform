@@ -109,8 +109,8 @@ export async function GET(req: Request) {
       select: { createdAt: true },
     }),
     // Rekap demografi hasil import Excel untuk kategori yang dipakai kartu.
-    // Angka per kategori dihitung dari data pekon (level 5) bila ada — konsisten
-    // dengan tabel publik yang menjumlahkan pekon; fallback ke baris kecamatan.
+    // Angka per kategori dihitung dari data desa (level 5) bila ada — konsisten
+    // dengan tabel publik yang menjumlahkan desa; fallback ke baris kecamatan.
     periode
       ? prisma.demografiWilayah.findMany({
           where: {

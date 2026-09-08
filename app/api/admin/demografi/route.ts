@@ -28,7 +28,7 @@ async function cekPetugas() {
   return { session, error: null };
 }
 
-/** Ambil seluruh baris (kecamatan + pekon) satu kategori untuk editor manual. */
+/** Ambil seluruh baris (kecamatan + desa) satu kategori untuk editor manual. */
 export async function GET(req: NextRequest) {
   const { error } = await cekPetugas();
   if (error) return error;

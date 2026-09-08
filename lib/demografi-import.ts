@@ -7,7 +7,7 @@ import ExcelJS from "exceljs";
  * PENTING: nomor IDEM TIDAK konsisten antar file (mis. kecamatan = IDEM 4 di file
  * jenis kelamin, tapi IDEM 3 di file KK/WKTP), dan format KODE berbeda (bertitik
  * "82.72.01" vs polos "827201"). Karena itu level ditentukan dari STRUKTUR KODE
- * (standar kode wilayah Kemendagri): 6 digit = kecamatan, 10 digit = desa/pekon.
+ * (standar kode wilayah Kemendagri): 6 digit = kecamatan, 10 digit = desa/desa.
  * Baris kab/kota (≤4 digit) & dusun (mengandung huruf, mis. ".DUSUN") diabaikan.
  * Kolom setelah WILAYAH = nilai (mis. L, P, JML untuk jenis kelamin).
  */
@@ -24,7 +24,7 @@ export interface ParseResult {
   rows: DemografiRow[];
   kolom: string[]; // nama kolom nilai (untuk header tabel di UI)
   kecamatan: number;
-  pekon: number;
+  desa: number;
 }
 
 const norm = (s: unknown) => String(s ?? "").trim();
@@ -153,7 +153,7 @@ function bacaLembar(ws: ExcelJS.Worksheet): {
   ws.eachRow((row, rowNumber) => {
     if (rowNumber <= barisHeader) return;
     const cls = classifyKode(norm(row.getCell(cKode).value));
-    if (!cls) return; // bukan kecamatan/pekon (kab/dusun/lainnya)
+    if (!cls) return; // bukan kecamatan/desa (kab/dusun/lainnya)
     const wilayah = norm(row.getCell(cWil).value);
     if (!wilayah) return;
 
@@ -161,7 +161,7 @@ function bacaLembar(ws: ExcelJS.Worksheet): {
     for (const { col, name } of valueCols) {
       data[name] = cellNum(row.getCell(col).value);
     }
-    // Induk pekon = 6 digit pertama (kode kecamatan).
+    // Induk desa = 6 digit pertama (kode kecamatan).
     const parentKode = cls.level === 5 ? cls.kode.slice(0, 6) : null;
     rows.push({ kode: cls.kode, wilayah, level: cls.level, parentKode, data });
   });
@@ -209,6 +209,6 @@ export async function parseDemografiExcel(buffer: Buffer): Promise<ParseResult> 
     rows,
     kolom: utama.kolom,
     kecamatan: rows.filter((r) => r.level === 4).length,
-    pekon: rows.filter((r) => r.level === 5).length,
+    desa: rows.filter((r) => r.level === 5).length,
   };
 }

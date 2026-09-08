@@ -10,16 +10,16 @@ export const dynamic = "force-dynamic";
 /**
  * Data demografi publik.
  * GET /api/demografi?kategori=jenis-kelamin             → daftar kecamatan (level 4)
- * GET /api/demografi?kategori=jenis-kelamin&parent=KODE → daftar pekon di kecamatan
+ * GET /api/demografi?kategori=jenis-kelamin&parent=KODE → daftar desa di kecamatan
  * &tahun=2025&semester=1                                 → periode tertentu
  *
  * 🔴 SELALU satu periode. Tanpa penyaringan, angka dua semester ikut terjumlah
  * dan tabelnya menampilkan penduduk dua kali lipat — kesalahan yang mustahil
  * terjadi sebelum tabel ini punya dimensi waktu, dan kini mungkin.
  *
- * Angka kecamatan = PENJUMLAHAN seluruh pekon (level 5) di bawahnya, sehingga
+ * Angka kecamatan = PENJUMLAHAN seluruh desa (level 5) di bawahnya, sehingga
  * tabel utama selalu berupa ringkasan dari data rinci. Baris kecamatan dari
- * Excel hanya dipakai sebagai sumber nama & cadangan bila belum ada data pekon.
+ * Excel hanya dipakai sebagai sumber nama & cadangan bila belum ada data desa.
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   const saringPeriode = { tahun: periode.tahun, semester: periode.semester };
 
-  // Detail pekon dalam satu kecamatan — apa adanya.
+  // Detail desa dalam satu kecamatan — apa adanya.
   if (parent) {
     const rows = await prisma.demografiWilayah.findMany({
       where: { kategori, ...saringPeriode, level: 5, parentKode: parent },
@@ -53,8 +53,8 @@ export async function GET(req: NextRequest) {
     return ok({ kolom, items: rows, periode, periodeTersedia: tersedia });
   }
 
-  // Ringkasan kecamatan: jumlahkan data pekon per parentKode.
-  const [kecamatan, pekon] = await Promise.all([
+  // Ringkasan kecamatan: jumlahkan data desa per parentKode.
+  const [kecamatan, desa] = await Promise.all([
     prisma.demografiWilayah.findMany({
       where: { kategori, ...saringPeriode, level: 4 },
       orderBy: { kode: "asc" },
@@ -67,14 +67,14 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  const kolom = (kecamatan[0] ?? pekon[0])
-    ? Object.keys(((kecamatan[0] ?? pekon[0]).data ?? {}) as Record<string, number>)
+  const kolom = (kecamatan[0] ?? desa[0])
+    ? Object.keys(((kecamatan[0] ?? desa[0]).data ?? {}) as Record<string, number>)
     : [];
 
-  // Jumlah per kecamatan dari pekon-pekonnya.
+  // Jumlah per kecamatan dari desa-desanya.
   const sumByParent = new Map<string, Record<string, number>>();
   const countByParent = new Map<string, number>();
-  for (const p of pekon) {
+  for (const p of desa) {
     const key = p.parentKode ?? "";
     if (!key) continue;
     const acc = sumByParent.get(key) ?? {};
@@ -88,12 +88,12 @@ export async function GET(req: NextRequest) {
   const items = kecamatan.map((k) => ({
     kode: k.kode,
     wilayah: k.wilayah,
-    // Ada data pekon → pakai jumlahnya; belum ada → angka kecamatan dari Excel.
+    // Ada data desa → pakai jumlahnya; belum ada → angka kecamatan dari Excel.
     data: sumByParent.get(k.kode) ?? (k.data as Record<string, number>),
-    jumlahPekon: countByParent.get(k.kode) ?? 0,
+    jumlahDesa: countByParent.get(k.kode) ?? 0,
   }));
 
-  // Kecamatan yang hanya muncul lewat pekon (tak ada baris level 4 tersimpan).
+  // Kecamatan yang hanya muncul lewat desa (tak ada baris level 4 tersimpan).
   const known = new Set(kecamatan.map((k) => k.kode));
   for (const [kode, data] of sumByParent) {
     if (!known.has(kode)) {
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
         kode,
         wilayah: `Kecamatan ${kode}`,
         data,
-        jumlahPekon: countByParent.get(kode) ?? 0,
+        jumlahDesa: countByParent.get(kode) ?? 0,
       });
     }
   }

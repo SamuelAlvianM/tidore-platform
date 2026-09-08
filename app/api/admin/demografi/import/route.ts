@@ -105,12 +105,12 @@ export async function POST(req: NextRequest) {
     session,
     "IMPOR",
     "Demografi",
-    `Impor Excel demografi kategori ${kategori} ${labelP}: ${parsed.kecamatan} kecamatan, ${parsed.pekon} desa`,
+    `Impor Excel demografi kategori ${kategori} ${labelP}: ${parsed.kecamatan} kecamatan, ${parsed.desa} desa`,
     { entitasId: kategori, req },
   );
 
   return ok(
-    { kecamatan: parsed.kecamatan, pekon: parsed.pekon, kolom: parsed.kolom, periode },
-    [`Import ${labelP} berhasil: ${parsed.kecamatan} kecamatan, ${parsed.pekon} desa`],
+    { kecamatan: parsed.kecamatan, desa: parsed.desa, kolom: parsed.kolom, periode },
+    [`Import ${labelP} berhasil: ${parsed.kecamatan} kecamatan, ${parsed.desa} desa`],
   );
 }
